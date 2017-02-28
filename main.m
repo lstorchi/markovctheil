@@ -14,8 +14,9 @@ for k=1:26
                     Nk(i,j,k)=Nk(i,j,k)+1;
                 end
                 Num(i,j)=sum(Nk(i,j,:));
-                Den(i)=sum(Nk(i,:));
             end
+
+            Den(i)=sum(Num(i,:));
         end
     end
     disp(k), disp(" of 26 "); 
