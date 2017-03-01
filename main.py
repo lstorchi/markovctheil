@@ -110,24 +110,44 @@ cc = cc[numpy.isfinite(cc)]
 
 d = y[7][0]
 
-# 0.5 + ((2.82 - 0.0) /0.25) ==> int
-AAA = numpy.histogram(aaa,11);
+minh = (0.0-(0.25/2.0))
+maxh = (2.82+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+AAA, xh = numpy.histogram(aaa, bins=nbins, range=(minh, maxh))
+Paaa = AAA/float(sum(AAA))
 
-print AAA
+minh = (0.0-(0.25/2.0))
+maxh = (5.69+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+AA, xh = numpy.histogram(aa, bins=nbins, range=(minh, maxh));
+Paa = AA/float(sum(AA))
 
-#Paaa = AAA/sum(AAA);
-#AA = hist(aa,0:0.25:5.69);
-#Paa = AA/sum(AA);
-#A = hist(a,0:0.25:11.57);
-#Pa = A/sum(A);
-#BBB = hist(bbb,0.13:0.25:11.29);
-#Pbbb = BBB/sum(BBB);
-#BB = hist(bb,1.52:0.25:12.15);
-#Pbb = BB/sum(BB);
-#B = hist(b,9.23:0.25:12.93);
-#Pb = B/sum(B);
-#CC = hist(cc,4.67:0.25:27.40);
-#Pcc = CC/sum(CC);
+minh = (0.0-(0.25/2.0))
+maxh = (11.57+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+A, xh = numpy.histogram(a, bins=nbins, range=(minh, maxh));
+Pa = A/float(sum(A))
 
-#
+minh = (0.13-(0.25/2.0))
+maxh = (11.29+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+BBB, xh = numpy.histogram(bbb, bins=nbins, range=(minh, maxh));
+Pbbb = BBB/float(sum(BBB))
 
+minh = (1.52-(0.25/2.0))
+maxh = (12.15+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+BB, xh = numpy.histogram(bb, bins=nbins, range=(minh, maxh));
+Pbb = BB/float(sum(BB))
+
+minh = (9.23-(0.25/2.0))
+maxh = (12.93+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+B, xh = numpy.histogram(b, bins=nbins, range=(minh, maxh));
+Pb = B/float(sum(B))
+
+minh = (4.67-(0.25/2.0))
+maxh = (27.40+(0.25/2.0))
+nbins = int ((maxh - minh) / 0.25)
+CC, xh = numpy.histogram(cc, bins=nbins, range=(minh, maxh));
+Pcc = CC/float(sum(CC))
