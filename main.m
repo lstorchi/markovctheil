@@ -83,23 +83,22 @@ cc=y(7,1:66);
 cc=cc(isfinite(cc));
 d=y(8,1:1);
 
+AAA = hist(aaa,0:0.25:2.82);
+Paaa = AAA/sum(AAA);
+AA = hist(aa,0:0.25:5.69);
+Paa = AA/sum(AA);
+A = hist(a,0:0.25:11.57);
+Pa = A/sum(A);
+BBB = hist(bbb,0.13:0.25:11.29);
+Pbbb = BBB/sum(BBB);
+BB = hist(bb,1.52:0.25:12.15);
+Pbb = BB/sum(BB);
+B = hist(b,9.23:0.25:12.93);
+Pb = B/sum(B);
+CC = hist(cc,4.67:0.25:27.40);
+Pcc = CC/sum(CC);
 
 # here
-
-AAA=hist(aaa,0:0.25:2.82);
-Paaa=AAA/sum(AAA);
-AA=hist(aa,0:0.25:5.69);
-Paa=AA/sum(AA);
-A=hist(a,0:0.25:11.57);
-Pa=A/sum(A);
-BBB=hist(bbb,0.13:0.25:11.29);
-Pbbb=BBB/sum(BBB);
-BB=hist(bb,1.52:0.25:12.15);
-Pbb=BB/sum(BB);
-B=hist(b,9.23:0.25:12.93);
-Pb=B/sum(B);
-CC=hist(cc,4.67:0.25:27.40);
-Pcc=CC/sum(CC);
 
 Taaa=sum(Paaa.*(log(length(Paaa))*Paaa));
 Taa=sum(Paa.*(log(length(Paa))*Paa));

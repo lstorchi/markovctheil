@@ -88,20 +88,46 @@ for i in range(len(ist)):
     y[i] = ist[i][0:2135]
 
 aaa = y[0]
+aaa = aaa[numpy.isfinite(aaa)]
 
-#aaa = aaa(isfinite(aaa));
-#aa = y(2,1:879);
-#aa = aa(isfinite(aa));
-#a = y(3,1:1248);
-#a = a(isfinite(a));
-#bbb = y(4,1:1033);
-#bbb = bbb(isfinite(bbb));
-#bb = y(5,1:410);
-#bb = bb(isfinite(bb));
-#b = y(6,1:131);
-#b = b(isfinite(b));
-#cc = y(7,1:66);
-#cc = cc(isfinite(cc));
-#d = y(8,1:1);
+aa = y[1][:879]
+aa = aa[numpy.isfinite(aa)]
 
+a = y[2][:1248]
+a = a[numpy.isfinite(a)]
+
+bbb = y[3][:1033]
+bbb = bbb[numpy.isfinite(bbb)]
+
+bb = y[4][:410]
+bb = bb[numpy.isfinite(bb)]
+
+b = y[5][:131]
+b = b[numpy.isfinite(b)]
+
+cc = y[6][:66]
+cc = cc[numpy.isfinite(cc)]
+
+d = y[7][0]
+
+# 0.5 + ((2.82 - 0.0) /0.25) ==> int
+AAA = numpy.histogram(aaa,11);
+
+print AAA
+
+#Paaa = AAA/sum(AAA);
+#AA = hist(aa,0:0.25:5.69);
+#Paa = AA/sum(AA);
+#A = hist(a,0:0.25:11.57);
+#Pa = A/sum(A);
+#BBB = hist(bbb,0.13:0.25:11.29);
+#Pbbb = BBB/sum(BBB);
+#BB = hist(bb,1.52:0.25:12.15);
+#Pbb = BB/sum(BB);
+#B = hist(b,9.23:0.25:12.93);
+#Pb = B/sum(B);
+#CC = hist(cc,4.67:0.25:27.40);
+#Pcc = CC/sum(CC);
+
+#
 
