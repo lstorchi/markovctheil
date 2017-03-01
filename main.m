@@ -83,6 +83,9 @@ cc=y(7,1:66);
 cc=cc(isfinite(cc));
 d=y(8,1:1);
 
+
+# here
+
 AAA=hist(aaa,0:0.25:2.82);
 Paaa=AAA/sum(AAA);
 AA=hist(aa,0:0.25:5.69);
