@@ -151,3 +151,17 @@ maxh = (27.40+(0.25/2.0))
 nbins = int ((maxh - minh) / 0.25)
 CC, xh = numpy.histogram(cc, bins=nbins, range=(minh, maxh));
 Pcc = CC/float(sum(CC))
+
+Taaa = sum((Paaa*(math.log(len(Paaa)))*Paaa))
+Taa = sum((Paa*(math.log(len(Paa)))*Paa))
+Ta = sum((Pa*(math.log(len(Pa)))*Pa))
+Tbbb = sum((Pbbb*(math.log(len(Pbbb)))*Pbbb))
+Tbb = sum((Pbb*(math.log(len(Pbb)))*Pbb))
+Tb = sum((Pb*(math.log(len(Pb)))*Pb))
+Tcc = sum((Pcc*(math.log(len(Pcc)))*Pcc))
+
+Mean = [numpy.mean(aaa),numpy.mean(aa), \
+        numpy.mean(a),numpy.mean(bbb),numpy.mean(bb), \
+        numpy.mean(b),numpy.mean(cc)]
+
+Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]

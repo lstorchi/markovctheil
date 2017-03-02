@@ -98,8 +98,6 @@ Pb = B/sum(B);
 CC = hist(cc,4.67:0.25:27.40);
 Pcc = CC/sum(CC);
 
-# here
-
 Taaa=sum(Paaa.*(log(length(Paaa))*Paaa));
 Taa=sum(Paa.*(log(length(Paa))*Paa));
 Ta=sum(Pa.*(log(length(Pa))*Pa));
@@ -110,8 +108,10 @@ Tcc=sum(Pcc.*(log(length(Pcc))*Pcc));
 
 Mean=[mean(aaa), mean(aa),mean(a),mean(bbb), mean(bb),mean(b),mean(cc)];
 Ti=[Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc];
-MEANST=[mean(aaa), mean(aa),mean(a),mean(bbb), mean(bb),mean(b),mean(cc); std(aaa),std(aa), std(a), std(bbb), std(bb), std(b), std(cc)];
-minmax=[min(aaa) max(aaa); min(aa) max(aa); min(a) max(a); min(bbb) max(bbb); min(bb) max(bb); min(b) max(b); min(cc) max(cc); min(d) max(d)];
+#MEANST=[mean(aaa), mean(aa),mean(a),mean(bbb), mean(bb),mean(b),mean(cc); std(aaa),std(aa), std(a), std(bbb), std(bb), std(b), std(cc)];
+#minmax=[min(aaa) max(aaa); min(aa) max(aa); min(a) max(a); min(bbb) max(bbb); min(bb) max(bb); min(b) max(b); min(cc) max(cc); min(d) max(d)];
+
+# here
 
 s_t=zeros(26,227);
 r(isnan(r))=0;
