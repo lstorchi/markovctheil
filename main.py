@@ -188,7 +188,7 @@ for t in range(227):
 
             T_t[t] += s_t[k][t]*math.log(countries * s_t[k][t])
 
-run = 100
+run = 100000
 X = numpy.random.rand(26,37,run)
 x = numpy.zeros((26,37,run), dtype='int')
 cdf = numpy.zeros((8,8), dtype='float64')
@@ -210,7 +210,6 @@ R_prev = numpy.zeros(37, dtype='float64')
 for j in range(run):
 
     # da controllare
-    print ms.shape
     for i in range(26):
         x[i][0][j] = ms[i][226]
 
