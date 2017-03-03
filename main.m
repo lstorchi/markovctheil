@@ -34,9 +34,6 @@ end
 
 mPr=mean(svd(Pr-eye(size(Pr))));
 
-disp(mPr);
-disp(Pr);
-
 %------Spreads----------------
 %per calcolare i bp abbiamo scaricato i tassi di interesse pagati sui
 %titoli sovrani a 10 anni. i dati sono raccolto con frequenza mensile 
@@ -138,7 +135,6 @@ bp=zeros(26,37,run);% basis point assegnati secondo il rating
 xm=zeros(26,37);
 r_prev=zeros(1,37,run);% tot punti base pagati da tutti i paesi
 Var=zeros(1,37); % II momento dell'entropia
-bpm=zeros(26,37);
 tot=zeros(7,37);  %basis point pagati dalla classe di rating i
 cont=zeros(7,37,run); %numero di paesi 
 ac=zeros(7,37,run);%quota di bp pagata dalla classe di rating i
@@ -160,6 +156,7 @@ for j=1:run
             cdf(i,k)=Pr(i,k)+cdf(i,k-1);
         end
     end
+
     for c=1:26
         if X(c,1,j)<=cdf(x(c,1,j),1)
             x(c,2,j)=1;
@@ -179,7 +176,9 @@ for j=1:run
                 end
             end
         end
-     end  
+    end  
+
+
     for t=1:37
         for c=1:26
             for i=1:7
@@ -189,10 +188,10 @@ for j=1:run
                     tot(i,t,j)=cont(i,t,j).*Mean(1,i);
                 end
             end
-            bpm(c,t)=mean(bp(c,t,:));
             r_prev(1,t,j)=sum(bp(:,t,j));
         end
     end
+
     for t=1:37
         for i=1:7
              ac(i,t,j)=tot(i,t,j)/r_prev(1,t,j);
@@ -215,8 +214,8 @@ end
 
 for t=1:37
     entropia(1,t)=mean(entr(1,t,:));
+    disp(entropia(1,t));
     Var(1,t)=std(entr(1,t,:));
+    disp(Var(1,t));
 end
 
-disp(entropia);
-disp(Var);

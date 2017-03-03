@@ -3,6 +3,7 @@ import numpy.random
 import scipy.io
 import numpy
 import math
+import sys
 
 msd = scipy.io.loadmat("ms.mat")
 bpd = scipy.io.loadmat("bp.mat")
@@ -186,16 +187,14 @@ for t in range(227):
 
             T_t[t] += s_t[k][t]*math.log(countries * s_t[k][t])
 
-run = 10
+run = 100
 X = numpy.random.rand(26,37,run)
-
 x = numpy.zeros((26,37,run), dtype='int')
-cdf = numpy.zeros((8,8), dtype='int')
+cdf = numpy.zeros((8,8), dtype='float64')
 bp = numpy.zeros((26,37,run), dtype='float64')
 xm = numpy.zeros((26,37), dtype='float64')
 r_prev = numpy.zeros((37,run), dtype='float64')
 Var = numpy.zeros((37), dtype='float64')
-bpm = numpy.zeros((26,37), dtype='float64')
 tot = numpy.zeros((7,37,run), dtype='float64')
 cont = numpy.zeros((7,37,run), dtype='float64')
 ac = numpy.zeros((7,37,run), dtype='float64')
@@ -207,47 +206,47 @@ entr = numpy.zeros((37,run), dtype='float64')
 entropia = numpy.zeros(37, dtype='float64')
 R_prev = numpy.zeros(37, dtype='float64')
 
-
 for j in range(run):
 
     # da controllare
+    print ms.shape
     for i in range(26):
         x[i][0][j] = ms[i][226]
 
     for i in range (8):
-        cdf[i][0] = int(Pr[i][0])
+        cdf[i][0] = Pr[i][0]
 
     for i in range(8):
         for k in range(1,8):
-            cdf[i][k] = int(Pr[i][k] + cdf[i][k-1])
+            cdf[i][k] = Pr[i][k] + cdf[i][k-1]
 
     for c in range(26):
-        if X[c][0][j] <= cdf[x[c][1][j]][0]:
+        if X[c][0][j] <= cdf[x[c][1][j]-1][0]:
             x[c][1][j] = 1
         for k in range(1,8):
-            if (cdf[x[c][1][j]][k-1] < X[c][0][j]) and \
-                    (X[c][0][j] <= cdf[x[c][0][j]][k] ):
-               x[c][1][j] = k
+            if (cdf[x[c][1][j]-1][k-1] < X[c][0][j]) and \
+                    (X[c][0][j] <= cdf[x[c][0][j]-1][k] ):
+               x[c][1][j] = k+1
         for t in range(2,37):
-            if X[c][t-1][j] <= cdf[x[c][t-1][j]][0]:
+            if X[c][t-1][j] <= cdf[x[c][t-1][j]-1][0]:
                 x[c][t][j] = 1
             for k in range(1,8):
-                if (cdf[x[c][t-1][j]][k-1] < X[c][t-1][j]) \
-                        and (X[c][t-1][j]<=cdf[x[c][t-1][j]][k]):
-                  x[c][t][j] = k
+                if (cdf[x[c][t-1][j]-1][k-1] < X[c][t-1][j]) \
+                        and (X[c][t-1][j]<=cdf[x[c][t-1][j]-1][k]):
+                  x[c][t][j] = k+1
+    
     for t in range(37):
         for c in range(26):
             for i in range(7):
-                if x[c][t][j] == i:
+                if x[c][t][j] == i+1:
                     bp[c][t][j] = Mean[i]
                     cont[i][t][j] = cont[i][t][j] + 1
                     tot[i][t][j] = cont[i][t][j] * Mean[i]
             
-            bpm[c][t] = numpy.mean(bp[c][t])
             summa = 0.0
             for a in range(bp.shape[0]):
                 summa += bp[a][t][j]
-            r_prev[t][j] = summa/float(bp.shape[0])
+            r_prev[t][j] = summa
 
     for t in range(37):
         for i in range(7):
@@ -270,5 +269,4 @@ for t in range(37):
 
 for t in range(37):
     print entropia[t], " ", Var[t]
-
 
