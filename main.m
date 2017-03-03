@@ -126,9 +126,11 @@ countries=26;
         end
     end
  end
+
 %----previsione per 36 mesi fino a 11/2019 con simulazione montecarlo e
 %formula PDTE del paper D'Amico et al.
-run=100;
+
+run=10;
 X=rand(26,37,run);% per simulare le traiettorie
 x=zeros(26,37,run);%possibile assegnazione rating in base  Pr
 cdf=zeros(8,8);%pdf 
@@ -147,6 +149,7 @@ term=zeros(1,37,run);%III membro equazione PDTE
 entr=zeros(1,37,run);%PDTE
 entropia=zeros(1,37);
 R_prev=zeros(1,37);
+
 for j=1:run
     x(:,1,j)=ms(:,227,:);
     for i=1:8

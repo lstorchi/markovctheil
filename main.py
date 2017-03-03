@@ -1,4 +1,5 @@
 import numpy.linalg
+import numpy.random
 import scipy.io
 import numpy
 import math
@@ -165,3 +166,109 @@ Mean = [numpy.mean(aaa),numpy.mean(aa), \
         numpy.mean(b),numpy.mean(cc)]
 
 Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
+
+s_t = numpy.zeros((26,227), dtype='float64')
+
+for i in range(r.shape[0]):
+    for j in range(r.shape[1]):
+        if math.isnan(r[i][j]):
+            r[i][j] = 0.0
+
+R_t = numpy.sum(r, axis=0)
+T_t = numpy.zeros(227, dtype='float64')
+
+countries = 26
+
+for t in range(227):
+    for k in range(26):
+        s_t[k][t] = r[k][t] / R_t[t]
+        if s_t[k][t] != 0:
+
+            T_t[t] += s_t[k][t]*math.log(countries * s_t[k][t])
+
+run = 10
+X = numpy.random.rand(26,37,run)
+
+x = numpy.zeros((26,37,run), dtype='int')
+cdf = numpy.zeros((8,8), dtype='int')
+bp = numpy.zeros((26,37,run), dtype='float64')
+xm = numpy.zeros((26,37), dtype='float64')
+r_prev = numpy.zeros((37,run), dtype='float64')
+Var = numpy.zeros((37), dtype='float64')
+bpm = numpy.zeros((26,37), dtype='float64')
+tot = numpy.zeros((7,37,run), dtype='float64')
+cont = numpy.zeros((7,37,run), dtype='float64')
+ac = numpy.zeros((7,37,run), dtype='float64')
+AC = numpy.zeros((7,37), dtype='float64')
+t1 = numpy.zeros((37,run), dtype='float64')
+t2 = numpy.zeros((37,run), dtype='float64')
+term = numpy.zeros((37,run), dtype='float64')
+entr = numpy.zeros((37,run), dtype='float64')
+entropia = numpy.zeros(37, dtype='float64')
+R_prev = numpy.zeros(37, dtype='float64')
+
+
+for j in range(run):
+
+    # da controllare
+    for i in range(26):
+        x[i][0][j] = ms[i][226]
+
+    for i in range (8):
+        cdf[i][0] = int(Pr[i][0])
+
+    for i in range(8):
+        for k in range(1,8):
+            cdf[i][k] = int(Pr[i][k] + cdf[i][k-1])
+
+    for c in range(26):
+        if X[c][0][j] <= cdf[x[c][1][j]][0]:
+            x[c][1][j] = 1
+        for k in range(1,8):
+            if (cdf[x[c][1][j]][k-1] < X[c][0][j]) and \
+                    (X[c][0][j] <= cdf[x[c][0][j]][k] ):
+               x[c][1][j] = k
+        for t in range(2,37):
+            if X[c][t-1][j] <= cdf[x[c][t-1][j]][0]:
+                x[c][t][j] = 1
+            for k in range(1,8):
+                if (cdf[x[c][t-1][j]][k-1] < X[c][t-1][j]) \
+                        and (X[c][t-1][j]<=cdf[x[c][t-1][j]][k]):
+                  x[c][t][j] = k
+    for t in range(37):
+        for c in range(26):
+            for i in range(7):
+                if x[c][t][j] == i:
+                    bp[c][t][j] = Mean[i]
+                    cont[i][t][j] = cont[i][t][j] + 1
+                    tot[i][t][j] = cont[i][t][j] * Mean[i]
+            
+            bpm[c][t] = numpy.mean(bp[c][t])
+            summa = 0.0
+            for a in range(bp.shape[0]):
+                summa += bp[a][t][j]
+            r_prev[t][j] = summa/float(bp.shape[0])
+
+    for t in range(37):
+        for i in range(7):
+             ac[i][t][j] = tot[i][t][j]/r_prev[t][j]
+             if ac[i][t][j] != 0:
+                 t1[t][j] += (ac[i][t][j]*Ti[i])
+                 t2[t][j] += ac[i][t][j]*math.log(7*ac[i][t][j])
+                 if cont[i][t][j] != 0:
+                    term[t][j] += ac[i][t][j]*math.log(countries/(7*cont[i][t][j]))
+ 
+             AC[i][t] = numpy.mean(ac[i][t])
+        entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
+        R_prev[t] = numpy.mean(r_prev[t][j])
+
+    print j, " of ", run
+
+for t in range(37):
+    entropia[t] =numpy.mean(entr[t])
+    Var[t] = numpy.std(entr[t])
+
+for t in range(37):
+    print entropia[t], " ", Var[t]
+
+
