@@ -33,6 +33,7 @@ for k in range(26):
             Den[i] = sum(Num[i])
 
     print k , " of 26"
+    sys.stdout.flush()
 
 #print Num 
 #print Den
@@ -262,6 +263,7 @@ for j in range(run):
         R_prev[t] = numpy.mean(r_prev[t][j])
 
     print j, " of ", run
+    sys.stdout.flush()
 
 for t in range(37):
     entropia[t] =numpy.mean(entr[t])
