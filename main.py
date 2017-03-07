@@ -210,7 +210,6 @@ R_prev = numpy.zeros(37, dtype='float64')
 for j in range(run):
 
     # da controllare
-    print ms.shape
     for i in range(26):
         x[i][0][j] = ms[i][226]
 
@@ -221,11 +220,23 @@ for j in range(run):
         for k in range(1,8):
             cdf[i][k] = Pr[i][k] + cdf[i][k-1]
 
+
+   #for i in range(8):
+   #    for k in range(8):
+   #        sys.stdout.write ("%f "%cdf[i][k])
+   #    sys.stdout.write ("\n")
+
+   #for i in range(8):
+   #    for k in range(8):
+   #        sys.stdout.write ("%f "%Pr[i][k])
+   #    sys.stdout.write ("\n")
+
+
     for c in range(26):
         if X[c][0][j] <= cdf[x[c][1][j]-1][0]:
             x[c][1][j] = 1
         for k in range(1,8):
-            if (cdf[x[c][1][j]-1][k-1] < X[c][0][j]) and \
+            if (cdf[x[c][0][j]-1][k-1] < X[c][0][j]) and \
                     (X[c][0][j] <= cdf[x[c][0][j]-1][k] ):
                x[c][1][j] = k+1
         for t in range(2,37):
@@ -244,10 +255,16 @@ for j in range(run):
                     cont[i][t][j] = cont[i][t][j] + 1
                     tot[i][t][j] = cont[i][t][j] * Mean[i]
             
-            summa = 0.0
-            for a in range(bp.shape[0]):
-                summa += bp[a][t][j]
-            r_prev[t][j] = summa
+        summa = 0.0
+        for a in range(bp.shape[0]):
+            summa += bp[a][t][j]
+        r_prev[t][j] = summa
+
+    for t in range(37):
+        sys.stdout.write ("%f "%r_prev[t][j])
+        sys.stdout.write ("\n")
+
+    exit(1)
 
     for t in range(37):
         for i in range(7):
@@ -256,7 +273,7 @@ for j in range(run):
                  t1[t][j] += (ac[i][t][j]*Ti[i])
                  t2[t][j] += ac[i][t][j]*math.log(7*ac[i][t][j])
                  if cont[i][t][j] != 0:
-                    term[t][j] += ac[i][t][j]*math.log(countries/(7*cont[i][t][j]))
+                    term[t][j] += ac[i][t][j]*math.log(countries/(7.0*cont[i][t][j]))
  
              AC[i][t] = numpy.mean(ac[i][t])
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
