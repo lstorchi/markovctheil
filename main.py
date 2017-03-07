@@ -188,7 +188,7 @@ for t in range(227):
 
             T_t[t] += s_t[k][t]*math.log(countries * s_t[k][t])
 
-run = 100
+run = 100000
 X = numpy.random.rand(26,37,run)
 x = numpy.zeros((26,37,run), dtype='int')
 cdf = numpy.zeros((8,8), dtype='float64')
