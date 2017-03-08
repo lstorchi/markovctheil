@@ -5,49 +5,69 @@ import numpy
 import math
 import sys
 
+import sys
+
+filename1 = ""
+filename2 = ""
+step = 0.25 
+
+'''
+if len(sys.argv) != 2:
+    print "usage: ", sys.argv[0], " filein" 
+    exit(1)
+else:
+    filename1 = sys.argv[1] 
+    filename2 = sys.argv[2]
+'''
+
+numpy.random.seed(9001)
+
 msd = scipy.io.loadmat("ms.mat")
 bpd = scipy.io.loadmat("bp.mat")
 
-#print msd['ms']
-#print bpd['i_r']
+if msd['ms'].shape[0] != bpd['i_r'].shape[0]:
+    print "wrong dim of the input matrix"
+    exit(1)
+
+countries = msd['ms'].shape[0]
+rating = numpy.max(msd['ms'])
 
 ms = msd['ms']
 i_r = bpd['i_r']
-
 time = len(ms[1,:])
 
-Nk = numpy.zeros((8,8,26), dtype='int64')
-Num = numpy.zeros((8,8), dtype='int64')
-Den = numpy.zeros(8, dtype='int64')
-Pr = numpy.zeros((8,8), dtype='float64')
+Nk = numpy.zeros((rating,rating,countries), dtype='int64')
+Num = numpy.zeros((rating,rating), dtype='int64')
+Den = numpy.zeros(rating, dtype='int64')
+Pr = numpy.zeros((rating,rating), dtype='float64')
 
 verbose = False
 
-for k in range(26):
-    for time in range(226):
-        for i in range(8):
-            for j in range(8):
-                if (ms[k][time] == (i+1)) and (ms[k][time+1] == (j+1)):
+for k in range(countries):
+    for t in range(time-1):
+        for i in range(rating):
+            for j in range(rating):
+                if (ms[k][t] == (i+1)) and (ms[k][t+1] == (j+1)):
                     Nk[i][j][k] = Nk[i][j][k] + 1
 
                 Num[i][j] = sum(Nk[i][j])
 
             Den[i] = sum(Num[i])
 
-    print k , " of 26"
+    #print k , " of ", countries
     sys.stdout.flush()
 
 #print Num 
 #print Den
 
-for i in range(8):
-    for j in range(8):
+for i in range(rating):
+    for j in range(rating):
         if Den[i] != 0:
             Pr[i][j] = float(Num[i][j])/float(Den[i])
         else: 
             Pr[i][j] = 0.0
 
-newPr = Pr - numpy.identity(8, dtype='float64')
+newPr = Pr - numpy.identity(rating, dtype='float64')
 
 #print newPr
 
@@ -61,9 +81,9 @@ for i in range(len(i_r)):
 
 benchmark = numpy.amin(i_r, 0)
 
-r = numpy.zeros((26,227), dtype='float64') 
+r = numpy.zeros((countries,227), dtype='float64') 
 
-for k in range(26):
+for k in range(countries):
     for Time in range(227):
         r[k][Time] = i_r[k][Time] - benchmark[Time]
 
@@ -74,11 +94,11 @@ for i in range(len(r)):
 
 #print r
 
-ist = numpy.zeros((8,227*26), dtype='float64')
-Nn = numpy.zeros((8,1), dtype='int')
+ist = numpy.zeros((rating,227*countries), dtype='float64')
+Nn = numpy.zeros((rating), dtype='int')
 
-for i in range(8):
-    for k in range(26):
+for i in range(rating):
+    for k in range(countries):
         for Time in range(227):
             if ms[k][Time] == i+1: 
                 Nn[i] = Nn[i] + 1 
@@ -87,127 +107,140 @@ for i in range(8):
 #print Nn
 #print ist.shape
 
-Hfile = scipy.io.loadmat("ist.mat")
-ist1 = Hfile['ist']
+#Hfile = scipy.io.loadmat("ist.mat")
+#ist1 = Hfile['ist']
 
-#for i in range(8):
-#    for k in range(26*227):
+#for i in range(rating):
+#    for k in range(countries*227):
 #        if (ist[i][k] != ist1[i][k]):
 #            sys.stdout.write("ist: %f ist1: %f \n"%(ist[i][k], ist1[i][k]))
 
-Mean = numpy.zeros((7), dtype='float64')
-y = numpy.zeros((ist.shape[0], 2135), dtype='float64')
+Mean = numpy.zeros((rating), dtype='float64')
+y = numpy.zeros((ist.shape[0], Nn[0]), dtype='float64')
 for i in range(len(ist)):
-    y[i] = ist[i][0:2135]
+    y[i] = ist[i][0:Nn[0]]
 
 #Yfile = scipy.io.loadmat("y.mat")
 #y = Yfile['y']
 
-aaa = y[0]
+aaa = y[0][:Nn[0]]
 aaa = aaa[numpy.isfinite(aaa)]
 
-aa = y[1][:879]
-aa = aa[numpy.isfinite(aa)]
+aa = []
+a = []
+bbb = []
+bb = []
+b = []
+cc = [] 
+d = []
 
-a = y[2][:1248]
-a = a[numpy.isfinite(a)]
+if rating > 1:
+  aa = y[1][:Nn[1]]
+  aa = aa[numpy.isfinite(aa)]
 
-bbb = y[3][:1033]
-bbb = bbb[numpy.isfinite(bbb)]
+if rating > 2:
+ a = y[2][:Nn[2]]
+ a = a[numpy.isfinite(a)]
 
-bb = y[4][:410]
-bb = bb[numpy.isfinite(bb)]
+if rating > 3: 
+  bbb = y[3][:Nn[3]]
+  bbb = bbb[numpy.isfinite(bbb)]
 
-b = y[5][:131]
-b = b[numpy.isfinite(b)]
+if rating > 4:
+  bb = y[4][:Nn[4]]
+  bb = bb[numpy.isfinite(bb)]
 
-cc = y[6][:66]
-cc = cc[numpy.isfinite(cc)]
+if rating > 5:
+  b = y[5][:Nn[5]]
+  b = b[numpy.isfinite(b)]
 
-d = y[7][0]
+if rating > 6:
+  cc = y[6][:Nn[6]]
+  cc = cc[numpy.isfinite(cc)]
 
-ABCDfile = scipy.io.loadmat("yabcd.mat")
-aaa1 = ABCDfile['aaa'][0]  
-aa1 = ABCDfile['aa'][0]
-bbb1 = ABCDfile['bbb'][0]
-bb1 = ABCDfile['bb'][0]
-b1 = ABCDfile['b'][0]
-cc1 = ABCDfile['cc'][0]
-a1 = ABCDfile['a'][0]
-d1 = ABCDfile['d'][0]
+if rating > 7:
+    d = y[rating-1][:Nn[7]]
 
-for i in range(len(aaa)):
-    if (aaa[i] != aaa1[i]):
-        sys.stdout.write("aaa: %f aaa1: %f \n"%(aaa[i], aaa1[i]))
+#ABCDfile = scipy.io.loadmat("yabcd.mat")
+#aaa1 = ABCDfile['aaa'][0]  
+#aa1 = ABCDfile['aa'][0]
+#bbb1 = ABCDfile['bbb'][0]
+#bb1 = ABCDfile['bb'][0]
+#b1 = ABCDfile['b'][0]
+#cc1 = ABCDfile['cc'][0]
+#a1 = ABCDfile['a'][0]
+#d1 = ABCDfile['d'][0]
 
-for i in range(len(aa)):
-    if (aa[i] != aa1[i]):
-        sys.stdout.write("aa: %f aa1: %f \n"%(aa[i], aa1[i]))
+#for i in range(len(aaa)):
+#    if (aaa[i] != aaa1[i]):
+#        sys.stdout.write("aaa: %f aaa1: %f \n"%(aaa[i], aaa1[i]))
+#
+#for i in range(len(aa)):
+#    if (aa[i] != aa1[i]):
+#        sys.stdout.write("aa: %f aa1: %f \n"%(aa[i], aa1[i]))
+#
+#for i in range(len(bbb)):
+#    if (bbb[i] != bbb1[i]):
+#        sys.stdout.write("bbb: %f bbb1: %f \n"%(bbb[i], bbb1[i]))
+#
+#for i in range(len(bb)):
+#    if (bb[i] != bb1[i]):
+#        sys.stdout.write("bb: %f bb1: %f \n"%(bb[i], bb1[i]))
+#
+#for i in range(len(b)):
+#    if (b[i] != b1[i]):
+#        sys.stdout.write("b: %f b1: %f \n"%(b[i], b1[i]))
+#
+#for i in range(len(a)):
+#    if (a[i] != a1[i]):
+#        sys.stdout.write("a: %f a1: %f \n"%(a[i], a1[i]))
+#
+#if (d != d1):
+#    sys.stdout.write("d: %f d1: %f \n"%(d, d1))
+#
+#for i in range(len(cc)):
+#    if (cc[i] != cc1[i]):
+#        sys.stdout.write("cc: %f cc1: %f \n"%(cc[i], cc1[i]))
 
-for i in range(len(bbb)):
-    if (bbb[i] != bbb1[i]):
-        sys.stdout.write("bbb: %f bbb1: %f \n"%(bbb[i], bbb1[i]))
-
-for i in range(len(bb)):
-    if (bb[i] != bb1[i]):
-        sys.stdout.write("bb: %f bb1: %f \n"%(bb[i], bb1[i]))
-
-for i in range(len(b)):
-    if (b[i] != b1[i]):
-        sys.stdout.write("b: %f b1: %f \n"%(b[i], b1[i]))
-
-for i in range(len(a)):
-    if (a[i] != a1[i]):
-        sys.stdout.write("a: %f a1: %f \n"%(a[i], a1[i]))
-
-if (d != d1):
-    sys.stdout.write("d: %f d1: %f \n"%(d, d1))
-
-for i in range(len(cc)):
-    if (cc[i] != cc1[i]):
-        sys.stdout.write("cc: %f cc1: %f \n"%(cc[i], cc1[i]))
-
-#exit(1)
-
-minh = (0.0-(0.25/2.0))
-maxh = (2.82+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(aaa)
+maxh = max(aaa)
+nbins = int ((maxh - minh) / step)
 AAA, xh = numpy.histogram(aaa, bins=nbins, range=(minh, maxh))
 Paaa = AAA/float(sum(AAA))
 
-minh = (0.0-(0.25/2.0))
-maxh = (5.69+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(aa)
+maxh = max(aa)
+nbins = int ((maxh - minh) / step)
 AA, xh = numpy.histogram(aa, bins=nbins, range=(minh, maxh));
 Paa = AA/float(sum(AA))
 
-minh = (0.0-(0.25/2.0))
-maxh = (11.57+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(a)
+maxh = max(a)
+nbins = int ((maxh - minh) / step)
 A, xh = numpy.histogram(a, bins=nbins, range=(minh, maxh));
 Pa = A/float(sum(A))
 
-minh = (0.13-(0.25/2.0))
-maxh = (11.29+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(bbb)
+maxh = max(bbb)
+nbins = int ((maxh - minh) / step)
 BBB, xh = numpy.histogram(bbb, bins=nbins, range=(minh, maxh));
 Pbbb = BBB/float(sum(BBB))
 
-minh = (1.52-(0.25/2.0))
-maxh = (12.15+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(bb)
+maxh = max(bb)
+nbins = int ((maxh - minh) / step)
 BB, xh = numpy.histogram(bb, bins=nbins, range=(minh, maxh));
 Pbb = BB/float(sum(BB))
 
-minh = (9.23-(0.25/2.0))
-maxh = (12.93+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(b)
+maxh = max(b)
+nbins = int ((maxh - minh) / step)
 B, xh = numpy.histogram(b, bins=nbins, range=(minh, maxh));
 Pb = B/float(sum(B))
 
-minh = (4.67-(0.25/2.0))
-maxh = (27.40+(0.25/2.0))
-nbins = int ((maxh - minh) / 0.25)
+minh = min(cc)
+maxh = max(cc)
+nbins = int ((maxh - minh) / step)
 CC, xh = numpy.histogram(cc, bins=nbins, range=(minh, maxh));
 Pcc = CC/float(sum(CC))
 
@@ -234,7 +267,7 @@ Mean = [numpy.mean(aaa),numpy.mean(aa), \
 
 Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
 
-s_t = numpy.zeros((26,227), dtype='float64')
+s_t = numpy.zeros((countries,227), dtype='float64')
 
 for i in range(r.shape[0]):
     for j in range(r.shape[1]):
@@ -244,30 +277,28 @@ for i in range(r.shape[0]):
 R_t = numpy.sum(r, axis=0)
 T_t = numpy.zeros(227, dtype='float64')
 
-countries = 26.0
-
 for t in range(227):
-    for k in range(26):
+    for k in range(countries):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
 
-            T_t[t] += s_t[k][t]*math.log(countries * s_t[k][t])
+            T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
 
 run = 1000
 
-X = numpy.random.rand(26,37,run)
-cdf = numpy.zeros((8,8), dtype='float64')
+X = numpy.random.rand(countries,37,run)
+cdf = numpy.zeros((rating,rating), dtype='float64')
 
-Xfile = scipy.io.loadmat("XcdfPr.mat")
+#Xfile = scipy.io.loadmat("XcdfPr.mat")
 #X = Xfile['X']
 #cdf = Xfile['cdf']
 #Pr = Xfile['Pr']
 #Mean = Xfile['Mean'][0]
 #Ti = Xfile['Ti'][0]
 
-x = numpy.zeros((26,37,run), dtype='int')
-bp = numpy.zeros((26,37,run), dtype='float64')
-xm = numpy.zeros((26,37), dtype='float64')
+x = numpy.zeros((countries,37,run), dtype='int')
+bp = numpy.zeros((countries,37,run), dtype='float64')
+xm = numpy.zeros((countries,37), dtype='float64')
 r_prev = numpy.zeros((37,run), dtype='float64')
 Var = numpy.zeros((37), dtype='float64')
 tot = numpy.zeros((7,37,run), dtype='float64')
@@ -281,7 +312,7 @@ entropia = numpy.zeros(37, dtype='float64')
 R_prev = numpy.zeros(37, dtype='float64')
 
 #for j in range(run):
-#   for i in range(26):
+#   for i in range(countries):
 #       for k in range(37):
 #           sys.stdout.write ("%f "%X[i][k][j])
 #       sys.stdout.write ("\n")
@@ -292,31 +323,31 @@ R_prev = numpy.zeros(37, dtype='float64')
 for j in range(run):
 
     # da controllare
-    for i in range(26):
-        x[i][0][j] = ms[i][226]
+    for i in range(countries):
+        x[i][0][j] = ms[i][time-1]
 
-    for i in range (8):
+    for i in range (rating):
         cdf[i][0] = Pr[i][0]
 
-    for i in range(8):
-        for k in range(1,8):
+    for i in range(rating):
+        for k in range(1,rating):
             cdf[i][k] = Pr[i][k] + cdf[i][k-1]
 
-    #for i in range(8):
-    #    for k in range(8):
+    #for i in range(rating):
+    #    for k in range(rating):
     #        sys.stdout.write ("%f "%cdf[i][k])
     #    sys.stdout.write ("\n")
 
-    #for i in range(8):
-    #    for k in range(8):
+    #for i in range(rating):
+    #    for k in range(rating):
     #        sys.stdout.write ("%f "%Pr[i][k])
     #    sys.stdout.write ("\n")
 
-    for c in range(26):
+    for c in range(countries):
         if X[c][0][j] <= cdf[x[c][0][j]-1][0]:
             x[c][1][j] = 1
 
-        for k in range(1,8):
+        for k in range(1,rating):
             if (cdf[x[c][0][j]-1][k-1] < X[c][0][j]) and \
                     (X[c][0][j] <= cdf[x[c][0][j]-1][k] ):
                x[c][1][j] = k + 1
@@ -325,18 +356,18 @@ for j in range(run):
             if X[c][t-1][j] <= cdf[x[c][t-1][j]-1][0]:
                 x[c][t][j] = 1
 
-            for k in range(1,8):
+            for k in range(1,rating):
                 if (cdf[x[c][t-1][j]-1][k-1] < X[c][t-1][j]) \
                         and (X[c][t-1][j] <= cdf[x[c][t-1][j]-1][k]):
                   x[c][t][j] = k + 1
 
-    #for c in range(26):
+    #for c in range(countries):
     #    for t in range(37):
     #        sys.stdout.write ("%d "%x[c][t][j])
     #    sys.stdout.write ("\n")
 
     for t in range(37):
-        for c in range(26):
+        for c in range(countries):
             for i in range(7):
                 if x[c][t][j] == i+1:
                     bp[c][t][j] = Mean[i]
@@ -364,7 +395,7 @@ for j in range(run):
                  t1[t][j] += (ac[i][t][j]*Ti[i])
                  t2[t][j] += (ac[i][t][j]*math.log(7.0*ac[i][t][j]))
                  if cont[i][t][j] != 0:
-                    term[t][j] += ac[i][t][j]*math.log(countries/(7.0*cont[i][t][j]))
+                    term[t][j] += ac[i][t][j]*math.log(float(countries)/(7.0*cont[i][t][j]))
  
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
@@ -379,7 +410,7 @@ for j in range(run):
    
     #exit(1)
 
-    print j, " of ", run
+    #print j, " of ", run
     sys.stdout.flush()
 
 for t in range(37):
