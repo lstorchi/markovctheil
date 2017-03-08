@@ -5,8 +5,30 @@ import scipy.io
 import numpy
 import math
 import sys
+import os
 
-import sys
+###############################################################################
+
+def mat_to_stdout (mat):
+
+    for i in range(mat.shape[0]):
+       for j in range(mat.shape[1]):
+           sys.stdout.write ("%f "%mat[i][j])
+       sys.stdout.write ("\n")
+
+###############################################################################
+
+def progress_bar (count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush() 
+
+###############################################################################
 
 filename1 = "ms.mat"
 filename2 = "bp.mat"
@@ -14,14 +36,15 @@ step = 0.25
 run = 100000
 tprev = 37 # mesi previsione
 
-'''
-if len(sys.argv) != 2:
-    print "usage: ", sys.argv[0], " filein" 
+if len(sys.argv) != 6:
+    print "usage: ", sys.argv[0], " msmatfilename bpmatfilename step tprev run" 
     exit(1)
 else:
     filename1 = sys.argv[1] 
     filename2 = sys.argv[2]
-'''
+    step = float(sys.argv[3])
+    tprev = int(sys.argv[4])
+    run = int(sys.argv[5])
 
 #numpy.random.seed(9001)
 
@@ -57,8 +80,7 @@ for k in range(countries):
 
             Den[i] = sum(Num[i])
 
-    #print k , " of ", countries
-    sys.stdout.flush()
+    progress_bar(k+1, countries)
 
 #print Num 
 #print Den
@@ -95,8 +117,6 @@ for i in range(len(r)):
         if (r[i][j] == float('Inf')):
            r[i][j] = float('nan')
 
-#print r
-
 ist = numpy.zeros((rating,time*countries), dtype='float64')
 Nn = numpy.zeros((rating), dtype='int')
 
@@ -107,16 +127,8 @@ for i in range(rating):
                 Nn[i] = Nn[i] + 1 
                 ist[i][Nn[i]-1] = r[k][Time]
 
-#print Nn
-#print ist.shape
-
 #Hfile = scipy.io.loadmat("ist.mat")
 #ist1 = Hfile['ist']
-
-#for i in range(rating):
-#    for k in range(countries*time):
-#        if (ist[i][k] != ist1[i][k]):
-#            sys.stdout.write("ist: %f ist1: %f \n"%(ist[i][k], ist1[i][k]))
 
 Mean = numpy.zeros((rating), dtype='float64')
 y = numpy.zeros((ist.shape[0], Nn[0]), dtype='float64')
@@ -173,37 +185,6 @@ if rating > 7:
 #cc1 = ABCDfile['cc'][0]
 #a1 = ABCDfile['a'][0]
 #d1 = ABCDfile['d'][0]
-
-#for i in range(len(aaa)):
-#    if (aaa[i] != aaa1[i]):
-#        sys.stdout.write("aaa: %f aaa1: %f \n"%(aaa[i], aaa1[i]))
-#
-#for i in range(len(aa)):
-#    if (aa[i] != aa1[i]):
-#        sys.stdout.write("aa: %f aa1: %f \n"%(aa[i], aa1[i]))
-#
-#for i in range(len(bbb)):
-#    if (bbb[i] != bbb1[i]):
-#        sys.stdout.write("bbb: %f bbb1: %f \n"%(bbb[i], bbb1[i]))
-#
-#for i in range(len(bb)):
-#    if (bb[i] != bb1[i]):
-#        sys.stdout.write("bb: %f bb1: %f \n"%(bb[i], bb1[i]))
-#
-#for i in range(len(b)):
-#    if (b[i] != b1[i]):
-#        sys.stdout.write("b: %f b1: %f \n"%(b[i], b1[i]))
-#
-#for i in range(len(a)):
-#    if (a[i] != a1[i]):
-#        sys.stdout.write("a: %f a1: %f \n"%(a[i], a1[i]))
-#
-#if (d != d1):
-#    sys.stdout.write("d: %f d1: %f \n"%(d, d1))
-#
-#for i in range(len(cc)):
-#    if (cc[i] != cc1[i]):
-#        sys.stdout.write("cc: %f cc1: %f \n"%(cc[i], cc1[i]))
 
 minh = min(aaa)
 maxh = max(aaa)
@@ -270,8 +251,19 @@ Mean = [numpy.mean(aaa),numpy.mean(aa), \
 
 fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
 
-print "F-value: ", fval
-print "P value: ", pval
+print " "
+
+oufilename = "1wayanova.txt"
+
+if os.path.exists(oufilename):
+    os.remove(oufilename)
+
+outf = open(oufilename, "w")
+
+outf.write("F-value: %f"%fval)
+outf.write("P value: %f"%pval)
+
+outf.close()
 
 Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
 
@@ -316,15 +308,6 @@ entr = numpy.zeros((tprev,run), dtype='float64')
 entropia = numpy.zeros(tprev, dtype='float64')
 R_prev = numpy.zeros(tprev, dtype='float64')
 
-#for j in range(run):
-#   for i in range(countries):
-#       for k in range(tprev):
-#           sys.stdout.write ("%f "%X[i][k][j])
-#       sys.stdout.write ("\n")
-#   sys.stdout.write ("\n\n")
-
-#exit(1);
-
 for j in range(run):
 
     # da controllare
@@ -337,16 +320,6 @@ for j in range(run):
     for i in range(rating):
         for k in range(1,rating):
             cdf[i][k] = Pr[i][k] + cdf[i][k-1]
-
-    #for i in range(rating):
-    #    for k in range(rating):
-    #        sys.stdout.write ("%f "%cdf[i][k])
-    #    sys.stdout.write ("\n")
-
-    #for i in range(rating):
-    #    for k in range(rating):
-    #        sys.stdout.write ("%f "%Pr[i][k])
-    #    sys.stdout.write ("\n")
 
     for c in range(countries):
         if X[c][0][j] <= cdf[x[c][0][j]-1][0]:
@@ -366,11 +339,6 @@ for j in range(run):
                         and (X[c][t-1][j] <= cdf[x[c][t-1][j]-1][k]):
                   x[c][t][j] = k + 1
 
-    #for c in range(countries):
-    #    for t in range(tprev):
-    #        sys.stdout.write ("%d "%x[c][t][j])
-    #    sys.stdout.write ("\n")
-
     for t in range(tprev):
         for c in range(countries):
             for i in range(rating):
@@ -383,15 +351,6 @@ for j in range(run):
         for a in range(bp.shape[0]):
             summa += bp[a][t][j]
         r_prev[t][j] = summa
-
-    #for t in range(tprev):
-    #    sys.stdout.write ("%f "%r_prev[t][j])
-    #    sys.stdout.write ("\n")
-
-    #for i in range(rating):
-    #   for t in range(tprev):
-    #      sys.stdout.write ("%f "%tot[i][t][j])
-    #   sys.stdout.write ("\n")
 
     for t in range(tprev):
         for i in range(rating):
@@ -406,23 +365,22 @@ for j in range(run):
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
 
-    #for t in range(tprev):
-    #   sys.stdout.write ("%f "%entr[t][j])
-    #sys.stdout.write ("\n")
+    progress_bar(j+1, run)
 
-    #for t in range(tprev):
-    #    sys.stdout.write ("%f "%R_prev[t])
-    #    sys.stdout.write ("\n")
-   
-    #exit(1)
+print " "
 
-    #print j, " of ", run
-    sys.stdout.flush()
+oufilename = "entropy.txt"
+
+if os.path.exists(oufilename):
+    os.remove(oufilename)
+
+outf = open(oufilename, "w")
 
 for t in range(tprev):
     entropia[t] =numpy.mean(entr[t])
     Var[t] = numpy.std(entr[t])
 
 for t in range(tprev):
-    print t+1, " ", entropia[t], " ", Var[t]
+    outf.write("%d %f %f \n"%(t+1, entropia[t], Var[t]))
 
+outf.close()
