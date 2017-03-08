@@ -1,5 +1,6 @@
 import numpy.linalg
 import numpy.random
+import scipy.stats
 import scipy.io
 import numpy
 import math
@@ -35,6 +36,7 @@ rating = numpy.max(msd['ms'])
 ms = msd['ms']
 i_r = bpd['i_r']
 time = len(ms[1,:])
+tprev = 37 # mesi previsione
 
 Nk = numpy.zeros((rating,rating,countries), dtype='int64')
 Num = numpy.zeros((rating,rating), dtype='int64')
@@ -81,10 +83,10 @@ for i in range(len(i_r)):
 
 benchmark = numpy.amin(i_r, 0)
 
-r = numpy.zeros((countries,227), dtype='float64') 
+r = numpy.zeros((countries,time), dtype='float64') 
 
 for k in range(countries):
-    for Time in range(227):
+    for Time in range(time):
         r[k][Time] = i_r[k][Time] - benchmark[Time]
 
 for i in range(len(r)):
@@ -94,12 +96,12 @@ for i in range(len(r)):
 
 #print r
 
-ist = numpy.zeros((rating,227*countries), dtype='float64')
+ist = numpy.zeros((rating,time*countries), dtype='float64')
 Nn = numpy.zeros((rating), dtype='int')
 
 for i in range(rating):
     for k in range(countries):
-        for Time in range(227):
+        for Time in range(time):
             if ms[k][Time] == i+1: 
                 Nn[i] = Nn[i] + 1 
                 ist[i][Nn[i]-1] = r[k][Time]
@@ -111,7 +113,7 @@ for i in range(rating):
 #ist1 = Hfile['ist']
 
 #for i in range(rating):
-#    for k in range(countries*227):
+#    for k in range(countries*time):
 #        if (ist[i][k] != ist1[i][k]):
 #            sys.stdout.write("ist: %f ist1: %f \n"%(ist[i][k], ist1[i][k]))
 
@@ -265,9 +267,14 @@ Mean = [numpy.mean(aaa),numpy.mean(aa), \
         numpy.mean(a),numpy.mean(bbb),numpy.mean(bb), \
         numpy.mean(b),numpy.mean(cc)]
 
+fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
+
+#print "F-value: ", fval
+#print "P value: ", pval
+
 Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
 
-s_t = numpy.zeros((countries,227), dtype='float64')
+s_t = numpy.zeros((countries,time), dtype='float64')
 
 for i in range(r.shape[0]):
     for j in range(r.shape[1]):
@@ -275,18 +282,17 @@ for i in range(r.shape[0]):
             r[i][j] = 0.0
 
 R_t = numpy.sum(r, axis=0)
-T_t = numpy.zeros(227, dtype='float64')
+T_t = numpy.zeros(time, dtype='float64')
 
-for t in range(227):
+for t in range(time):
     for k in range(countries):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
-
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
 
 run = 1000
 
-X = numpy.random.rand(countries,37,run)
+X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
 
 #Xfile = scipy.io.loadmat("XcdfPr.mat")
@@ -296,24 +302,24 @@ cdf = numpy.zeros((rating,rating), dtype='float64')
 #Mean = Xfile['Mean'][0]
 #Ti = Xfile['Ti'][0]
 
-x = numpy.zeros((countries,37,run), dtype='int')
-bp = numpy.zeros((countries,37,run), dtype='float64')
-xm = numpy.zeros((countries,37), dtype='float64')
-r_prev = numpy.zeros((37,run), dtype='float64')
-Var = numpy.zeros((37), dtype='float64')
-tot = numpy.zeros((7,37,run), dtype='float64')
-cont = numpy.zeros((7,37,run), dtype='int')
-ac = numpy.zeros((7,37,run), dtype='float64')
-t1 = numpy.zeros((37,run), dtype='float64')
-t2 = numpy.zeros((37,run), dtype='float64')
-term = numpy.zeros((37,run), dtype='float64')
-entr = numpy.zeros((37,run), dtype='float64')
-entropia = numpy.zeros(37, dtype='float64')
-R_prev = numpy.zeros(37, dtype='float64')
+x = numpy.zeros((countries,tprev,run), dtype='int')
+bp = numpy.zeros((countries,tprev,run), dtype='float64')
+xm = numpy.zeros((countries,tprev), dtype='float64')
+r_prev = numpy.zeros((tprev,run), dtype='float64')
+Var = numpy.zeros((tprev), dtype='float64')
+tot = numpy.zeros((rating,tprev,run), dtype='float64')
+cont = numpy.zeros((rating,tprev,run), dtype='int')
+ac = numpy.zeros((rating,tprev,run), dtype='float64')
+t1 = numpy.zeros((tprev,run), dtype='float64')
+t2 = numpy.zeros((tprev,run), dtype='float64')
+term = numpy.zeros((tprev,run), dtype='float64')
+entr = numpy.zeros((tprev,run), dtype='float64')
+entropia = numpy.zeros(tprev, dtype='float64')
+R_prev = numpy.zeros(tprev, dtype='float64')
 
 #for j in range(run):
 #   for i in range(countries):
-#       for k in range(37):
+#       for k in range(tprev):
 #           sys.stdout.write ("%f "%X[i][k][j])
 #       sys.stdout.write ("\n")
 #   sys.stdout.write ("\n\n")
@@ -352,7 +358,7 @@ for j in range(run):
                     (X[c][0][j] <= cdf[x[c][0][j]-1][k] ):
                x[c][1][j] = k + 1
 
-        for t in range(2,37):
+        for t in range(2,tprev):
             if X[c][t-1][j] <= cdf[x[c][t-1][j]-1][0]:
                 x[c][t][j] = 1
 
@@ -362,13 +368,13 @@ for j in range(run):
                   x[c][t][j] = k + 1
 
     #for c in range(countries):
-    #    for t in range(37):
+    #    for t in range(tprev):
     #        sys.stdout.write ("%d "%x[c][t][j])
     #    sys.stdout.write ("\n")
 
-    for t in range(37):
+    for t in range(tprev):
         for c in range(countries):
-            for i in range(7):
+            for i in range(rating):
                 if x[c][t][j] == i+1:
                     bp[c][t][j] = Mean[i]
                     cont[i][t][j] = cont[i][t][j] + 1
@@ -379,32 +385,33 @@ for j in range(run):
             summa += bp[a][t][j]
         r_prev[t][j] = summa
 
-    #for t in range(37):
+    #for t in range(tprev):
     #    sys.stdout.write ("%f "%r_prev[t][j])
     #    sys.stdout.write ("\n")
 
-    #for i in range(7):
-    #   for t in range(37):
+    #for i in range(rating):
+    #   for t in range(tprev):
     #      sys.stdout.write ("%f "%tot[i][t][j])
     #   sys.stdout.write ("\n")
 
-    for t in range(37):
-        for i in range(7):
+    for t in range(tprev):
+        for i in range(rating):
              ac[i][t][j] = tot[i][t][j]/r_prev[t][j]
              if ac[i][t][j] != 0.0:
                  t1[t][j] += (ac[i][t][j]*Ti[i])
-                 t2[t][j] += (ac[i][t][j]*math.log(7.0*ac[i][t][j]))
+                 t2[t][j] += (ac[i][t][j]*math.log(float(rating)*ac[i][t][j]))
                  if cont[i][t][j] != 0:
-                    term[t][j] += ac[i][t][j]*math.log(float(countries)/(7.0*cont[i][t][j]))
+                    term[t][j] += ac[i][t][j]* \
+                            math.log(float(countries)/(float(rating)*cont[i][t][j]))
  
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
 
-    #for t in range(37):
+    #for t in range(tprev):
     #   sys.stdout.write ("%f "%entr[t][j])
     #sys.stdout.write ("\n")
 
-    #for t in range(37):
+    #for t in range(tprev):
     #    sys.stdout.write ("%f "%R_prev[t])
     #    sys.stdout.write ("\n")
    
@@ -413,10 +420,10 @@ for j in range(run):
     #print j, " of ", run
     sys.stdout.flush()
 
-for t in range(37):
+for t in range(tprev):
     entropia[t] =numpy.mean(entr[t])
     Var[t] = numpy.std(entr[t])
 
-for t in range(37):
+for t in range(tprev):
     print t+1, " ", entropia[t], " ", Var[t]
 
