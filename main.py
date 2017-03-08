@@ -260,8 +260,8 @@ if os.path.exists(oufilename):
 
 outf = open(oufilename, "w")
 
-outf.write("F-value: %f"%fval)
-outf.write("P value: %f"%pval)
+outf.write("F-value: %f\n"%fval)
+outf.write("P value: %f\n"%pval)
 
 outf.close()
 
