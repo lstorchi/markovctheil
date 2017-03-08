@@ -8,9 +8,11 @@ import sys
 
 import sys
 
-filename1 = ""
-filename2 = ""
+filename1 = "ms.mat"
+filename2 = "bp.mat"
 step = 0.25 
+run = 100000
+tprev = 37 # mesi previsione
 
 '''
 if len(sys.argv) != 2:
@@ -21,10 +23,10 @@ else:
     filename2 = sys.argv[2]
 '''
 
-numpy.random.seed(9001)
+#numpy.random.seed(9001)
 
-msd = scipy.io.loadmat("ms.mat")
-bpd = scipy.io.loadmat("bp.mat")
+msd = scipy.io.loadmat(filename1)
+bpd = scipy.io.loadmat(filename2)
 
 if msd['ms'].shape[0] != bpd['i_r'].shape[0]:
     print "wrong dim of the input matrix"
@@ -36,7 +38,6 @@ rating = numpy.max(msd['ms'])
 ms = msd['ms']
 i_r = bpd['i_r']
 time = len(ms[1,:])
-tprev = 37 # mesi previsione
 
 Nk = numpy.zeros((rating,rating,countries), dtype='int64')
 Num = numpy.zeros((rating,rating), dtype='int64')
@@ -269,8 +270,8 @@ Mean = [numpy.mean(aaa),numpy.mean(aa), \
 
 fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
 
-#print "F-value: ", fval
-#print "P value: ", pval
+print "F-value: ", fval
+print "P value: ", pval
 
 Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
 
@@ -289,8 +290,6 @@ for t in range(time):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
-
-run = 1000
 
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
