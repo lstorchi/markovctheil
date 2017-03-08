@@ -253,7 +253,7 @@ fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
 
 print " "
 
-oufilename = "1wayanova.txt"
+oufilename = "1wayanova_"+str(run)+".txt"
 
 if os.path.exists(oufilename):
     os.remove(oufilename)
@@ -369,7 +369,7 @@ for j in range(run):
 
 print " "
 
-oufilename = "entropy.txt"
+oufilename = "entropy_"+str(run)+".txt"
 
 if os.path.exists(oufilename):
     os.remove(oufilename)
