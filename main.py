@@ -87,10 +87,21 @@ for i in range(8):
 #print Nn
 #print ist.shape
 
+Hfile = scipy.io.loadmat("ist.mat")
+ist1 = Hfile['ist']
+
+#for i in range(8):
+#    for k in range(26*227):
+#        if (ist[i][k] != ist1[i][k]):
+#            sys.stdout.write("ist: %f ist1: %f \n"%(ist[i][k], ist1[i][k]))
+
 Mean = numpy.zeros((7), dtype='float64')
 y = numpy.zeros((ist.shape[0], 2135), dtype='float64')
 for i in range(len(ist)):
     y[i] = ist[i][0:2135]
+
+#Yfile = scipy.io.loadmat("y.mat")
+#y = Yfile['y']
 
 aaa = y[0]
 aaa = aaa[numpy.isfinite(aaa)]
@@ -114,6 +125,49 @@ cc = y[6][:66]
 cc = cc[numpy.isfinite(cc)]
 
 d = y[7][0]
+
+ABCDfile = scipy.io.loadmat("yabcd.mat")
+aaa1 = ABCDfile['aaa'][0]  
+aa1 = ABCDfile['aa'][0]
+bbb1 = ABCDfile['bbb'][0]
+bb1 = ABCDfile['bb'][0]
+b1 = ABCDfile['b'][0]
+cc1 = ABCDfile['cc'][0]
+a1 = ABCDfile['a'][0]
+d1 = ABCDfile['d'][0]
+
+for i in range(len(aaa)):
+    if (aaa[i] != aaa1[i]):
+        sys.stdout.write("aaa: %f aaa1: %f \n"%(aaa[i], aaa1[i]))
+
+for i in range(len(aa)):
+    if (aa[i] != aa1[i]):
+        sys.stdout.write("aa: %f aa1: %f \n"%(aa[i], aa1[i]))
+
+for i in range(len(bbb)):
+    if (bbb[i] != bbb1[i]):
+        sys.stdout.write("bbb: %f bbb1: %f \n"%(bbb[i], bbb1[i]))
+
+for i in range(len(bb)):
+    if (bb[i] != bb1[i]):
+        sys.stdout.write("bb: %f bb1: %f \n"%(bb[i], bb1[i]))
+
+for i in range(len(b)):
+    if (b[i] != b1[i]):
+        sys.stdout.write("b: %f b1: %f \n"%(b[i], b1[i]))
+
+for i in range(len(a)):
+    if (a[i] != a1[i]):
+        sys.stdout.write("a: %f a1: %f \n"%(a[i], a1[i]))
+
+if (d != d1):
+    sys.stdout.write("d: %f d1: %f \n"%(d, d1))
+
+for i in range(len(cc)):
+    if (cc[i] != cc1[i]):
+        sys.stdout.write("cc: %f cc1: %f \n"%(cc[i], cc1[i]))
+
+#exit(1)
 
 minh = (0.0-(0.25/2.0))
 maxh = (2.82+(0.25/2.0))
@@ -157,6 +211,15 @@ nbins = int ((maxh - minh) / 0.25)
 CC, xh = numpy.histogram(cc, bins=nbins, range=(minh, maxh));
 Pcc = CC/float(sum(CC))
 
+#ALLHfile = scipy.io.loadmat("allhist.mat")
+#Paaa = ALLHfile['Paaa'][0]
+#Paa = ALLHfile['Paa'][0]
+#Pa = ALLHfile['Pa'][0]  
+#Pbbb = ALLHfile['Pbbb'][0]  
+#Pbb = ALLHfile['Pbb'][0]  
+#Pb = ALLHfile['Pb'][0]  
+#Pcc = ALLHfile['Pcc'][0]  
+
 Taaa = sum((Paaa*(math.log(len(Paaa)))*Paaa))
 Taa = sum((Paa*(math.log(len(Paa)))*Paa))
 Ta = sum((Pa*(math.log(len(Pa)))*Pa))
@@ -181,7 +244,7 @@ for i in range(r.shape[0]):
 R_t = numpy.sum(r, axis=0)
 T_t = numpy.zeros(227, dtype='float64')
 
-countries = 26
+countries = 26.0
 
 for t in range(227):
     for k in range(26):
@@ -192,13 +255,15 @@ for t in range(227):
 
 run = 1000
 
-#X = numpy.random.rand(26,37,run)
+X = numpy.random.rand(26,37,run)
 cdf = numpy.zeros((8,8), dtype='float64')
 
 Xfile = scipy.io.loadmat("XcdfPr.mat")
-X = Xfile['X']
-i#cdf = Xfile['cdf']
-Pr = Xfile['Pr']
+#X = Xfile['X']
+#cdf = Xfile['cdf']
+#Pr = Xfile['Pr']
+#Mean = Xfile['Mean'][0]
+#Ti = Xfile['Ti'][0]
 
 x = numpy.zeros((26,37,run), dtype='int')
 bp = numpy.zeros((26,37,run), dtype='float64')
@@ -206,9 +271,8 @@ xm = numpy.zeros((26,37), dtype='float64')
 r_prev = numpy.zeros((37,run), dtype='float64')
 Var = numpy.zeros((37), dtype='float64')
 tot = numpy.zeros((7,37,run), dtype='float64')
-cont = numpy.zeros((7,37,run), dtype='float64')
+cont = numpy.zeros((7,37,run), dtype='int')
 ac = numpy.zeros((7,37,run), dtype='float64')
-AC = numpy.zeros((7,37), dtype='float64')
 t1 = numpy.zeros((37,run), dtype='float64')
 t2 = numpy.zeros((37,run), dtype='float64')
 term = numpy.zeros((37,run), dtype='float64')
@@ -288,20 +352,26 @@ for j in range(run):
     #    sys.stdout.write ("%f "%r_prev[t][j])
     #    sys.stdout.write ("\n")
 
-    #exit(1)
+    #for i in range(7):
+    #   for t in range(37):
+    #      sys.stdout.write ("%f "%tot[i][t][j])
+    #   sys.stdout.write ("\n")
 
     for t in range(37):
         for i in range(7):
              ac[i][t][j] = tot[i][t][j]/r_prev[t][j]
-             if ac[i][t][j] != 0:
+             if ac[i][t][j] != 0.0:
                  t1[t][j] += (ac[i][t][j]*Ti[i])
-                 t2[t][j] += ac[i][t][j]*math.log(7*ac[i][t][j])
+                 t2[t][j] += (ac[i][t][j]*math.log(7.0*ac[i][t][j]))
                  if cont[i][t][j] != 0:
                     term[t][j] += ac[i][t][j]*math.log(countries/(7.0*cont[i][t][j]))
  
-             AC[i][t] = numpy.mean(ac[i][t])
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
+
+    #for t in range(37):
+    #   sys.stdout.write ("%f "%entr[t][j])
+    #sys.stdout.write ("\n")
 
     #for t in range(37):
     #    sys.stdout.write ("%f "%R_prev[t])

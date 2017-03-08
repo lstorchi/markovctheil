@@ -26,8 +26,9 @@ end
 for i=1:8
     for j=1:8
         if Den(i)~=0
-            Pr(i,j)=Num(i,j)/Den(i);
-        else Pr(i,j)=0;
+          Pr(i,j)=Num(i,j)/Den(i);
+        else 
+          Pr(i,j)=0;
         end
     end
 end
@@ -62,8 +63,13 @@ for i=1:8
     end
 end
 
-Mean=zeros(1,7);
+save('ist.mat', 'ist', '-mat7-binary')
+
+Mean=zeros(7);
 y = ist(:,1:2135);% mi toglie tutte le righe con gli 0
+
+save('y.mat', 'y', '-mat7-binary');
+
 aaa = y(1,:);
 aaa = aaa(isfinite(aaa));
 aa = y(2,1:879);
@@ -80,6 +86,8 @@ cc=y(7,1:66);
 cc=cc(isfinite(cc));
 d=y(8,1:1);
 
+save('yabcd.mat', 'aaa', 'aa', 'a', 'bbb', 'bb', 'b', 'cc', 'd', '-mat7-binary');
+
 AAA = hist(aaa,0:0.25:2.82);
 Paaa = AAA/sum(AAA);
 AA = hist(aa,0:0.25:5.69);
@@ -94,6 +102,10 @@ B = hist(b,9.23:0.25:12.93);
 Pb = B/sum(B);
 CC = hist(cc,4.67:0.25:27.40);
 Pcc = CC/sum(CC);
+
+save('allhist.mat', 'Paaa', 'Paa', 'Pa', 'Pbbb', 'Pbb', 'Pb', 'Pcc', '-mat7-binary');
+
+exit(1);
 
 Taaa=sum(Paaa.*(log(length(Paaa))*Paaa));
 Taa=sum(Paa.*(log(length(Paa))*Paa));
@@ -138,7 +150,6 @@ Var=zeros(1,37); % II momento dell'entropia
 tot=zeros(7,37);  %basis point pagati dalla classe di rating i
 cont=zeros(7,37,run); %numero di paesi 
 ac=zeros(7,37,run);%quota di bp pagata dalla classe di rating i
-AC=zeros(7,37);
 t1=zeros(1,37,run);% I membro equazione PDTE
 t2=zeros(1,37,run);% II membro equazione PDTE
 term=zeros(1,37,run);%III membro equazione PDTE
@@ -146,7 +157,7 @@ entr=zeros(1,37,run);%PDTE
 entropia=zeros(1,37);
 R_prev=zeros(1,37);
 
-save('XcdfPr.mat', 'X', 'cdf', 'Pr', '-mat7-binary')
+save('XcdfPr.mat', 'X', 'cdf', 'Pr', 'Mean', 'Ti', '-mat7-binary')
 
 for j=1:run
     x(:,1,j)=ms(:,227,:);
@@ -185,9 +196,9 @@ for j=1:run
         for c=1:26
             for i=1:7
                 if x(c,t,j)==i;
-                    bp(c,t,j)=Mean(1,i);
+                    bp(c,t,j)=Mean(i);
                     cont(i,t,j)=cont(i,t,j)+1;
-                    tot(i,t,j)=cont(i,t,j).*Mean(1,i);
+                    tot(i,t,j)=cont(i,t,j).*Mean(i);
                 end
             end
             r_prev(1,t,j)=sum(bp(:,t,j));
@@ -198,17 +209,19 @@ for j=1:run
         for i=1:7
              ac(i,t,j)=tot(i,t,j)/r_prev(1,t,j);
              if ac(i,t,j)~=0
-             t1(1,t,j)=t1(1,t,j)+(ac(i,t,j).*Ti(i));    
-             t2(1,t,j)=t2(1,t,j)+ac(i,t,j)*log(7*ac(i,t,j));
+                t1(1,t,j)=t1(1,t,j)+(ac(i,t,j).*Ti(i));    
+                t2(1,t,j)=t2(1,t,j)+ac(i,t,j)*log(7*ac(i,t,j));
                 if cont(i,t,j)~=0;
                   term(1,t,j)=term(1,t,j)+ac(i,t,j).*log(countries/(7*cont(i,t,j)));
                 end
              end  
-             AC(i,t)=mean(ac(i,t,:));
         end
         entr(1,t,j)=t1(1,t,j)+t2(1,t,j)+term(1,t,j);
         R_prev(1,t)=mean(r_prev(1,t,j));
     end
+
+    #disp(entr);
+    #exit(1);
 
     printf ("%d of %d\n", j, run);
     fflush(stdout);
