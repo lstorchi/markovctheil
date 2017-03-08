@@ -19,7 +19,7 @@ for k=1:26
             Den(i)=sum(Num(i,:));
         end
     end
-    disp(k), disp(" of 26 "); 
+    printf ("%d of 26\n", k )
     fflush(stdout);
 end
 
@@ -146,7 +146,7 @@ entr=zeros(1,37,run);%PDTE
 entropia=zeros(1,37);
 R_prev=zeros(1,37);
 
-save('friends.mat', 'X', 'cdf', 'Pr', '-mat7-binary')
+save('XcdfPr.mat', 'X', 'cdf', 'Pr', '-mat7-binary')
 
 for j=1:run
     x(:,1,j)=ms(:,227,:);
@@ -210,7 +210,7 @@ for j=1:run
         R_prev(1,t)=mean(r_prev(1,t,j));
     end
 
-    disp(j), disp(" of "),  disp(run); 
+    printf ("%d of %d\n", j, run);
     fflush(stdout);
 end  
 

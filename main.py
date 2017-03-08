@@ -192,13 +192,13 @@ for t in range(227):
 
 run = 1000
 
-X = numpy.random.rand(26,37,run)
-#Xfile = scipy.io.loadmat("friends.mat")
-#X = Xfile['X']
-
+#X = numpy.random.rand(26,37,run)
 cdf = numpy.zeros((8,8), dtype='float64')
-#cdf = Xfile['cdf']
-#Pr = Xfile['Pr']
+
+Xfile = scipy.io.loadmat("XcdfPr.mat")
+X = Xfile['X']
+i#cdf = Xfile['cdf']
+Pr = Xfile['Pr']
 
 x = numpy.zeros((26,37,run), dtype='int')
 bp = numpy.zeros((26,37,run), dtype='float64')
@@ -288,6 +288,8 @@ for j in range(run):
     #    sys.stdout.write ("%f "%r_prev[t][j])
     #    sys.stdout.write ("\n")
 
+    #exit(1)
+
     for t in range(37):
         for i in range(7):
              ac[i][t][j] = tot[i][t][j]/r_prev[t][j]
@@ -300,6 +302,12 @@ for j in range(run):
              AC[i][t] = numpy.mean(ac[i][t])
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
+
+    #for t in range(37):
+    #    sys.stdout.write ("%f "%R_prev[t])
+    #    sys.stdout.write ("\n")
+   
+    #exit(1)
 
     print j, " of ", run
     sys.stdout.flush()
