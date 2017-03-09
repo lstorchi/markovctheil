@@ -35,6 +35,8 @@ filename2 = "bp.mat"
 step = 0.25 
 run = 100000
 tprev = 37 # mesi previsione
+namems = 'sp'
+namebp = 'i_r'
 
 if len(sys.argv) != 6:
     print "usage: ", sys.argv[0], " msmatfilename bpmatfilename step tprev run" 
@@ -51,15 +53,25 @@ else:
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
 
-if msd['ms'].shape[0] != bpd['i_r'].shape[0]:
+if not(namems in msd.keys()):
+    print "Cannot find ", namems, " in ", filename1
+    print msd.keys()
+    exit(1)
+
+if not(namebp in bpd.keys()):
+    print "Cannot find ", namebp, " in ", filename2
+    print bpd.keys()
+    exit(1)
+
+if msd[namems].shape[0] != bpd[namebp].shape[0]:
     print "wrong dim of the input matrix"
     exit(1)
 
-countries = msd['ms'].shape[0]
-rating = numpy.max(msd['ms'])
+countries = msd[namems].shape[0]
+rating = numpy.max(msd[namems])
 
-ms = msd['ms']
-i_r = bpd['i_r']
+ms = msd[namems]
+i_r = bpd[namebp]
 time = len(ms[1,:])
 
 Nk = numpy.zeros((rating,rating,countries), dtype='int64')
@@ -174,7 +186,7 @@ if rating > 6:
   cc = cc[numpy.isfinite(cc)]
 
 if rating > 7:
-    d = y[rating-1][:Nn[7]]
+  d = y[rating-1][:Nn[7]]
 
 #ABCDfile = scipy.io.loadmat("yabcd.mat")
 #aaa1 = ABCDfile['aaa'][0]  
