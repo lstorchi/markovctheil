@@ -30,12 +30,26 @@ def progress_bar (count, total, status=''):
 
 ###############################################################################
 
+def get_histo (v, step):
+    
+    minh = min(v)
+    maxh = max(v)
+    nbins = int ((maxh - minh) / step)
+    h, xh = numpy.histogram(v, bins=nbins, range=(minh, maxh))
+    p = h/float(sum(h))
+
+    t = sum((p*(math.log(len(p)))*p))
+
+    return p, t
+
+###############################################################################
+
 filename1 = "ms.mat"
 filename2 = "bp.mat"
 step = 0.25 
 run = 100000
 tprev = 37 # mesi previsione
-namems = 'sp'
+namems = 'ms'
 namebp = 'i_r'
 
 if len(sys.argv) != 6:
@@ -48,7 +62,7 @@ else:
     tprev = int(sys.argv[4])
     run = int(sys.argv[5])
 
-#numpy.random.seed(9001)
+numpy.random.seed(9001)
 
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
@@ -69,6 +83,10 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 
 countries = msd[namems].shape[0]
 rating = numpy.max(msd[namems])
+
+if (rating <= 0) or (rating > 8):
+    print "rating ", rating, " is not a valid value"
+    exit(1)
 
 ms = msd[namems]
 i_r = bpd[namebp]
@@ -139,145 +157,102 @@ for i in range(rating):
                 Nn[i] = Nn[i] + 1 
                 ist[i][Nn[i]-1] = r[k][Time]
 
-#Hfile = scipy.io.loadmat("ist.mat")
-#ist1 = Hfile['ist']
-
 Mean = numpy.zeros((rating), dtype='float64')
 y = numpy.zeros((ist.shape[0], Nn[0]), dtype='float64')
 for i in range(len(ist)):
     y[i] = ist[i][0:Nn[0]]
 
-#Yfile = scipy.io.loadmat("y.mat")
-#y = Yfile['y']
+allratings = []
+Mean = []
+Ti = []
 
-aaa = y[0][:Nn[0]]
-aaa = aaa[numpy.isfinite(aaa)]
+if rating > 0:
+    aaa = y[0][:Nn[0]]
+    aaa = aaa[numpy.isfinite(aaa)]
+    Paaa, Taaa = get_histo(aaa, step)
 
-aa = []
-a = []
-bbb = []
-bb = []
-b = []
-cc = [] 
-d = []
+    allratings.append(aaa)
+    Mean.append(numpy.mean(aaa))
+    Ti.append(Taaa)
 
 if rating > 1:
-  aa = y[1][:Nn[1]]
-  aa = aa[numpy.isfinite(aa)]
+    aa = y[1][:Nn[1]]
+    aa = aa[numpy.isfinite(aa)]
+    Paa, Taa = get_histo(aa, step)
+
+    allratings.append(aa)
+    Mean.append(numpy.mean(aa))
+    Ti.append(Taa)
 
 if rating > 2:
- a = y[2][:Nn[2]]
- a = a[numpy.isfinite(a)]
+    a = y[2][:Nn[2]]
+    a = a[numpy.isfinite(a)]
+    Pa, Ta = get_histo(a, step)
+
+    allratings.append(a)
+    Mean.append(numpy.mean(a))
+    Ti.append(Ta)
 
 if rating > 3: 
-  bbb = y[3][:Nn[3]]
-  bbb = bbb[numpy.isfinite(bbb)]
+    bbb = y[3][:Nn[3]]
+    bbb = bbb[numpy.isfinite(bbb)]
+    Pbbb, Tbbb = get_histo(bbb, step)
+
+    allratings.append(bbb)
+    Mean.append(numpy.mean(bbb))
+    Ti.append(Tbbb)
 
 if rating > 4:
-  bb = y[4][:Nn[4]]
-  bb = bb[numpy.isfinite(bb)]
+    bb = y[4][:Nn[4]]
+    bb = bb[numpy.isfinite(bb)]
+    Pbb, Tbb = get_histo(bb, step)
+
+    allratings.append(bb)
+    Mean.append(numpy.mean(bb))
+    Ti.append(Tbb)
 
 if rating > 5:
-  b = y[5][:Nn[5]]
-  b = b[numpy.isfinite(b)]
+    b = y[5][:Nn[5]]
+    b = b[numpy.isfinite(b)]
+    Pb, Tb = get_histo(b, step)
+
+    allratings.append(b)
+    Mean.append(numpy.mean(b))
+    Ti.append(Tb)
 
 if rating > 6:
-  cc = y[6][:Nn[6]]
-  cc = cc[numpy.isfinite(cc)]
+    cc = y[6][:Nn[6]]
+    cc = cc[numpy.isfinite(cc)]
+    Pcc, Tcc = get_histo(cc, step)
+
+    allratings.append(cc)
+    Mean.append(numpy.mean(cc))
+    Ti.append(Tcc)
 
 if rating > 7:
-  d = y[rating-1][:Nn[7]]
+    d = y[rating-1][:Nn[7]]
+    allratings.append(d)
+    Pd, Td = get_histo(d, step)
 
-#ABCDfile = scipy.io.loadmat("yabcd.mat")
-#aaa1 = ABCDfile['aaa'][0]  
-#aa1 = ABCDfile['aa'][0]
-#bbb1 = ABCDfile['bbb'][0]
-#bb1 = ABCDfile['bb'][0]
-#b1 = ABCDfile['b'][0]
-#cc1 = ABCDfile['cc'][0]
-#a1 = ABCDfile['a'][0]
-#d1 = ABCDfile['d'][0]
+    allratings.append(d)
+    Mean.append(numpy.mean(d))
+    Ti.append(Td)
 
-minh = min(aaa)
-maxh = max(aaa)
-nbins = int ((maxh - minh) / step)
-AAA, xh = numpy.histogram(aaa, bins=nbins, range=(minh, maxh))
-Paaa = AAA/float(sum(AAA))
+#fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
 
-minh = min(aa)
-maxh = max(aa)
-nbins = int ((maxh - minh) / step)
-AA, xh = numpy.histogram(aa, bins=nbins, range=(minh, maxh));
-Paa = AA/float(sum(AA))
+#print " "
 
-minh = min(a)
-maxh = max(a)
-nbins = int ((maxh - minh) / step)
-A, xh = numpy.histogram(a, bins=nbins, range=(minh, maxh));
-Pa = A/float(sum(A))
+#oufilename = "1wayanova_"+str(run)+".txt"
 
-minh = min(bbb)
-maxh = max(bbb)
-nbins = int ((maxh - minh) / step)
-BBB, xh = numpy.histogram(bbb, bins=nbins, range=(minh, maxh));
-Pbbb = BBB/float(sum(BBB))
+#if os.path.exists(oufilename):
+#    os.remove(oufilename)
 
-minh = min(bb)
-maxh = max(bb)
-nbins = int ((maxh - minh) / step)
-BB, xh = numpy.histogram(bb, bins=nbins, range=(minh, maxh));
-Pbb = BB/float(sum(BB))
+#outf = open(oufilename, "w")
 
-minh = min(b)
-maxh = max(b)
-nbins = int ((maxh - minh) / step)
-B, xh = numpy.histogram(b, bins=nbins, range=(minh, maxh));
-Pb = B/float(sum(B))
+#outf.write("F-value: %f\n"%fval)
+#outf.write("P value: %f\n"%pval)
 
-minh = min(cc)
-maxh = max(cc)
-nbins = int ((maxh - minh) / step)
-CC, xh = numpy.histogram(cc, bins=nbins, range=(minh, maxh));
-Pcc = CC/float(sum(CC))
-
-#ALLHfile = scipy.io.loadmat("allhist.mat")
-#Paaa = ALLHfile['Paaa'][0]
-#Paa = ALLHfile['Paa'][0]
-#Pa = ALLHfile['Pa'][0]  
-#Pbbb = ALLHfile['Pbbb'][0]  
-#Pbb = ALLHfile['Pbb'][0]  
-#Pb = ALLHfile['Pb'][0]  
-#Pcc = ALLHfile['Pcc'][0]  
-
-Taaa = sum((Paaa*(math.log(len(Paaa)))*Paaa))
-Taa = sum((Paa*(math.log(len(Paa)))*Paa))
-Ta = sum((Pa*(math.log(len(Pa)))*Pa))
-Tbbb = sum((Pbbb*(math.log(len(Pbbb)))*Pbbb))
-Tbb = sum((Pbb*(math.log(len(Pbb)))*Pbb))
-Tb = sum((Pb*(math.log(len(Pb)))*Pb))
-Tcc = sum((Pcc*(math.log(len(Pcc)))*Pcc))
-
-Mean = [numpy.mean(aaa),numpy.mean(aa), \
-        numpy.mean(a),numpy.mean(bbb),numpy.mean(bb), \
-        numpy.mean(b),numpy.mean(cc)]
-
-fval, pval = scipy.stats.f_oneway (aaa, aa, a, bbb, bb, b, cc)
-
-print " "
-
-oufilename = "1wayanova_"+str(run)+".txt"
-
-if os.path.exists(oufilename):
-    os.remove(oufilename)
-
-outf = open(oufilename, "w")
-
-outf.write("F-value: %f\n"%fval)
-outf.write("P value: %f\n"%pval)
-
-outf.close()
-
-Ti = [Taaa, Taa, Ta, Tbbb, Tbb, Tb, Tcc]
+#outf.close()
 
 s_t = numpy.zeros((countries,time), dtype='float64')
 
@@ -297,13 +272,6 @@ for t in range(time):
 
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
-
-#Xfile = scipy.io.loadmat("XcdfPr.mat")
-#X = Xfile['X']
-#cdf = Xfile['cdf']
-#Pr = Xfile['Pr']
-#Mean = Xfile['Mean'][0]
-#Ti = Xfile['Ti'][0]
 
 x = numpy.zeros((countries,tprev,run), dtype='int')
 bp = numpy.zeros((countries,tprev,run), dtype='float64')
