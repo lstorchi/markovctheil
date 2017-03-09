@@ -62,7 +62,7 @@ else:
     tprev = int(sys.argv[4])
     run = int(sys.argv[5])
 
-numpy.random.seed(9001)
+#numpy.random.seed(9001)
 
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
