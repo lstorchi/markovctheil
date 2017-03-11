@@ -389,3 +389,35 @@ for t in range(tprev):
     outf.write("%d %f %f \n"%(t+1, entropia[t], Var[t]))
 
 outf.close()
+
+oufilename = "ac_"+str(run)+".txt"
+
+if os.path.exists(oufilename):
+    os.remove(oufilename)
+
+outf = open(oufilename, "w")
+
+for k in range(ac.shape[2]):
+    outf.write("K %d\n"%(k+1))
+    for i in range(ac.shape[0]):
+        for j in range(ac.shape[1]):
+            outf.write(" %f "%(ac[i][j][k]))
+        outf.write("\n")
+
+outf.close()
+
+oufilename = "bp_"+str(run)+".txt"
+
+if os.path.exists(oufilename):
+    os.remove(oufilename)
+
+outf = open(oufilename, "w")
+
+for k in range(bp.shape[2]):
+    outf.write("K %d\n"%(k+1))
+    for i in range(bp.shape[0]):
+        for j in range(bp.shape[1]):
+            outf.write(" %f "%(bp[i][j][k]))
+        outf.write("\n")
+
+outf.close()
