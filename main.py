@@ -390,34 +390,40 @@ for t in range(tprev):
 
 outf.close()
 
-oufilename = "ac_"+str(run)+".txt"
+acm = numpy.zeros((rating,tprev), dtype='float64')
+for i in range(acm.shape[0]):
+    for j in range(acm.shape[1]):
+        acm[i][j] = numpy.mean(ac[i][j])
+
+oufilename = "acm_"+str(run)+".txt"
 
 if os.path.exists(oufilename):
     os.remove(oufilename)
 
 outf = open(oufilename, "w")
 
-for k in range(ac.shape[2]):
-    outf.write("K %d\n"%(k+1))
-    for i in range(ac.shape[0]):
-        for j in range(ac.shape[1]):
-            outf.write(" %f "%(ac[i][j][k]))
-        outf.write("\n")
+for i in range(acm.shape[0]):
+    for j in range(acm.shape[1]):
+        outf.write(" %f "%(acm[i][j]))
+    outf.write("\n")
 
 outf.close()
 
-oufilename = "bp_"+str(run)+".txt"
+bpm = numpy.zeros((countries,tprev), dtype='float64')
+for i in range(bpm.shape[0]):
+    for j in range(bpm.shape[1]):
+        bpm[i][j] = numpy.mean(bp[i][j])
+
+oufilename = "bpm_"+str(run)+".txt"
 
 if os.path.exists(oufilename):
     os.remove(oufilename)
 
 outf = open(oufilename, "w")
 
-for k in range(bp.shape[2]):
-    outf.write("K %d\n"%(k+1))
-    for i in range(bp.shape[0]):
-        for j in range(bp.shape[1]):
-            outf.write(" %f "%(bp[i][j][k]))
-        outf.write("\n")
+for i in range(bpm.shape[0]):
+    for j in range(bpm.shape[1]):
+        outf.write(" %f "%(bpm[i][j]))
+    outf.write("\n")
 
 outf.close()
