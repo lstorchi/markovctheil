@@ -107,6 +107,92 @@ time2 = len(ms2[1,:])
 countries1 = ms1d[namems1].shape[0]
 countries2 = ms2d[namems2].shape[0]
 
-Pr1, Num1, Den1 = get_osserv (ms1, rating1, countries1, time1)
-Pr2, Num2, Den2 = get_osserv (ms2, rating2, countries2, time2)
+iPr1, iNum1, iDen1 = get_osserv (ms1, rating1, countries1, time1)
+iPr2, iNum2, iDen2 = get_osserv (ms2, rating2, countries2, time2)
+
+print ""
+
+dim = max(iNum1.shape[0], iNum2.shape[0])
+
+Pr1 = iPr1 
+Pr2 = iPr2 
+Num1 = iNum1
+Num2 = iNum1
+
+Den1 = iDen1
+Den2 = iDen2
+
+if (iNum1.shape[0] == dim):
+    Pr1 = iPr1 
+    Num1 = iNum1
+    Den1 = iDen1
+else:
+    Num1 = numpy.zeros((dim, dim), dtype='int64')
+    Den1 = numpy.zeros(dim, dtype='int64')
+    Pr1 = numpy.zeros((dim,dim), dtype='float64')
+
+
+if (iNum2.shape[0] == dim):
+    Pr2 = iPr2
+    Num2 = iNum2
+    Den2 = iDen2
+else:
+    Num2 = numpy.zeros((dim,dim), dtype='int64')
+    Den2 = numpy.zeros(dim, dtype='int64')
+    Pr2 = numpy.zeros((dim,dim), dtype='float64')
+
+
+pele1 = 0
+for i in range(Num1.shape[0]):
+    for j in range(Num1.shape[1]):
+        if Num1[i][j] > 0.0:
+            pele1 += 1
+
+ndof1 = pele1 - Num1.shape[0]
+
+print "DOF 1: ", ndof1
+
+ch21 = scipy.stats.chi2.isf(0.025, ndof1)
+pvalue1 = 1.0 - scipy.stats.chi2.cdf(ch21, ndof1)
+
+print ch21, " " , pvalue1
+
+pele2 = 0 
+for i in range(Num2.shape[0]):
+    for j in range(Num2.shape[1]):
+        if Num2[i][j] > 0.0:
+            pele2 += 1
+
+ndof2 = pele2 - Num2.shape[0]
+print "DOF 2: ", ndof2
+
+ch22 = scipy.stats.chi2.isf(0.025, ndof2)
+
+pvalue2 = 1.0 - scipy.stats.chi2.cdf(ch22, ndof2)
+
+print ch22, " " , pvalue2
+
+#mat_to_stdout(Num1)
+#print ""
+#mat_to_stdout(Pr2)
+
+phi = 0.0
+for i in range(Num1.shape[0]):
+    for j in range(Num1.shape[1]):
+        den = Den1[i]*Pr2[i][j] 
+        if den != 0.0:
+          phi += (Num1[i][j] - Den1[i] \
+                  * Pr2[i][j] )**2 / den
+
+print phi
+
+phi = 0.0
+for i in range(Num1.shape[0]):
+    for j in range(Num1.shape[1]):
+        den = Den2[i]*Pr1[i][j] 
+        if den != 0.0:
+          phi += (Num2[i][j] - Den2[i] \
+                  * Pr1[i][j] )**2 / den
+
+print phi
 
