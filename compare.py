@@ -112,65 +112,67 @@ iPr2, iNum2, iDen2 = get_osserv (ms2, rating2, countries2, time2)
 
 print ""
 
-dim = max(iNum1.shape[0], iNum2.shape[0])
-
-Pr1 = iPr1 
-Pr2 = iPr2 
-Num1 = iNum1
-Num2 = iNum1
-
-Den1 = iDen1
-Den2 = iDen2
-
-if (iNum1.shape[0] == dim):
-    Pr1 = iPr1 
-    Num1 = iNum1
-    Den1 = iDen1
-else:
-    Num1 = numpy.zeros((dim, dim), dtype='int64')
-    Den1 = numpy.zeros(dim, dtype='int64')
-    Pr1 = numpy.zeros((dim,dim), dtype='float64')
-
-
-if (iNum2.shape[0] == dim):
-    Pr2 = iPr2
-    Num2 = iNum2
-    Den2 = iDen2
-else:
-    Num2 = numpy.zeros((dim,dim), dtype='int64')
-    Den2 = numpy.zeros(dim, dtype='int64')
-    Pr2 = numpy.zeros((dim,dim), dtype='float64')
-
-
 pele1 = 0
-for i in range(Num1.shape[0]):
-    for j in range(Num1.shape[1]):
-        if Num1[i][j] > 0.0:
+for i in range(iNum1.shape[0]):
+    for j in range(iNum1.shape[1]):
+        if iNum1[i][j] > 0.0:
             pele1 += 1
 
-ndof1 = pele1 - Num1.shape[0]
+ndof1 = pele1 - iNum1.shape[0]
 
 print "DOF 1: ", ndof1
 
 ch21 = scipy.stats.chi2.isf(0.025, ndof1)
 pvalue1 = 1.0 - scipy.stats.chi2.cdf(ch21, ndof1)
 
-print ch21, " " , pvalue1
+print "Chi2: ",  ch21, " p-value: " , pvalue1
 
 pele2 = 0 
-for i in range(Num2.shape[0]):
-    for j in range(Num2.shape[1]):
-        if Num2[i][j] > 0.0:
+for i in range(iNum2.shape[0]):
+    for j in range(iNum2.shape[1]):
+        if iNum2[i][j] > 0.0:
             pele2 += 1
 
-ndof2 = pele2 - Num2.shape[0]
+ndof2 = pele2 - iNum2.shape[0]
 print "DOF 2: ", ndof2
 
 ch22 = scipy.stats.chi2.isf(0.025, ndof2)
 
 pvalue2 = 1.0 - scipy.stats.chi2.cdf(ch22, ndof2)
 
-print ch22, " " , pvalue2
+print "Chi2: ", ch22, " p-value: " , pvalue2
+
+dim = max(iNum1.shape[0], iNum2.shape[0])
+
+Pr1 = numpy.identity(dim, dtype='float64')
+Pr2 = numpy.identity(dim, dtype='float64')
+Num1 = numpy.identity(dim, dtype='int64')
+Num2 = numpy.identity(dim, dtype='int64')
+
+Den1 = numpy.ones(dim, dtype='int64')
+Den2 = numpy.ones(dim, dtype='int64')
+
+if (iNum1.shape[0] == dim):
+    Pr1 = iPr1 
+    Num1 = iNum1
+    Den1 = iDen1
+else:
+    for i in range(iNum1.shape[0]):
+        Den1[i] = iDen1[i]
+        for j in range(iNum1.shape[1]):
+            Num1[i][j] = iNum1[i][j]
+            Pr1[i][j] = iPr1[i][j]
+
+if (iNum2.shape[0] == dim):
+    Pr2 = iPr2
+    Num2 = iNum2
+    Den2 = iDen2
+else:
+    for i in range(iNum2.shape[0]):
+        Den2[i] = iDen2[i]
+        for j in range(iNum2.shape[1]):
+            Num2[i][j] = iNum2[i][j]
+            Pr2[i][j] = iPr2[i][j]
 
 #mat_to_stdout(Num1)
 #print ""
@@ -183,8 +185,8 @@ for i in range(Num1.shape[0]):
         if den != 0.0:
           phi += (Num1[i][j] - Den1[i] \
                   * Pr2[i][j] )**2 / den
-
-print phi
+          
+print "Phi: ", phi
 
 phi = 0.0
 for i in range(Num1.shape[0]):
@@ -194,5 +196,4 @@ for i in range(Num1.shape[0]):
           phi += (Num2[i][j] - Den2[i] \
                   * Pr1[i][j] )**2 / den
 
-print phi
-
+print "Phi: ", phi
