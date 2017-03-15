@@ -122,11 +122,10 @@ ndof1 = pele1 - iNum1.shape[0]
 
 print "DOF 1: ", ndof1
 
-ch21 = scipy.stats.chi2.isf(0.025, ndof1)
-pvalue1 = 1.0 - scipy.stats.chi2.cdf(ch21, ndof1)
+ch21 = scipy.stats.chi2.isf(0.05, ndof1)
 
-print "Chi2: ",  ch21, " p-value: " , pvalue1
 
+print "Chi2: ",  ch21
 pele2 = 0 
 for i in range(iNum2.shape[0]):
     for j in range(iNum2.shape[1]):
@@ -136,11 +135,9 @@ for i in range(iNum2.shape[0]):
 ndof2 = pele2 - iNum2.shape[0]
 print "DOF 2: ", ndof2
 
-ch22 = scipy.stats.chi2.isf(0.025, ndof2)
+ch22 = scipy.stats.chi2.isf(0.05, ndof2)
 
-pvalue2 = 1.0 - scipy.stats.chi2.cdf(ch22, ndof2)
-
-print "Chi2: ", ch22, " p-value: " , pvalue2
+print "Chi2: ", ch22
 
 dim = max(iNum1.shape[0], iNum2.shape[0])
 
@@ -173,10 +170,14 @@ else:
         for j in range(iNum2.shape[1]):
             Num2[i][j] = iNum2[i][j]
             Pr2[i][j] = iPr2[i][j]
+#print"ms", Pr1, "sp", Pr2
+mat_to_stdout(Num1)
+print ""
+mat_to_stdout(Pr2)
 
-#mat_to_stdout(Num1)
-#print ""
-#mat_to_stdout(Pr2)
+mat_to_stdout(Num2)
+print""
+mat_to_stdout(Pr1)
 
 phi = 0.0
 for i in range(Num1.shape[0]):
@@ -186,7 +187,9 @@ for i in range(Num1.shape[0]):
           phi += (Num1[i][j] - Den1[i] \
                   * Pr2[i][j] )**2 / den
           
-print "Phi: ", phi
+pvalue1 = 1.0 - scipy.stats.chi2.cdf(phi, ndof1)
+print "Phi: ", phi, " p-value: " , pvalue1
+
 
 phi = 0.0
 for i in range(Num1.shape[0]):
@@ -196,4 +199,6 @@ for i in range(Num1.shape[0]):
           phi += (Num2[i][j] - Den2[i] \
                   * Pr1[i][j] )**2 / den
 
-print "Phi: ", phi
+pvalue2 = 1.0 - scipy.stats.chi2.cdf(phi, ndof2)
+
+print "Phi: ", phi,"p-value", pvalue2

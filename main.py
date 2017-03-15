@@ -40,14 +40,14 @@ def get_histo (v, step):
 
     t = sum((p*(math.log(len(p)))*p))
 
-    return p, t
+    return p, t, h
 
 ###############################################################################
 
 filename1 = "ms.mat"
 filename2 = "bp.mat"
 step = 0.25 
-run = 100000
+run = 100
 tprev = 37 # mesi previsione
 namems = 'ms'
 namebp = 'i_r'
@@ -169,7 +169,7 @@ Ti = []
 if rating > 0:
     aaa = y[0][:Nn[0]]
     aaa = aaa[numpy.isfinite(aaa)]
-    Paaa, Taaa = get_histo(aaa, step)
+    Paaa, Taaa, haaa = get_histo(aaa, step)
 
     allratings.append(aaa)
     Mean.append(numpy.mean(aaa))
@@ -178,7 +178,7 @@ if rating > 0:
 if rating > 1:
     aa = y[1][:Nn[1]]
     aa = aa[numpy.isfinite(aa)]
-    Paa, Taa = get_histo(aa, step)
+    Paa, Taa, haa = get_histo(aa, step)
 
     allratings.append(aa)
     Mean.append(numpy.mean(aa))
