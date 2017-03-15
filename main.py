@@ -196,7 +196,7 @@ if rating > 2:
 if rating > 3: 
     bbb = y[3][:Nn[3]]
     bbb = bbb[numpy.isfinite(bbb)]
-    Pbbb, Tbbb = get_histo(bbb, step)
+    Pbbb, Tbbb, hbbb = get_histo(bbb, step)
 
     allratings.append(bbb)
     Mean.append(numpy.mean(bbb))
@@ -205,7 +205,7 @@ if rating > 3:
 if rating > 4:
     bb = y[4][:Nn[4]]
     bb = bb[numpy.isfinite(bb)]
-    Pbb, Tbb = get_histo(bb, step)
+    Pbb, Tbb,hbb = get_histo(bb, step)
 
     allratings.append(bb)
     Mean.append(numpy.mean(bb))
@@ -214,7 +214,7 @@ if rating > 4:
 if rating > 5:
     b = y[5][:Nn[5]]
     b = b[numpy.isfinite(b)]
-    Pb, Tb = get_histo(b, step)
+    Pb, Tb,hb = get_histo(b, step)
 
     allratings.append(b)
     Mean.append(numpy.mean(b))
@@ -223,7 +223,7 @@ if rating > 5:
 if rating > 6:
     cc = y[6][:Nn[6]]
     cc = cc[numpy.isfinite(cc)]
-    Pcc, Tcc = get_histo(cc, step)
+    Pcc, Tcc, hcc = get_histo(cc, step)
 
     allratings.append(cc)
     Mean.append(numpy.mean(cc))
@@ -232,7 +232,7 @@ if rating > 6:
 if rating > 7:
     d = y[rating-1][:Nn[7]]
     allratings.append(d)
-    Pd, Td = get_histo(d, step)
+    Pd, Td, hd = get_histo(d, step)
 
     allratings.append(d)
     Mean.append(numpy.mean(d))
