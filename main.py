@@ -187,7 +187,7 @@ if rating > 1:
 if rating > 2:
     a = y[2][:Nn[2]]
     a = a[numpy.isfinite(a)]
-    Pa, Ta = get_histo(a, step)
+    Pa, Ta, ha = get_histo(a, step)
 
     allratings.append(a)
     Mean.append(numpy.mean(a))
