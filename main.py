@@ -42,7 +42,7 @@ def histo_to_file (xh, h, oufilename):
     outf = open(oufilename, "w")
 
     for i in range(len(h)):
-        outf.write("%f %f %f\n"%(xh[i], xh[i+1], h[i]))
+        outf.write("%f %f\n"%((xh[i]+xh[i+1])/2.0, h[i]))
         
     outf.close()
 
