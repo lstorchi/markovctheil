@@ -18,7 +18,38 @@ def mat_to_stdout (mat):
 
 ###############################################################################
 
+def mat_to_file (bpm, oufilename):
+
+    if os.path.exists(oufilename):
+        os.remove(oufilename)
+    
+    outf = open(oufilename, "w")
+
+    for i in range(bpm.shape[0]):
+        for j in range(bpm.shape[1]):
+            outf.write(" %f "%(bpm[i][j]))
+        outf.write("\n")
+        
+    outf.close()
+
+###############################################################################
+
+def histo_to_file (xh, h, oufilename):
+
+    if os.path.exists(oufilename):
+        os.remove(oufilename)
+    
+    outf = open(oufilename, "w")
+
+    for i in range(len(h)):
+        outf.write("%f %f %f\n"%(xh[i], xh[i+1], h[i]))
+        
+    outf.close()
+
+###############################################################################
+
 def progress_bar (count, total, status=''):
+
     bar_len = 60
     filled_len = int(round(bar_len * count / float(total)))
 
@@ -40,7 +71,7 @@ def get_histo (v, step):
 
     t = sum((p*(math.log(len(p)))*p))
 
-    return p, t
+    return p, t, h, xh
 
 ###############################################################################
 
@@ -169,7 +200,9 @@ Ti = []
 if rating > 0:
     aaa = y[0][:Nn[0]]
     aaa = aaa[numpy.isfinite(aaa)]
-    Paaa, Taaa = get_histo(aaa, step)
+    Paaa, Taaa, aaa, xaaa = get_histo(aaa, step)
+
+    histo_to_file (xaaa, aaa, "aaa_"+str(run)+".txt")
 
     allratings.append(aaa)
     Mean.append(numpy.mean(aaa))
@@ -178,7 +211,9 @@ if rating > 0:
 if rating > 1:
     aa = y[1][:Nn[1]]
     aa = aa[numpy.isfinite(aa)]
-    Paa, Taa = get_histo(aa, step)
+    Paa, Taa, aa, xaa = get_histo(aa, step)
+
+    histo_to_file (xaa, aa, "aa_"+str(run)+".txt")
 
     allratings.append(aa)
     Mean.append(numpy.mean(aa))
@@ -187,7 +222,9 @@ if rating > 1:
 if rating > 2:
     a = y[2][:Nn[2]]
     a = a[numpy.isfinite(a)]
-    Pa, Ta = get_histo(a, step)
+    Pa, Ta, a, xa = get_histo(a, step)
+
+    histo_to_file (xa, a, "a_"+str(run)+".txt")
 
     allratings.append(a)
     Mean.append(numpy.mean(a))
@@ -196,7 +233,9 @@ if rating > 2:
 if rating > 3: 
     bbb = y[3][:Nn[3]]
     bbb = bbb[numpy.isfinite(bbb)]
-    Pbbb, Tbbb = get_histo(bbb, step)
+    Pbbb, Tbbb, bbb, xbbb = get_histo(bbb, step)
+
+    histo_to_file (xbbb, bbb, "bbb_"+str(run)+".txt")
 
     allratings.append(bbb)
     Mean.append(numpy.mean(bbb))
@@ -205,7 +244,9 @@ if rating > 3:
 if rating > 4:
     bb = y[4][:Nn[4]]
     bb = bb[numpy.isfinite(bb)]
-    Pbb, Tbb = get_histo(bb, step)
+    Pbb, Tbb, bb, xbb = get_histo(bb, step)
+
+    histo_to_file (xbb, bb, "bb_"+str(run)+".txt")
 
     allratings.append(bb)
     Mean.append(numpy.mean(bb))
@@ -214,7 +255,9 @@ if rating > 4:
 if rating > 5:
     b = y[5][:Nn[5]]
     b = b[numpy.isfinite(b)]
-    Pb, Tb = get_histo(b, step)
+    Pb, Tb, b, xb = get_histo(b, step)
+
+    histo_to_file (xb, b, "b_"+str(run)+".txt")
 
     allratings.append(b)
     Mean.append(numpy.mean(b))
@@ -223,7 +266,9 @@ if rating > 5:
 if rating > 6:
     cc = y[6][:Nn[6]]
     cc = cc[numpy.isfinite(cc)]
-    Pcc, Tcc = get_histo(cc, step)
+    Pcc, Tcc, cc, xcc = get_histo(cc, step)
+
+    histo_to_file (xcc, cc, "cc_"+str(run)+".txt")
 
     allratings.append(cc)
     Mean.append(numpy.mean(cc))
@@ -232,7 +277,9 @@ if rating > 6:
 if rating > 7:
     d = y[rating-1][:Nn[7]]
     allratings.append(d)
-    Pd, Td = get_histo(d, step)
+    Pd, Td, d, xd = get_histo(d, step)
+    
+    histo_to_file (xd, d, "d_"+str(run)+".txt")
 
     allratings.append(d)
     Mean.append(numpy.mean(d))
@@ -397,17 +444,7 @@ for i in range(acm.shape[0]):
 
 oufilename = "acm_"+str(run)+".txt"
 
-if os.path.exists(oufilename):
-    os.remove(oufilename)
-
-outf = open(oufilename, "w")
-
-for i in range(acm.shape[0]):
-    for j in range(acm.shape[1]):
-        outf.write(" %f "%(acm[i][j]))
-    outf.write("\n")
-
-outf.close()
+mat_to_file (acm, oufilename)
 
 bpm = numpy.zeros((countries,tprev), dtype='float64')
 for i in range(bpm.shape[0]):
@@ -416,14 +453,5 @@ for i in range(bpm.shape[0]):
 
 oufilename = "bpm_"+str(run)+".txt"
 
-if os.path.exists(oufilename):
-    os.remove(oufilename)
+mat_to_file (bpm, oufilename)
 
-outf = open(oufilename, "w")
-
-for i in range(bpm.shape[0]):
-    for j in range(bpm.shape[1]):
-        outf.write(" %f "%(bpm[i][j]))
-    outf.write("\n")
-
-outf.close()
