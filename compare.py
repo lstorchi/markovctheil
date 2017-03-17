@@ -67,7 +67,7 @@ namems1 = 'ms1'
 namems2 = 'ms2'
 
 if len(sys.argv) != 5:
-    print "usage: ", sys.argv[0], " ms2matfilename ms3matfilename mat1 mat2" 
+    print "usage: ", sys.argv[0], " ms1matfilename ms2matfilename mat1 mat2" 
     exit(1)
 else:
     filename1 = sys.argv[1] 
