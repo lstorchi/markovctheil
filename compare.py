@@ -119,13 +119,8 @@ for i in range(iNum1.shape[0]):
             pele1 += 1
 
 ndof1 = pele1 - iNum1.shape[0]
-
-print "DOF 1: ", ndof1
-
 ch21 = scipy.stats.chi2.isf(0.05, ndof1)
 
-
-print "Chi2: ",  ch21
 pele2 = 0 
 for i in range(iNum2.shape[0]):
     for j in range(iNum2.shape[1]):
@@ -133,11 +128,7 @@ for i in range(iNum2.shape[0]):
             pele2 += 1
 
 ndof2 = pele2 - iNum2.shape[0]
-print "DOF 2: ", ndof2
-
 ch22 = scipy.stats.chi2.isf(0.05, ndof2)
-
-print "Chi2: ", ch22
 
 dim = max(iNum1.shape[0], iNum2.shape[0])
 
@@ -189,8 +180,8 @@ for i in range(Num1.shape[0]):
                   * Pr2[i][j] )**2 / den
           
 pvalue1 = 1.0 - scipy.stats.chi2.cdf(phi, ndof1)
-print "Phi: ", phi, " p-value: " , pvalue1
 
+print "DOF1: ", ndof1, " chi2: ", ch21, " Phi: ", phi, " p-value: " , pvalue1
 
 phi = 0.0
 for i in range(Num1.shape[0]):
@@ -202,4 +193,4 @@ for i in range(Num1.shape[0]):
 
 pvalue2 = 1.0 - scipy.stats.chi2.cdf(phi, ndof2)
 
-print "Phi: ", phi,"p-value", pvalue2
+print "DOF2: ", ndof2, " chi2: ", ch22, " Phi: ", phi, " p-value: ", pvalue2
