@@ -89,6 +89,8 @@ run = 100000
 tprev = 37 # mesi previsione
 namems = 'ms'
 namebp = 'i_r'
+#timeinf = False
+timeinf = True
 
 if len(sys.argv) != 6 and len(sys.argv) != 7:
     print "usage: ", sys.argv[0], \
@@ -108,7 +110,6 @@ else:
       tprev = int(sys.argv[4])
       run = int(sys.argv[5])
       namems = sys.argv[6]
-
 
 #numpy.random.seed(9001)
 
@@ -169,6 +170,25 @@ for i in range(rating):
             Pr[i][j] = float(Num[i][j])/float(Den[i])
         else: 
             Pr[i][j] = 0.0
+print ""
+if timeinf:
+    ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(Pr)
+    a = numpy.zeros((rating+1,rating), dtype='float64')
+    for i in range(rating):
+        for j in range(rating):
+            a[i][j] = ai[i][j]
+    for i in range(rating):
+        a[rating][i] = 1.0 
+
+    b = numpy.zeros(rating+1, dtype='float64')
+    b[rating] = 1.0
+    #x = numpy.linalg.solve(a, b)
+    x = numpy.linalg.lstsq(a, b)
+    print x[0]
+
+print numpy.linalg.matrix_power(Pr, 20000)
+
+exit()
 
 newPr = Pr - numpy.identity(rating, dtype='float64')
 
