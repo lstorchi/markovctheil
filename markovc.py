@@ -436,7 +436,7 @@ for t in range(time):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
-print "entropia storica", T_t
+#print "entropia storica", T_t
 oufilename = "T_t.txt"
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
