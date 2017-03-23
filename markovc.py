@@ -185,17 +185,17 @@ if timeinf:
     b[rating] = 1.0
     #x = numpy.linalg.solve(a, b)
     x = numpy.linalg.lstsq(a, b)
-    print x[0]
+    #print x[0]
     #print numpy.linalg.matrix_power(Pr, 20000)
     for j in range(rating):
         for i in range(rating):
             Pr[i][j] = x[0][j] 
 
-print Pr
+#print Pr
 
 newPr = Pr - numpy.identity(rating, dtype='float64')
-
 s, v, d = numpy.linalg.svd(newPr)
+
 print numpy.mean(v)
 
 for i in range(len(i_r)):
@@ -436,8 +436,11 @@ for t in range(time):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
+
 print "entropia storica", T_t
-oufilename = "T_t.txt"
+oufilename = "T_t_"+str(run)+".txt"
+mat_to_file(T_t, oufilename)
+
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
 
