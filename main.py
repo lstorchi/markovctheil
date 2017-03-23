@@ -52,15 +52,23 @@ tprev = 37 # mesi previsione
 namems = 'ms'
 namebp = 'i_r'
 
-if len(sys.argv) != 6:
-    print "usage: ", sys.argv[0], " msmatfilename bpmatfilename step tprev run" 
+if len(sys.argv) != 6 and len(sys.argv)!=7:
+    print "usage: ", sys.argv[0], " msmatfilename bpmatfilename step tprev run [matname]" 
     exit(1)
 else:
-    filename1 = sys.argv[1] 
-    filename2 = sys.argv[2]
-    step = float(sys.argv[3])
-    tprev = int(sys.argv[4])
-    run = int(sys.argv[5])
+    if len(sys.argv)==6:
+     filename1 = sys.argv[1] 
+     filename2 = sys.argv[2]
+     step = float(sys.argv[3])
+     tprev = int(sys.argv[4])
+     run = int(sys.argv[5])
+    elif len(sys.argv)==7:
+     filename1=sys.argv[1]
+     filename2=sys.argv[2]
+     step=float(sys.argv[3])
+     tprev=int(sys.argv[4])
+     run=int(sys.argv[5])
+     namems=sys.argv[6]
 
 #numpy.random.seed(9001)
 
@@ -127,7 +135,7 @@ newPr = Pr - numpy.identity(rating, dtype='float64')
 #print newPr
 
 s, v, d = numpy.linalg.svd(newPr)
-#print numpy.mean(v)
+print numpy.mean(v)
 
 for i in range(len(i_r)):
     for j in range(len(i_r[0])):
@@ -237,7 +245,7 @@ if rating > 7:
     allratings.append(d)
     Mean.append(numpy.mean(d))
     Ti.append(Td)
-
+print "Ti", Ti
 fval = 0.0
 pval = 0.0
 
