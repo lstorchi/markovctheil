@@ -170,6 +170,7 @@ for i in range(rating):
             Pr[i][j] = float(Num[i][j])/float(Den[i])
         else: 
             Pr[i][j] = 0.0
+
 print ""
 if timeinf:
     ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(Pr)
@@ -185,14 +186,14 @@ if timeinf:
     #x = numpy.linalg.solve(a, b)
     x = numpy.linalg.lstsq(a, b)
     print x[0]
+    #print numpy.linalg.matrix_power(Pr, 20000)
+    for j in range(rating):
+        for i in range(rating):
+            Pr[i][j] = x[0][j] 
 
-print numpy.linalg.matrix_power(Pr, 20000)
-
-exit()
+print Pr
 
 newPr = Pr - numpy.identity(rating, dtype='float64')
-
-#print newPr
 
 s, v, d = numpy.linalg.svd(newPr)
 print numpy.mean(v)
