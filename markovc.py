@@ -21,6 +21,23 @@ def mat_to_stdout (mat):
 
 ###############################################################################
 
+def vct_to_file (bpm, oufilename):
+
+    if os.path.exists(oufilename):
+        os.remove(oufilename)
+    
+    outf = open(oufilename, "w")
+
+    for i in range(bpm.shape[0]):
+        outf.write(" %f "%(bpm[i]))
+    outf.write("\n")
+        
+    outf.close()
+
+###############################################################################
+
+
+
 def mat_to_file (bpm, oufilename):
 
     if os.path.exists(oufilename):
@@ -196,7 +213,8 @@ if timeinf:
 newPr = Pr - numpy.identity(rating, dtype='float64')
 s, v, d = numpy.linalg.svd(newPr)
 
-print numpy.mean(v)
+print "mean value: ", numpy.mean(v)
+print " "
 
 for i in range(len(i_r)):
     for j in range(len(i_r[0])):
@@ -437,9 +455,9 @@ for t in range(time):
         if s_t[k][t] != 0:
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
 
-print "entropia storica", T_t
-oufilename = "T_t_"+str(run)+".txt"
-mat_to_file(T_t, oufilename)
+#print "entropia storica", T_t
+oufilename = "entropy_histi_"+str(run)+".txt"
+vct_to_file(T_t, oufilename)
 
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
