@@ -21,6 +21,23 @@ def mat_to_stdout (mat):
 
 ###############################################################################
 
+def vct_to_file (bpm, oufilename):
+
+    if os.path.exists(oufilename):
+        os.remove(oufilename)
+    
+    outf = open(oufilename, "w")
+
+    for i in range(bpm.shape[0]):
+        outf.write(" %f "%(bpm[i]))
+    outf.write("\n")
+        
+    outf.close()
+
+###############################################################################
+
+
+
 def mat_to_file (bpm, oufilename):
 
     if os.path.exists(oufilename):
@@ -171,8 +188,9 @@ for i in range(rating):
         else: 
             Pr[i][j] = 0.0
 
-print ""
 if timeinf:
+    print ""
+    print "Solve ..."
     ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(Pr)
     a = numpy.zeros((rating+1,rating), dtype='float64')
     for i in range(rating):
@@ -185,18 +203,21 @@ if timeinf:
     b[rating] = 1.0
     #x = numpy.linalg.solve(a, b)
     x = numpy.linalg.lstsq(a, b)
-    print x[0]
+    #print x[0]
     #print numpy.linalg.matrix_power(Pr, 20000)
     for j in range(rating):
         for i in range(rating):
             Pr[i][j] = x[0][j] 
 
-print Pr
+#print Pr
 
+print " "
+print "Solve SVD "
 newPr = Pr - numpy.identity(rating, dtype='float64')
-
 s, v, d = numpy.linalg.svd(newPr)
-print numpy.mean(v)
+
+print " "
+print "mean value: ", numpy.mean(v)
 
 for i in range(len(i_r)):
     for j in range(len(i_r[0])):
@@ -254,6 +275,8 @@ if rating > 0:
     Mean.append(numpy.mean(aaa))
     Ti.append(Taaa)
 
+    print "AAA done"
+
 if rating > 1:
     aa = y[1][:Nn[1]]
     aa = aa[numpy.isfinite(aa)]
@@ -271,6 +294,9 @@ if rating > 1:
     allratings.append(aa)
     Mean.append(numpy.mean(aa))
     Ti.append(Taa)
+
+    print "AA done"
+
 
 if rating > 2:
     a = y[2][:Nn[2]]
@@ -290,6 +316,8 @@ if rating > 2:
     Mean.append(numpy.mean(a))
     Ti.append(Ta)
 
+    print "A done"
+
 if rating > 3: 
     bbb = y[3][:Nn[3]]
     bbb = bbb[numpy.isfinite(bbb)]
@@ -307,6 +335,8 @@ if rating > 3:
     allratings.append(bbb)
     Mean.append(numpy.mean(bbb))
     Ti.append(Tbbb)
+
+    print "BBB done"
 
 if rating > 4:
     bb = y[4][:Nn[4]]
@@ -326,6 +356,8 @@ if rating > 4:
     Mean.append(numpy.mean(bb))
     Ti.append(Tbb)
 
+    print "BB done"
+
 if rating > 5:
     b = y[5][:Nn[5]]
     b = b[numpy.isfinite(b)]
@@ -343,6 +375,8 @@ if rating > 5:
     allratings.append(b)
     Mean.append(numpy.mean(b))
     Ti.append(Tb)
+
+    print "B done"
 
 if rating > 6:
     cc = y[6][:Nn[6]]
@@ -362,6 +396,8 @@ if rating > 6:
     Mean.append(numpy.mean(cc))
     Ti.append(Tcc)
 
+    print "CC done"
+
 if rating > 7:
     d = y[rating-1][:Nn[7]]
     allratings.append(d)
@@ -379,6 +415,8 @@ if rating > 7:
     allratings.append(d)
     Mean.append(numpy.mean(d))
     Ti.append(Td)
+
+    print "D done"
 
 fval = 0.0
 pval = 0.0
@@ -436,8 +474,16 @@ for t in range(time):
         s_t[k][t] = r[k][t] / R_t[t]
         if s_t[k][t] != 0:
             T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
+<<<<<<< HEAD
 #print "entropia storica", T_t
 oufilename = "T_t.txt"
+=======
+
+#print "entropia storica", T_t
+oufilename = "entropy_histi_"+str(run)+".txt"
+vct_to_file(T_t, oufilename)
+
+>>>>>>> ec721321876ed950c52adefb17f5194ae1fae182
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
 
