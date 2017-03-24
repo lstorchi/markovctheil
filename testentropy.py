@@ -34,7 +34,8 @@ for l in fp:
     idx += 1
 
     if len(sval) == 4:
-      cmpval.append(1.0 - (float(sval[2])**2 / a**2))
+      var = (float(sval[2])**2 / a**2)
+      cmpval.append(1.0 - var)
       mmax.append(float(sval[1]) + a)
       mmin.append(float(sval[1]) - a)
       m.append(float(sval[1]))
