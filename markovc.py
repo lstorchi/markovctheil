@@ -10,94 +10,8 @@ import os
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-###############################################################################
-
-def mat_to_stdout (mat):
-
-    for i in range(mat.shape[0]):
-       for j in range(mat.shape[1]):
-           sys.stdout.write ("%f "%mat[i][j])
-       sys.stdout.write ("\n")
-
-###############################################################################
-
-def vct_to_file (bpm, oufilename):
-
-    if os.path.exists(oufilename):
-        os.remove(oufilename)
-    
-    outf = open(oufilename, "w")
-
-    for i in range(bpm.shape[0]):
-        outf.write(" %f "%(bpm[i]))
-    outf.write("\n")
-        
-    outf.close()
-
-###############################################################################
-
-
-
-def mat_to_file (bpm, oufilename):
-
-    if os.path.exists(oufilename):
-        os.remove(oufilename)
-    
-    outf = open(oufilename, "w")
-
-    for i in range(bpm.shape[0]):
-        for j in range(bpm.shape[1]):
-            outf.write(" %f "%(bpm[i][j]))
-        outf.write("\n")
-        
-    outf.close()
-
-###############################################################################
-
-def histo_to_file (xh, h, oufilename):
-
-    if os.path.exists(oufilename):
-        os.remove(oufilename)
-    
-    outf = open(oufilename, "w")
-
-    for i in range(len(h)):
-        outf.write("%f %f\n"%((xh[i]+xh[i+1])/2.0, h[i]))
-        
-    outf.close()
-
-###############################################################################
-
-def progress_bar (count, total, status=''):
-
-    bar_len = 60
-    filled_len = int(round(bar_len * count / float(total)))
-
-    percents = round(100.0 * count / float(total), 1)
-    bar = '=' * filled_len + '-' * (bar_len - filled_len)
-
-    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
-    sys.stdout.flush() 
-
-###############################################################################
-
-def get_histo (v, step):
-    
-    minh = min(v)
-    maxh = max(v)
-    nbins = int ((maxh - minh) / step)
-    h, xh = numpy.histogram(v, bins=nbins, range=(minh, maxh))
-    p = h/float(sum(h))
-
-    t = sum((p*(math.log(len(p)))*p))
-
-    bins = []
-    for i in range(len(h)):
-        bins.append((xh[i]+xh[i+1])/2.0) 
-
-    return p, t, h, xh, nbins
-
-###############################################################################
+sys.path.append("./module")
+import basicutils
 
 filename1 = "ms.mat"
 filename2 = "bp.mat"
@@ -176,7 +90,7 @@ for k in range(countries):
 
             Den[i] = sum(Num[i])
 
-    progress_bar(k+1, countries)
+    basicutils.progress_bar(k+1, countries)
 
 #print Num 
 #print Den
@@ -260,7 +174,7 @@ if rating > 0:
     aaa = y[0][:Nn[0]]
     aaa = aaa[numpy.isfinite(aaa)]
 
-    Paaa, Taaa, haaa, xaaa, nbins = get_histo(aaa, step)
+    Paaa, Taaa, haaa, xaaa, nbins = basicutils.get_histo(aaa, step)
 
     plt.hist(aaa, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -269,7 +183,7 @@ if rating > 0:
     plt.grid(True)
     plt.savefig("aaa_"+str(run)+".eps")
 
-    histo_to_file (xaaa, haaa, "aaa_"+str(run)+".txt")
+    basicutils.histo_to_file (xaaa, haaa, "aaa_"+str(run)+".txt")
 
     allratings.append(aaa)
     Mean.append(numpy.mean(aaa))
@@ -280,7 +194,7 @@ if rating > 0:
 if rating > 1:
     aa = y[1][:Nn[1]]
     aa = aa[numpy.isfinite(aa)]
-    Paa, Taa, haa, xaa, nbins = get_histo(aa, step)
+    Paa, Taa, haa, xaa, nbins = basicutils.get_histo(aa, step)
 
     plt.hist(aa, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -289,7 +203,7 @@ if rating > 1:
     plt.grid(True)
     plt.savefig("aa_"+str(run)+".eps")
 
-    histo_to_file (xaa, haa, "aa_"+str(run)+".txt")
+    basicutils.histo_to_file (xaa, haa, "aa_"+str(run)+".txt")
 
     allratings.append(aa)
     Mean.append(numpy.mean(aa))
@@ -301,7 +215,7 @@ if rating > 1:
 if rating > 2:
     a = y[2][:Nn[2]]
     a = a[numpy.isfinite(a)]
-    Pa, Ta, ha, xa, nbins = get_histo(a, step)
+    Pa, Ta, ha, xa, nbins = basicutils.get_histo(a, step)
 
     plt.hist(a, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -310,7 +224,7 @@ if rating > 2:
     plt.grid(True)
     plt.savefig("a_"+str(run)+".eps")
 
-    histo_to_file (xa, ha, "a_"+str(run)+".txt")
+    basicutils.histo_to_file (xa, ha, "a_"+str(run)+".txt")
 
     allratings.append(a)
     Mean.append(numpy.mean(a))
@@ -321,7 +235,7 @@ if rating > 2:
 if rating > 3: 
     bbb = y[3][:Nn[3]]
     bbb = bbb[numpy.isfinite(bbb)]
-    Pbbb, Tbbb, hbbb, xbbb, nbins = get_histo(bbb, step)
+    Pbbb, Tbbb, hbbb, xbbb, nbins = basicutils.get_histo(bbb, step)
 
     plt.hist(bbb, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -330,7 +244,7 @@ if rating > 3:
     plt.grid(True)
     plt.savefig("bbb_"+str(run)+".eps")
 
-    histo_to_file (xbbb, hbbb, "bbb_"+str(run)+".txt")
+    basicutils.histo_to_file (xbbb, hbbb, "bbb_"+str(run)+".txt")
 
     allratings.append(bbb)
     Mean.append(numpy.mean(bbb))
@@ -341,7 +255,7 @@ if rating > 3:
 if rating > 4:
     bb = y[4][:Nn[4]]
     bb = bb[numpy.isfinite(bb)]
-    Pbb, Tbb, hbb, xbb, nbins = get_histo(bb, step)
+    Pbb, Tbb, hbb, xbb, nbins = basicutils.get_histo(bb, step)
 
     plt.hist(bb, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -350,7 +264,7 @@ if rating > 4:
     plt.grid(True)
     plt.savefig("bb_"+str(run)+".eps")
 
-    histo_to_file (xbb, hbb, "bb_"+str(run)+".txt")
+    basicutils.histo_to_file (xbb, hbb, "bb_"+str(run)+".txt")
 
     allratings.append(bb)
     Mean.append(numpy.mean(bb))
@@ -361,7 +275,7 @@ if rating > 4:
 if rating > 5:
     b = y[5][:Nn[5]]
     b = b[numpy.isfinite(b)]
-    Pb, Tb, hb, xb, nbins = get_histo(b, step)
+    Pb, Tb, hb, xb, nbins = basicutils.get_histo(b, step)
 
     plt.hist(b, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -370,7 +284,7 @@ if rating > 5:
     plt.grid(True)
     plt.savefig("b_"+str(run)+".eps")
 
-    histo_to_file (xb, hb, "b_"+str(run)+".txt")
+    basicutils.histo_to_file (xb, hb, "b_"+str(run)+".txt")
 
     allratings.append(b)
     Mean.append(numpy.mean(b))
@@ -381,7 +295,7 @@ if rating > 5:
 if rating > 6:
     cc = y[6][:Nn[6]]
     cc = cc[numpy.isfinite(cc)]
-    Pcc, Tcc, hcc, xcc, nbins = get_histo(cc, step)
+    Pcc, Tcc, hcc, xcc, nbins = basicutils.get_histo(cc, step)
 
     plt.hist(cc, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -390,7 +304,7 @@ if rating > 6:
     plt.grid(True)
     plt.savefig("cc_"+str(run)+".eps")
 
-    histo_to_file (xcc, hcc, "cc_"+str(run)+".txt")
+    basicutils.histo_to_file (xcc, hcc, "cc_"+str(run)+".txt")
 
     allratings.append(cc)
     Mean.append(numpy.mean(cc))
@@ -401,7 +315,7 @@ if rating > 6:
 if rating > 7:
     d = y[rating-1][:Nn[7]]
     allratings.append(d)
-    Pd, Td, hd, xd, nbins = get_histo(d, step)
+    Pd, Td, hd, xd, nbins = basicutils.get_histo(d, step)
 
     plt.hist(d, normed=False, bins=nbins, facecolor='green')
     plt.xlabel("bp")
@@ -410,7 +324,7 @@ if rating > 7:
     plt.grid(True)
     plt.savefig("d_"+str(run)+".eps")
     
-    histo_to_file (xd, hd, "d_"+str(run)+".txt")
+    basicutils.histo_to_file (xd, hd, "d_"+str(run)+".txt")
 
     allratings.append(d)
     Mean.append(numpy.mean(d))
@@ -477,7 +391,7 @@ for t in range(time):
 
 #print "entropia storica", T_t
 oufilename = "entropy_histi_"+str(run)+".txt"
-vct_to_file(T_t, oufilename)
+basicutils.vct_to_file(T_t, oufilename)
 
 X = numpy.random.rand(countries,tprev,run)
 cdf = numpy.zeros((rating,rating), dtype='float64')
@@ -554,7 +468,7 @@ for j in range(run):
         entr[t][j] = t1[t][j] + t2[t][j] + term[t][j]
         R_prev[t] = numpy.mean(r_prev[t][j])
 
-    progress_bar(j+1, run)
+    basicutils.progress_bar(j+1, run)
 
 print " "
 
@@ -581,7 +495,7 @@ for i in range(acm.shape[0]):
 
 oufilename = "acm_"+str(run)+".txt"
 
-mat_to_file (acm, oufilename)
+basicutils.mat_to_file (acm, oufilename)
 
 bpm = numpy.zeros((countries,tprev), dtype='float64')
 for i in range(bpm.shape[0]):
@@ -590,5 +504,4 @@ for i in range(bpm.shape[0]):
 
 oufilename = "bpm_"+str(run)+".txt"
 
-mat_to_file (bpm, oufilename)
-
+basicutils.mat_to_file (bpm, oufilename)
