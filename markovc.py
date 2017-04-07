@@ -161,7 +161,7 @@ for i in range(len(ist)):
 
 allratings = []
 meanval = []
-Ti = []
+tiv = []
 
 if rating > 0:
     aaa = y[0][:nn[0]]
@@ -169,18 +169,19 @@ if rating > 0:
 
     Paaa, Taaa, haaa, xaaa, nbins = basicutils.get_histo(aaa, step)
 
-    plt.hist(aaa, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("AAA")
-    plt.grid(True)
-    plt.savefig("aaa_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(aaa, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("AAA")
+      plt.grid(True)
+      plt.savefig("aaa_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xaaa, haaa, "aaa_"+str(numofrun)+".txt")
 
     allratings.append(aaa)
     meanval.append(numpy.mean(aaa))
-    Ti.append(Taaa)
+    tiv.append(Taaa)
 
     print "AAA done"
 
@@ -189,39 +190,40 @@ if rating > 1:
     aa = aa[numpy.isfinite(aa)]
     Paa, Taa, haa, xaa, nbins = basicutils.get_histo(aa, step)
 
-    plt.hist(aa, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("AA")
-    plt.grid(True)
-    plt.savefig("aa_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(aa, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("AA")
+      plt.grid(True)
+      plt.savefig("aa_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xaa, haa, "aa_"+str(numofrun)+".txt")
 
     allratings.append(aa)
     meanval.append(numpy.mean(aa))
-    Ti.append(Taa)
+    tiv.append(Taa)
 
     print "AA done"
-
 
 if rating > 2:
     a = y[2][:nn[2]]
     a = a[numpy.isfinite(a)]
     Pa, Ta, ha, xa, nbins = basicutils.get_histo(a, step)
 
-    plt.hist(a, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("A")
-    plt.grid(True)
-    plt.savefig("a_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(a, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("A")
+      plt.grid(True)
+      plt.savefig("a_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xa, ha, "a_"+str(numofrun)+".txt")
 
     allratings.append(a)
     meanval.append(numpy.mean(a))
-    Ti.append(Ta)
+    tiv.append(Ta)
 
     print "A done"
 
@@ -230,18 +232,19 @@ if rating > 3:
     bbb = bbb[numpy.isfinite(bbb)]
     Pbbb, Tbbb, hbbb, xbbb, nbins = basicutils.get_histo(bbb, step)
 
-    plt.hist(bbb, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("BBB")
-    plt.grid(True)
-    plt.savefig("bbb_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(bbb, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("BBB")
+      plt.grid(True)
+      plt.savefig("bbb_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xbbb, hbbb, "bbb_"+str(numofrun)+".txt")
 
     allratings.append(bbb)
     meanval.append(numpy.mean(bbb))
-    Ti.append(Tbbb)
+    tiv.append(Tbbb)
 
     print "BBB done"
 
@@ -250,18 +253,19 @@ if rating > 4:
     bb = bb[numpy.isfinite(bb)]
     Pbb, Tbb, hbb, xbb, nbins = basicutils.get_histo(bb, step)
 
-    plt.hist(bb, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("BB")
-    plt.grid(True)
-    plt.savefig("bb_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(bb, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("BB")
+      plt.grid(True)
+      plt.savefig("bb_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xbb, hbb, "bb_"+str(numofrun)+".txt")
 
     allratings.append(bb)
     meanval.append(numpy.mean(bb))
-    Ti.append(Tbb)
+    tiv.append(Tbb)
 
     print "BB done"
 
@@ -270,18 +274,19 @@ if rating > 5:
     b = b[numpy.isfinite(b)]
     Pb, Tb, hb, xb, nbins = basicutils.get_histo(b, step)
 
-    plt.hist(b, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("B")
-    plt.grid(True)
-    plt.savefig("b_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(b, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("B")
+      plt.grid(True)
+      plt.savefig("b_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xb, hb, "b_"+str(numofrun)+".txt")
 
     allratings.append(b)
     meanval.append(numpy.mean(b))
-    Ti.append(Tb)
+    tiv.append(Tb)
 
     print "B done"
 
@@ -290,18 +295,19 @@ if rating > 6:
     cc = cc[numpy.isfinite(cc)]
     Pcc, Tcc, hcc, xcc, nbins = basicutils.get_histo(cc, step)
 
-    plt.hist(cc, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("CC")
-    plt.grid(True)
-    plt.savefig("cc_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(cc, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("CC")
+      plt.grid(True)
+      plt.savefig("cc_"+str(numofrun)+".eps")
 
     basicutils.histo_to_file (xcc, hcc, "cc_"+str(numofrun)+".txt")
 
     allratings.append(cc)
     meanval.append(numpy.mean(cc))
-    Ti.append(Tcc)
+    tiv.append(Tcc)
 
     print "CC done"
 
@@ -310,18 +316,19 @@ if rating > 7:
     allratings.append(d)
     Pd, Td, hd, xd, nbins = basicutils.get_histo(d, step)
 
-    plt.hist(d, normed=False, bins=nbins, facecolor='green')
-    plt.xlabel("bp")
-    plt.ylabel("f(x)")
-    plt.title("D")
-    plt.grid(True)
-    plt.savefig("d_"+str(numofrun)+".eps")
+    if verbose:
+      plt.hist(d, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel("bp")
+      plt.ylabel("f(x)")
+      plt.title("D")
+      plt.grid(True)
+      plt.savefig("d_"+str(numofrun)+".eps")
     
     basicutils.histo_to_file (xd, hd, "d_"+str(numofrun)+".txt")
 
     allratings.append(d)
     meanval.append(numpy.mean(d))
-    Ti.append(Td)
+    tiv.append(Td)
 
     print "D done"
 
@@ -449,7 +456,7 @@ for run in range(numofrun):
         for i in range(rating):
              ac[i][t][run] = tot[i][t][run]/r_prev[t][run]
              if ac[i][t][run] != 0.0:
-                 t1[t][run] += (ac[i][t][run]*Ti[i])
+                 t1[t][run] += (ac[i][t][run]*tiv[i])
                  t2[t][run] += (ac[i][t][run]*math.log(float(rating)*ac[i][t][run]))
                  if cont[i][t][run] != 0:
                     term[t][run] += ac[i][t][run]* \
