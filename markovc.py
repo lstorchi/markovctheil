@@ -82,10 +82,10 @@ for k in range(countries):
     for t in range(time-1):
         for i in range(rating):
             for j in range(rating):
-                if (ms[k][t] == (i+1)) and (ms[k][t+1] == (j+1)):
-                    nk[i][j][k] = nk[i][j][k] + 1
+                if (ms[k, t] == (i+1)) and (ms[k, t+1] == (j+1)):
+                    nk[i, j, k] = nk[i, j, k] + 1
 
-                num[i][j] = sum(nk[i][j])
+                num[i, j] = sum(nk[i, j])
 
             den[i] = sum(num[i])
 
@@ -94,9 +94,9 @@ for k in range(countries):
 for i in range(rating):
     for j in range(rating):
         if den[i] != 0:
-            pr[i][j] = float(num[i][j])/float(den[i])
+            pr[i, j] = float(num[i, j])/float(den[i])
         else: 
-            pr[i][j] = 0.0
+            pr[i, j] = 0.0
 
 if timeinf: # matrice delle probabilita' diventa stazionaria tempo elevato 
     print ""
@@ -106,17 +106,17 @@ if timeinf: # matrice delle probabilita' diventa stazionaria tempo elevato
 
     for i in range(rating):
         for j in range(rating):
-            a[i][j] = ai[i][j]
+            a[i, j] = ai[i, j]
 
     for i in range(rating):
-        a[rating][i] = 1.0 
+        a[rating, i] = 1.0 
 
     b = numpy.zeros(rating+1, dtype='float64')
     b[rating] = 1.0
     x = numpy.linalg.lstsq(a, b)
     for j in range(rating):
         for i in range(rating):
-            pr[i][j] = x[0][j] 
+            pr[i, j] = x[0, j] 
  
 print " "
 print "Solve SVD "
@@ -128,8 +128,8 @@ print "mean value: ", numpy.mean(v)
 
 for i in range(len(i_r)):
     for j in range(len(i_r[0])):
-        if math.isnan(i_r[i][j]):
-           i_r[i][j] = float('inf')
+        if math.isnan(i_r[i, j]):
+           i_r[i, j] = float('inf')
 
 benchmark = numpy.amin(i_r, 0)
 
@@ -137,12 +137,12 @@ r = numpy.zeros((countries,time), dtype='float64')
 
 for i in range(countries):
     for j in range(time):
-        r[i][j] = i_r[i][j] - benchmark[j]
+        r[i, j] = i_r[i, j] - benchmark[j]
 
 for i in range(len(r)):
     for j in range(len(r[0])):
-        if (r[i][j] == float('Inf')):
-           r[i][j] = float('nan')
+        if (r[i, j] == float('Inf')):
+           r[i, j] = float('nan')
 
 ist = numpy.zeros((rating,time*countries), dtype='float64')
 nn = numpy.zeros((rating), dtype='int')
@@ -150,187 +150,74 @@ nn = numpy.zeros((rating), dtype='int')
 for i in range(rating):
     for j in range(countries):
         for k in range(time):
-            if ms[j][k] == i+1: 
+            if ms[j, k] == i+1: 
                 nn[i] = nn[i] + 1 
-                ist[i][nn[i]-1] = r[j][k]
+                ist[i, nn[i]-1] = r[j, k]
 
 meanval = numpy.zeros((rating), dtype='float64')
 y = numpy.zeros((ist.shape[0], nn[0]), dtype='float64')
 for i in range(len(ist)):
-    y[i] = ist[i][0:nn[0]]
+    y[i] = ist[i, 0:nn[0]]
 
 allratings = []
 meanval = []
 tiv = []
 
 if rating > 0:
-    aaa = y[0][:nn[0]]
-    aaa = aaa[numpy.isfinite(aaa)]
-
-    Paaa, Taaa, haaa, xaaa, nbins = basicutils.get_histo(aaa, step)
-
-    if verbose:
-      plt.hist(aaa, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("AAA")
-      plt.grid(True)
-      plt.savefig("aaa_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xaaa, haaa, "aaa_"+str(numofrun)+".txt")
-
-    allratings.append(aaa)
-    meanval.append(numpy.mean(aaa))
-    tiv.append(Taaa)
-
-    print "AAA done"
+    a, b, c = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
+            "aaa")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 1:
-    aa = y[1][:nn[1]]
-    aa = aa[numpy.isfinite(aa)]
-    Paa, Taa, haa, xaa, nbins = basicutils.get_histo(aa, step)
-
-    if verbose:
-      plt.hist(aa, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("AA")
-      plt.grid(True)
-      plt.savefig("aa_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xaa, haa, "aa_"+str(numofrun)+".txt")
-
-    allratings.append(aa)
-    meanval.append(numpy.mean(aa))
-    tiv.append(Taa)
-
-    print "AA done"
+    a, b, c = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
+            "aa")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 2:
-    a = y[2][:nn[2]]
-    a = a[numpy.isfinite(a)]
-    Pa, Ta, ha, xa, nbins = basicutils.get_histo(a, step)
-
-    if verbose:
-      plt.hist(a, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("A")
-      plt.grid(True)
-      plt.savefig("a_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xa, ha, "a_"+str(numofrun)+".txt")
-
+    a, b, c = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
+            "a")
     allratings.append(a)
-    meanval.append(numpy.mean(a))
-    tiv.append(Ta)
-
-    print "A done"
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 3: 
-    bbb = y[3][:nn[3]]
-    bbb = bbb[numpy.isfinite(bbb)]
-    Pbbb, Tbbb, hbbb, xbbb, nbins = basicutils.get_histo(bbb, step)
-
-    if verbose:
-      plt.hist(bbb, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("BBB")
-      plt.grid(True)
-      plt.savefig("bbb_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xbbb, hbbb, "bbb_"+str(numofrun)+".txt")
-
-    allratings.append(bbb)
-    meanval.append(numpy.mean(bbb))
-    tiv.append(Tbbb)
-
-    print "BBB done"
+    a, b, c = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
+            "bbb")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 4:
-    bb = y[4][:nn[4]]
-    bb = bb[numpy.isfinite(bb)]
-    Pbb, Tbb, hbb, xbb, nbins = basicutils.get_histo(bb, step)
-
-    if verbose:
-      plt.hist(bb, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("BB")
-      plt.grid(True)
-      plt.savefig("bb_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xbb, hbb, "bb_"+str(numofrun)+".txt")
-
-    allratings.append(bb)
-    meanval.append(numpy.mean(bb))
-    tiv.append(Tbb)
-
-    print "BB done"
+    a, b, c = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
+            "bb")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 5:
-    b = y[5][:nn[5]]
-    b = b[numpy.isfinite(b)]
-    Pb, Tb, hb, xb, nbins = basicutils.get_histo(b, step)
-
-    if verbose:
-      plt.hist(b, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("B")
-      plt.grid(True)
-      plt.savefig("b_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xb, hb, "b_"+str(numofrun)+".txt")
-
-    allratings.append(b)
-    meanval.append(numpy.mean(b))
-    tiv.append(Tb)
-
-    print "B done"
+    a, b, c = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
+            "b")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 6:
-    cc = y[6][:nn[6]]
-    cc = cc[numpy.isfinite(cc)]
-    Pcc, Tcc, hcc, xcc, nbins = basicutils.get_histo(cc, step)
-
-    if verbose:
-      plt.hist(cc, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("CC")
-      plt.grid(True)
-      plt.savefig("cc_"+str(numofrun)+".eps")
-
-    basicutils.histo_to_file (xcc, hcc, "cc_"+str(numofrun)+".txt")
-
-    allratings.append(cc)
-    meanval.append(numpy.mean(cc))
-    tiv.append(Tcc)
-
-    print "CC done"
+    a, b, c = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
+            "cc")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 if rating > 7:
-    d = y[rating-1][:nn[7]]
-    allratings.append(d)
-    Pd, Td, hd, xd, nbins = basicutils.get_histo(d, step)
-
-    if verbose:
-      plt.hist(d, normed=False, bins=nbins, facecolor='green')
-      plt.xlabel("bp")
-      plt.ylabel("f(x)")
-      plt.title("D")
-      plt.grid(True)
-      plt.savefig("d_"+str(numofrun)+".eps")
-    
-    basicutils.histo_to_file (xd, hd, "d_"+str(numofrun)+".txt")
-
-    allratings.append(d)
-    meanval.append(numpy.mean(d))
-    tiv.append(Td)
-
-    print "D done"
+    a, b, c = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
+            "d")
+    allratings.append(a)
+    meanval.append(b)
+    tiv.append(c)
 
 fval = 0.0
 pval = 0.0
@@ -377,17 +264,17 @@ s_t = numpy.zeros((countries,time), dtype='float64')
 
 for i in range(r.shape[0]):
     for j in range(r.shape[1]):
-        if math.isnan(r[i][j]):
-            r[i][j] = 0.0
+        if math.isnan(r[i, j]):
+            r[i, j] = 0.0
 
 R_t = numpy.sum(r, axis=0)
 T_t = numpy.zeros(time, dtype='float64')
 
 for t in range(time):
     for k in range(countries):
-        s_t[k][t] = r[k][t] / R_t[t]
-        if s_t[k][t] != 0:
-            T_t[t] += s_t[k][t]*math.log(float(countries) * s_t[k][t])
+        s_t[k, t] = r[k, t] / R_t[t]
+        if s_t[k, t] != 0:
+            T_t[t] += s_t[k, t]*math.log(float(countries) * s_t[k, t])
 
 #print "entropia storica", T_t
 oufilename = "entropy_histi_"+str(numofrun)+".txt"
@@ -410,59 +297,59 @@ xi = numpy.random.rand(countries,tprev,numofrun)
 var = numpy.zeros((tprev), dtype='float64')
 
 for i in range (rating):
-    cdf[i][0] = pr[i][0]
+    cdf[i, 0] = pr[i, 0]
 
 for i in range(rating):
     for j in range(1,rating):
-        cdf[i][j] = pr[i][j] + cdf[i][j-1]
+        cdf[i, j] = pr[i, j] + cdf[i, j-1]
 
 for run in range(numofrun):
 
     for c in range(countries):
-        x[c][0][run] = ms[c][time-1]
+        x[c, 0, run] = ms[c, time-1]
 
     for c in range(countries):
-        if xi[c][0][run] <= cdf[x[c][0][run]-1][0]:
-            x[c][1][run] = 1
+        if xi[c, 0, run] <= cdf[x[c, 0, run]-1, 0]:
+            x[c, 1, run] = 1
 
         for k in range(1,rating):
-            if (cdf[x[c][0][run]-1][k-1] < xi[c][0][run]) and \
-                    (xi[c][0][run] <= cdf[x[c][0][run]-1][k] ):
-               x[c][1][run] = k + 1
+            if (cdf[x[c, 0, run]-1, k-1] < xi[c, 0, run]) and \
+                    (xi[c, 0, run] <= cdf[x[c, 0, run]-1, k] ):
+               x[c, 1, run] = k + 1
 
         for t in range(2,tprev):
-            if xi[c][t-1][run] <= cdf[x[c][t-1][run]-1][0]:
-                x[c][t][run] = 1
+            if xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, 0]:
+                x[c, t, run] = 1
 
             for k in range(1,rating):
-                if (cdf[x[c][t-1][run]-1][k-1] < xi[c][t-1][run]) \
-                        and (xi[c][t-1][run] <= cdf[x[c][t-1][run]-1][k]):
-                  x[c][t][run] = k + 1
+                if (cdf[x[c, t-1, run]-1, k-1] < xi[c, t-1, run]) \
+                        and (xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, k]):
+                  x[c, t, run] = k + 1
 
     for t in range(tprev):
         for c in range(countries):
             for i in range(rating):
-                if x[c][t][run] == i+1:
-                    bp[c][t][run] = meanval[i]
-                    cont[i][t][run] = cont[i][t][run] + 1
-                    tot[i][t][run] = cont[i][t][run] * meanval[i]
+                if x[c, t, run] == i+1:
+                    bp[c, t, run] = meanval[i]
+                    cont[i, t, run] = cont[i, t, run] + 1
+                    tot[i, t, run] = cont[i, t, run] * meanval[i]
             
         summa = 0.0
         for a in range(bp.shape[0]):
-            summa += bp[a][t][run]
-        r_prev[t][run] = summa
+            summa += bp[a, t, run]
+        r_prev[t, run] = summa
 
     for t in range(tprev):
         for i in range(rating):
-             ac[i][t][run] = tot[i][t][run]/r_prev[t][run]
-             if ac[i][t][run] != 0.0:
-                 t1[t][run] += (ac[i][t][run]*tiv[i])
-                 t2[t][run] += (ac[i][t][run]*math.log(float(rating)*ac[i][t][run]))
-                 if cont[i][t][run] != 0:
-                    term[t][run] += ac[i][t][run]* \
-                            math.log(float(countries)/(float(rating)*cont[i][t][run]))
+             ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
+             if ac[i, t, run] != 0.0:
+                 t1[t, run] += (ac[i, t, run]*tiv[i])
+                 t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
+                 if cont[i, t, run] != 0:
+                    term[t, run] += ac[i, t, run]* \
+                            math.log(float(countries)/(float(rating)*cont[i, t, run]))
  
-        entr[t][run] = t1[t][run] + t2[t][run] + term[t][run]
+        entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
 
     basicutils.progress_bar(run+1, numofrun)
 
@@ -487,7 +374,7 @@ outf.close()
 acm = numpy.zeros((rating,tprev), dtype='float64')
 for i in range(acm.shape[0]):
     for j in range(acm.shape[1]):
-        acm[i][j] = numpy.mean(ac[i][j])
+        acm[i, j] = numpy.mean(ac[i, j])
 
 oufilename = "acm_"+str(numofrun)+".txt"
 
@@ -496,7 +383,7 @@ basicutils.mat_to_file (acm, oufilename)
 bpm = numpy.zeros((countries,tprev), dtype='float64')
 for i in range(bpm.shape[0]):
     for j in range(bpm.shape[1]):
-        bpm[i][j] = numpy.mean(bp[i][j])
+        bpm[i, j] = numpy.mean(bp[i, j])
 
 oufilename = "bpm_"+str(numofrun)+".txt"
 

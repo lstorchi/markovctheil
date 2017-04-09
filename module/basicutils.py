@@ -9,7 +9,7 @@ def mat_to_stdout (mat):
 
     for i in range(mat.shape[0]):
        for j in range(mat.shape[1]):
-           sys.stdout.write ("%f "%mat[i][j])
+           sys.stdout.write ("%f "%mat[i, j])
        sys.stdout.write ("\n")
 
 ###############################################################################
@@ -38,7 +38,7 @@ def mat_to_file (bpm, oufilename):
 
     for i in range(bpm.shape[0]):
         for j in range(bpm.shape[1]):
-            outf.write(" %f "%(bpm[i][j]))
+            outf.write(" %f "%(bpm[i, j]))
         outf.write("\n")
         
     outf.close()
@@ -90,3 +90,22 @@ def get_histo (v, step):
 
 ###############################################################################
 
+def extract_ti_mean (dat, step, rtnum, numofrun, fname = "", verbose = False):
+
+    dat = dat[numpy.isfinite(dat)]
+    pdat, tdat, hdat, xdat, nbins = get_histo(dat, step)
+
+    if fname != "" and verbose:
+      plt.hist(bb, normed=False, bins=nbins, facecolor='green')
+      plt.xlabel(fname)
+      plt.ylabel("f(x)")
+      plt.title(fname)
+      plt.grid(True)
+      plt.savefig(fname+"_"+str(numofrun)+".eps")
+
+    if fname != "":
+      histo_to_file (xdat, hdat, fname+"_"+str(numofrun)+".txt")
+
+    return dat, numpy.mean(dat), tdat
+
+###############################################################################
