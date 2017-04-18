@@ -37,7 +37,8 @@ parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 parser.add_argument("-i", "--time-inf", help="Simulate infinie time", \
         default=False, action="store_true", dest="timeinf")
-
+parser.add_argument("-S", "--seed", help="using a seed for the random generator", \
+        default=False, action="store_true", dest="seed")
 
 if len(sys.argv) == 1:
     parser.print_help()
@@ -55,7 +56,8 @@ tprev = args.tprev
 numofrun = args.maxrun
 namems = args.nameofmatrix
 
-numpy.random.seed(9001)
+if args.seed:
+  numpy.random.seed(9001)
 
 if not (os.path.isfile(filename1)):
     print "File ", filename1, " does not exist "
