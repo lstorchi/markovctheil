@@ -2,10 +2,13 @@ import numpy.linalg
 import numpy.random
 import scipy.stats
 import scipy.io
+import argparse
 import numpy
 import math
 import sys
 import os
+
+import os.path
 
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
@@ -13,37 +16,54 @@ import matplotlib.pyplot as plt
 sys.path.append("./module")
 import basicutils
 
-filename1 = "ms.mat"
-filename2 = "bp.mat"
-step = 0.25 
-numofrun = 100000
-tprev = 37 # mesi previsione
-namems = 'ms'
-namebp = 'i_r'
-timeinf = False
-#timeinf = True
-verbose = False
+parser = argparse.ArgumentParser()
 
-if len(sys.argv) != 6 and len(sys.argv) != 7:
-    print "usage: ", sys.argv[0], \
-            " msmatfilename bpmatfilename step tprev run [matname]" 
+#parser.add_argument("-h","--help", help="print help message and exit")
+parser.add_argument("-m","--msmat-filename", help="MS mat filename", \
+        type=str, required=True, dest="msmatfilename")
+parser.add_argument("-b", "--bpmat-filename", help="BP mat filename", \
+        type=str, required=True, dest="bpmatfilename")
+parser.add_argument("-s", "--step", help="Step ", \
+        type=float, required=False, default=0.25, dest="step")
+parser.add_argument("-t", "--time-prev", help="Time prev ", \
+        type=int, required=False, default=37, dest="tprev")
+parser.add_argument("-n", "--max-run", help="Num. of run required ", \
+        type=int, required=True, dest="maxrun")
+parser.add_argument("-M", "--name-of-matrix", help="Name of MS matrix ", \
+        type=str, required=False, default="ms", dest="nameofmatrix")
+parser.add_argument("-B", "--name-of-bpmatrix", help="Name of BP matrix ", \
+        type=str, required=False, default="i_r", dest="nameofbpmatrix")
+parser.add_argument("-v", "--verbose", help="increase output verbosity", \
+        default=False, action="store_true")
+parser.add_argument("-i", "--time-inf", help="Simulate infinie time", \
+        default=False, action="store_true", dest="timeinf")
+
+
+if len(sys.argv) == 1:
+    parser.print_help()
     exit(1)
-else:
-    if len(sys.argv) == 6:
-      filename1 = sys.argv[1] 
-      filename2 = sys.argv[2]
-      step = float(sys.argv[3])
-      tprev = int(sys.argv[4])
-      numofrun = int(sys.argv[5])
-    elif len(sys.argv) == 7:
-      filename1 = sys.argv[1] 
-      filename2 = sys.argv[2]
-      step = float(sys.argv[3])
-      tprev = int(sys.argv[4])
-      numofrun = int(sys.argv[5])
-      namems = sys.argv[6]
+
+args = parser.parse_args()
+
+namebp = args.nameofbpmatrix
+timeinf = args.timeinf
+verbose = args.verbose
+filename1 = args.msmatfilename
+filename2 = args.bpmatfilename
+step = args.step
+tprev = args.tprev
+numofrun = args.maxrun
+namems = args.nameofmatrix
 
 numpy.random.seed(9001)
+
+if not (os.path.isfile(filename1)):
+    print "File ", filename1, " does not exist "
+    exit(1)
+
+if not (os.path.isfile(filename2)):
+    print "File ", filename2, " does not exist "
+    exit(1)
 
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
@@ -119,12 +139,15 @@ if timeinf: # matrice delle probabilita' diventa stazionaria tempo elevato
             pr[i, j] = x[0, j] 
  
 print " "
-print "Solve SVD "
+if verbose:
+  print "Solve SVD "
+
 npr = pr - numpy.identity(rating, dtype='float64')
 s, v, d = numpy.linalg.svd(npr)
 
-print " "
-print "mean value: ", numpy.mean(v)
+if verbose:
+    print " "
+    print "mean value: ", numpy.mean(v)
 
 for i in range(len(i_r)):
     for j in range(len(i_r[0])):

@@ -13,6 +13,7 @@ def meant (ms):
 
     gcont = 0.0
     gmt = 0.0
+    
     for i in range(ms.shape[0]):
     
         v1 = ms[i, 0]
