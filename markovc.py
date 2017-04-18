@@ -18,7 +18,6 @@ import basicutils
 
 parser = argparse.ArgumentParser()
 
-#parser.add_argument("-h","--help", help="print help message and exit")
 parser.add_argument("-m","--msmat-filename", help="MS mat filename", \
         type=str, required=True, dest="msmatfilename")
 parser.add_argument("-b", "--bpmat-filename", help="BP mat filename", \
