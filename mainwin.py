@@ -52,3 +52,8 @@ class main_window(QtGui.QMainWindow):
     def mainrun(self):
 
         self.__options_dialog__.exec_()
+
+    def get_options (self):
+
+        return self.__options_dialog__
+
