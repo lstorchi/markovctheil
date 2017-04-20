@@ -57,10 +57,11 @@ tprev = args.tprev
 numofrun = args.maxrun
 namems = args.nameofmatrix
 
-errmsg = ""
+errmsg = []
 
 if not mainmkvcmp.main_mkc_comp (filename1, namems, filename2, namebp, \
         timeinf, step, tprev, numofrun, verbose, args.seed, errmsg):
-  print errmsg
-  exit(1)
+    for m in errmsg:
+        print m
+    exit(1)
 

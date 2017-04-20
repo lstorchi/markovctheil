@@ -23,35 +23,37 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        numpy.random.seed(9001)
 
    if not (os.path.isfile(filename1)):
-       errmsg = "File " + filename1 + " does not exist "
+       errmsg.append("File " + filename1 + " does not exist ")
        return False
    
    if not (os.path.isfile(filename2)):
-       errmsg = "File ", filename2, " does not exist "
+       errmsg.append("File ", filename2, " does not exist ")
        return False
    
    msd = scipy.io.loadmat(filename1)
    bpd = scipy.io.loadmat(filename2)
    
    if not(namems in msd.keys()):
-       errmsg = "Cannot find " + namems + " in ", filename1
-       errmsg = msd.keys()
+       errmsg.append("Cannot find " + namems + " in " + filename1)
+       for k in msd.keys():
+           errmsg.append(k)
        return False
    
    if not(namebp in bpd.keys()):
-       errmsg = "Cannot find " + namebp + " in ", filename2
-       errmsg += bpd.keys()
+       errmsg.append("Cannot find " + namebp + " in " + filename2)
+       for k in bpd.keys():
+           errmsg.append(k)
        return False
    
    if msd[namems].shape[0] != bpd[namebp].shape[0]:
-       errmsg = "wrong dim of the input matrix"
+       errmsg.append("wrong dim of the input matrix")
        return False
    
    countries = msd[namems].shape[0]
    rating = numpy.max(msd[namems])
    
    if (rating <= 0) or (rating > 8):
-       errmsg = "rating " + rating + " is not a valid value"
+       errmsg.append("rating " + rating + " is not a valid value")
        return False
    
    ms = msd[namems]
