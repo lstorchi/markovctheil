@@ -88,6 +88,7 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        if verbose:
          print ""
          print "Solve ..."
+
        ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(pr)
        a = numpy.zeros((rating+1,rating), dtype='float64')
    
@@ -101,9 +102,10 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        b = numpy.zeros(rating+1, dtype='float64')
        b[rating] = 1.0
        x = numpy.linalg.lstsq(a, b)
+       
        for j in range(rating):
            for i in range(rating):
-               pr[i, j] = x[0, j] 
+               pr[i, j] = x[0][j] 
     
 
    if verbose:
@@ -346,7 +348,8 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        if verbose:
          basicutils.progress_bar(run+1, numofrun)
    
-   print " "
+   if verbose:
+     print " "
    
    oufilename = "entropy_"+str(numofrun)+".txt"
    
