@@ -60,14 +60,14 @@ class optiondialog(QtGui.QDialog):
             "STEP unexpected value reset to defaul")
 
         if (basicutils.is_integer(str(self.tprevtb.displayText()))):
-           self.__tprev__ = float(str(self.tprevtb.displayText()))
+           self.__tprev__ = int(str(self.tprevtb.displayText()))
         else:
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
             "TPREV unexpected value reset to defaul")
 
         if (basicutils.is_integer(str(self.nofruntb.displayText()))):
-           self.__nofrun__ = float(str(self.nofruntb.displayText()))
+           self.__nofrun__ = int(str(self.nofruntb.displayText()))
         else:
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
@@ -81,7 +81,7 @@ class optiondialog(QtGui.QDialog):
         return self.__step__
 
     def gettprev (self):
-        return self.__step__
+        return self.__tprev__
 
     def getnofrun (self):
         return self.__nofrun__

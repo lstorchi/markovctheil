@@ -16,50 +16,21 @@ import matplotlib.pyplot as plt
 sys.path.append("./module")
 import basicutils
 
-def main_mkc_comp (filename1, namems, filename2, namebp, \
-        timeinf, step, tprev, numofrun, verbose, seed, errmsg):
+def main_mkc_comp (rm, ir, timeinf, step, tprev, \
+        numofrun, verbose, seed, errmsg, setval=None, \
+        setlbl=None, refself=None):
 
    if seed:
        numpy.random.seed(9001)
 
-   if not (os.path.isfile(filename1)):
-       errmsg.append("File " + filename1 + " does not exist ")
-       return False
-   
-   if not (os.path.isfile(filename2)):
-       errmsg.append("File ", filename2, " does not exist ")
-       return False
-   
-   msd = scipy.io.loadmat(filename1)
-   bpd = scipy.io.loadmat(filename2)
-   
-   if not(namems in msd.keys()):
-       errmsg.append("Cannot find " + namems + " in " + filename1)
-       for k in msd.keys():
-           errmsg.append(k)
-       return False
-   
-   if not(namebp in bpd.keys()):
-       errmsg.append("Cannot find " + namebp + " in " + filename2)
-       for k in bpd.keys():
-           errmsg.append(k)
-       return False
-   
-   if msd[namems].shape[0] != bpd[namebp].shape[0]:
-       errmsg.append("wrong dim of the input matrix")
-       return False
-   
-   countries = msd[namems].shape[0]
-   rating = numpy.max(msd[namems])
+   countries = rm.shape[0]
+   rating = numpy.max(rm)
+   time = len(rm[1,:])
    
    if (rating <= 0) or (rating > 8):
        errmsg.append("rating " + rating + " is not a valid value")
        return False
-   
-   ms = msd[namems]
-   i_r = bpd[namebp]
-   time = len(ms[1,:])
-   
+     
    pr = numpy.zeros((rating,rating), dtype='float64')
    nk = numpy.zeros((rating,rating,countries), dtype='int64')
    num = numpy.zeros((rating,rating), dtype='int64')
@@ -69,7 +40,7 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        for t in range(time-1):
            for i in range(rating):
                for j in range(rating):
-                   if (ms[k, t] == (i+1)) and (ms[k, t+1] == (j+1)):
+                   if (rm[k, t] == (i+1)) and (rm[k, t+1] == (j+1)):
                        nk[i, j, k] = nk[i, j, k] + 1
    
                    num[i, j] = sum(nk[i, j])
@@ -108,7 +79,6 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        for j in range(rating):
            for i in range(rating):
                pr[i, j] = x[0][j] 
-    
 
    if verbose:
      print " "
@@ -121,18 +91,18 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
        print " "
        print "mean value: ", numpy.mean(v)
    
-   for i in range(len(i_r)):
-       for j in range(len(i_r[0])):
-           if math.isnan(i_r[i, j]):
-              i_r[i, j] = float('inf')
+   for i in range(len(ir)):
+       for j in range(len(ir[0])):
+           if math.isnan(ir[i, j]):
+              ir[i, j] = float('inf')
    
-   benchmark = numpy.amin(i_r, 0)
+   benchmark = numpy.amin(ir, 0)
    
    r = numpy.zeros((countries,time), dtype='float64') 
    
    for i in range(countries):
        for j in range(time):
-           r[i, j] = i_r[i, j] - benchmark[j]
+           r[i, j] = ir[i, j] - benchmark[j]
    
    for i in range(len(r)):
        for j in range(len(r[0])):
@@ -145,7 +115,7 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
    for i in range(rating):
        for j in range(countries):
            for k in range(time):
-               if ms[j, k] == i+1: 
+               if rm[j, k] == i+1: 
                    nn[i] = nn[i] + 1 
                    ist[i, nn[i]-1] = r[j, k]
    
@@ -302,7 +272,7 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
    for run in range(numofrun):
    
        for c in range(countries):
-           x[c, 0, run] = ms[c, time-1]
+           x[c, 0, run] = rm[c, time-1]
    
        for c in range(countries):
            if xi[c, 0, run] <= cdf[x[c, 0, run]-1, 0]:
@@ -348,7 +318,10 @@ def main_mkc_comp (filename1, namems, filename2, namebp, \
            entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
    
        if verbose:
-         basicutils.progress_bar(run+1, numofrun)
+           basicutils.progress_bar(run+1, numofrun)
+
+       if setval != None:
+           setval(refself, float(run+1)/float(numofrun))
    
    if verbose:
      print " "

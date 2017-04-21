@@ -1,10 +1,16 @@
 from PyQt4 import QtGui, QtCore 
+import scipy.io
 import options
+import mainmkvcmp
 
 class main_window(QtGui.QMainWindow):
     
     def __init__(self):
         self.__inputfile__ = ""
+        self.__fileio__ = False
+
+        self.__namerm__ = "ratings"
+        self.__nameir__ = "interest_rates"
         
         QtGui.QMainWindow.__init__(self) 
         self.resize(350, 250) 
@@ -48,10 +54,73 @@ class main_window(QtGui.QMainWindow):
     def openfile(self):
 
         self.__inputfile__ = QtGui.QFileDialog.getOpenFileName(self) 
+        self.__fileio__ = False
+
+        msd = scipy.io.loadmat(str(self.__inputfile__))
+        bpd = scipy.io.loadmat(str(self.__inputfile__))
+        
+        if not(self.__namerm__ in msd.keys()):
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "Cannot find " + self.__namerm__ + " in " + self.__inputfile__)
+           return 
+
+        if not(self.__nameir__ in bpd.keys()):
+            QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    "Cannot find " + self.__nameir__ + " in " + self.__inputfile__)
+            return 
+        
+        if msd[self.__namerm__].shape[0] != bpd[self.__nameir__].shape[0]:
+            QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    "wrong dim of the input matrix")
+            return 
+        
+        self.__rm__ = msd[self.__namerm__]
+        self.__ir__ = bpd[self.__nameir__]
+        self.__fileio__ = True
 
     def mainrun(self):
 
-        self.__options_dialog__.exec_()
+        if (self.__fileio__):
+            self.__options_dialog__.exec_()
+
+            progdialog = QtGui.QProgressDialog(
+                    "", "Cancel", 0, 100.0, self)
+
+            progdialog.setWindowTitle("Running")
+            progdialog.setWindowModality(QtCore.Qt.WindowModal)
+            progdialog.show()
+            
+            errmsg = []
+
+            mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
+                    self.__options_dialog__.getinftime(), \
+                    self.__options_dialog__.getstep(), \
+                    self.__options_dialog__.gettprev(), \
+                    self.__options_dialog__.getnofrun(), \
+                    False, False, errmsg, progdialog.setValue,
+                    progdialog.setLabelText, progdialog.self)
+
+            # TODO 
+            # for i in range(0, 100):
+            #     QtCore.QCoreApplication.processEvents()
+            #     progdialog.setValue(i)
+            #     
+            #     cont = 0
+            #     for j in range(0, 1000000):
+            #         cont += 1
+
+            #     progdialog.setLabelText(str(i))
+
+            progdialog.setValue(100.0)
+            progdialog.close()
+
+        else:
+            QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    "Error occurs while opening input file")
 
     def get_options (self):
 

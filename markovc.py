@@ -20,10 +20,10 @@ import basicutils
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-m","--msmat-filename", help="MS mat filename", \
-        type=str, required=True, dest="msmatfilename")
-parser.add_argument("-b", "--bpmat-filename", help="BP mat filename", \
-        type=str, required=True, dest="bpmatfilename")
+parser.add_argument("-m","--rmat-filename", help="Rating mattrix filename", \
+        type=str, required=True, dest="rmatfilename")
+parser.add_argument("-b", "--imat-filename", help="Interest rates matrix filename", \
+        type=str, required=True, dest="imatfilename")
 parser.add_argument("-s", "--step", help="Step ", \
         type=float, required=False, default=0.25, dest="step")
 parser.add_argument("-t", "--time-prev", help="Time prev ", \
@@ -50,8 +50,8 @@ args = parser.parse_args()
 namebp = args.nameofbpmatrix
 timeinf = args.timeinf
 verbose = args.verbose
-filename1 = args.msmatfilename
-filename2 = args.bpmatfilename
+filename1 = args.rmatfilename
+filename2 = args.imatfilename
 step = args.step
 tprev = args.tprev
 numofrun = args.maxrun
@@ -59,8 +59,36 @@ namems = args.nameofmatrix
 
 errmsg = []
 
-if not mainmkvcmp.main_mkc_comp (filename1, namems, filename2, namebp, \
-        timeinf, step, tprev, numofrun, verbose, args.seed, errmsg):
+if not (os.path.isfile(filename1)):
+    errmsg.append("File " + filename1 + " does not exist ")
+    exit(1)
+
+if not (os.path.isfile(filename2)):
+    errmsg.append("File ", filename2, " does not exist ")
+    exit(1)
+
+msd = scipy.io.loadmat(filename1)
+bpd = scipy.io.loadmat(filename2)
+
+if not(namems in msd.keys()):
+    print "Cannot find " + namems + " in " + filename1
+    print msd.keys()
+    exit(1)
+
+if not(namebp in bpd.keys()):
+    print "Cannot find " + namebp + " in " + filename2
+    print bpd.keys()
+    exit(1)
+
+if msd[namems].shape[0] != bpd[namebp].shape[0]:
+    print "wrong dim of the input matrix"
+    exit(1)
+
+ms = msd[namems]
+i_r = bpd[namebp]
+
+if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
+        numofrun, verbose, args.seed, errmsg):
     for m in errmsg:
         print m
     exit(1)
