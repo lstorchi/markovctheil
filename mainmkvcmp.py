@@ -17,7 +17,8 @@ sys.path.append("./module")
 import basicutils
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
-        numofrun, verbose, seed, errmsg, setval=None):
+        numofrun, verbose, outfiles, seed, errmsg, \
+        entropia, var, setval=None):
 
    if seed:
        numpy.random.seed(9001)
@@ -58,6 +59,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
          if setval.wasCanceled():
              errmsg.append("Cancelled!")
              return False
+
+   if setval != None:
+        setval.setValue(0)
+        setval.setLabelText("Running...")
    
    for i in range(rating):
        for j in range(rating):
@@ -120,6 +125,12 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    ist = numpy.zeros((rating,time*countries), dtype='float64')
    nn = numpy.zeros((rating), dtype='int')
+
+   if setval != None:
+     setval.setValue(50.0)
+     if setval.wasCanceled():
+         errmsg.append("Cancelled!")
+         return False
    
    for i in range(rating):
        for j in range(countries):
@@ -136,65 +147,99 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    allratings = []
    meanval = []
    tiv = []
+
+   fname = ""
    
    if rating > 0:
+       if outfiles:
+           fname = "aaa"
+ 
        a, b, c = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
-               "aaa")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
+   fname = ""
+   
    if rating > 1:
+       if outfiles:
+           fname = "aa"
+
        a, b, c = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
-               "aa")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 2:
+       if outfiles:
+           fname = "a"
+ 
        a, b, c = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
-               "a")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 3: 
+       if outfiles:
+           fname = "bbb"
+ 
        a, b, c = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
-               "bbb")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 4:
+       if outfiles:
+           fname = "bb"
+ 
        a, b, c = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
-               "bb")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 5:
+       if outfiles:
+           fname = "b"
+ 
        a, b, c = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
-               "b")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 6:
+       if outfiles:
+           fname = "cc"
+ 
        a, b, c = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
-               "cc")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    if rating > 7:
+       if outfiles:
+           fname = "d"
+ 
        a, b, c = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
-               "d")
+               fname)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
    
    fval = 0.0
    pval = 0.0
+
+   if setval != None:
+     setval.setValue(75.0)
+     if setval.wasCanceled():
+         errmsg.append("Cancelled!")
+         return False
    
    if rating == 1:
        fval, pval = scipy.stats.f_oneway (allratings[0])
@@ -225,15 +270,16 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    oufilename = "1wayanova_"+str(numofrun)+".txt"
    
-   if os.path.exists(oufilename):
-       os.remove(oufilename)
+   if outfiles:
+     if os.path.exists(oufilename):
+         os.remove(oufilename)
    
-   outf = open(oufilename, "w")
+     outf = open(oufilename, "w")
    
-   outf.write("F-value: %f\n"%fval)
-   outf.write("P value: %f\n"%pval)
+     outf.write("F-value: %f\n"%fval)
+     outf.write("P value: %f\n"%pval)
    
-   outf.close()
+     outf.close()
    
    s_t = numpy.zeros((countries,time), dtype='float64')
    
@@ -251,9 +297,16 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
            if s_t[k, t] != 0:
                T_t[t] += s_t[k, t]*math.log(float(countries) * s_t[k, t])
    
-   #print "entropia storica", T_t
    oufilename = "entropy_histi_"+str(numofrun)+".txt"
-   basicutils.vct_to_file(T_t, oufilename)
+   
+   if outfiles:
+     basicutils.vct_to_file(T_t, oufilename)
+
+   if setval != None:
+     setval.setValue(100.0)
+     if setval.wasCanceled():
+         errmsg.append("Cancelled!")
+         return False
    
    bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
    tot = numpy.zeros((rating,tprev,numofrun), dtype='float64')
@@ -267,10 +320,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
-   entropia = numpy.zeros(tprev, dtype='float64')
    xi = numpy.random.rand(countries,tprev,numofrun)
-   var = numpy.zeros((tprev), dtype='float64')
-   
+  
    for i in range (rating):
        cdf[i, 0] = pr[i, 0]
    
@@ -343,20 +394,22 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      print " "
    
    oufilename = "entropy_"+str(numofrun)+".txt"
-   
-   if os.path.exists(oufilename):
-       os.remove(oufilename)
-   
-   outf = open(oufilename, "w")
-   
+
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
        var[t] = numpy.std(entr[t])
+
+   if outfiles:
    
-   for t in range(tprev):
-       outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+     if os.path.exists(oufilename):
+         os.remove(oufilename)
    
-   outf.close()
+     outf = open(oufilename, "w")
+  
+     for t in range(tprev):
+         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+    
+     outf.close()
    
    acm = numpy.zeros((rating,tprev), dtype='float64')
    for i in range(acm.shape[0]):
@@ -365,7 +418,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    oufilename = "acm_"+str(numofrun)+".txt"
    
-   basicutils.mat_to_file (acm, oufilename)
+   if outfiles:
+     basicutils.mat_to_file (acm, oufilename)
    
    bpm = numpy.zeros((countries,tprev), dtype='float64')
    for i in range(bpm.shape[0]):
@@ -373,7 +427,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
            bpm[i, j] = numpy.mean(bp[i, j])
    
    oufilename = "bpm_"+str(numofrun)+".txt"
-   
-   basicutils.mat_to_file (bpm, oufilename)
+  
+   if outfiles:
+     basicutils.mat_to_file (bpm, oufilename)
 
    return True

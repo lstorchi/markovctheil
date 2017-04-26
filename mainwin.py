@@ -1,7 +1,13 @@
 from PyQt4 import QtGui, QtCore 
+
+import mainmkvcmp
 import scipy.io
 import options
-import mainmkvcmp
+import numpy
+
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
+import matplotlib.pyplot as plt
 
 class main_window(QtGui.QMainWindow):
     
@@ -13,7 +19,7 @@ class main_window(QtGui.QMainWindow):
         self.__nameir__ = "interest_rates"
         
         QtGui.QMainWindow.__init__(self) 
-        self.resize(350, 250) 
+        self.resize(640, 480) 
         self.setWindowTitle('Markov QT')
         self.statusBar().showMessage('Markov started') 
 
@@ -48,6 +54,10 @@ class main_window(QtGui.QMainWindow):
         edit.addAction(run)
 
         help = menubar.addMenu('&Help')
+
+        self.__figure__ = plt.figure()
+        self.__canvas__ = FigureCanvas(self.__figure__)
+        self.setCentralWidget(self.__canvas__)
 
         self.__options_dialog__ = options.optiondialog(self)
 
@@ -96,34 +106,45 @@ class main_window(QtGui.QMainWindow):
             
             errmsg = []
 
+            tprev = self.__options_dialog__.gettprev()
+
+            entropia = numpy.zeros(tprev, dtype='float64')
+            var = numpy.zeros((tprev), dtype='float64')
+
             if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
                     self.__options_dialog__.getstep(), \
                     self.__options_dialog__.gettprev(), \
                     self.__options_dialog__.getnofrun(), \
-                    False, False, errmsg, progdialog)):
+                    False, False, False, errmsg, entropia, \
+                    var, progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])
-
-            # TODO 
-            # for i in range(0, 100):
-            #     QtCore.QCoreApplication.processEvents()
-            #     progdialog.setValue(i)
-            #     
-            #     cont = 0
-            #     for j in range(0, 1000000):
-            #         cont += 1
-
-            #     progdialog.setLabelText(str(i))
+                
+                progdialog.setValue(100.0)
+                progdialog.close()
+                
+                return 
 
             progdialog.setValue(100.0)
             progdialog.close()
+
+            self.plot(entropia)
 
         else:
             QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     "Error occurs while opening input file")
+
+    def plot(self, data):
+        ax = self.__figure__.add_subplot(111)
+
+        ax.hold(False)
+
+        ax.plot(data, '*-')
+
+        self.__canvas__.draw()
 
     def get_options (self):
 

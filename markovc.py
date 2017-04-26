@@ -87,8 +87,12 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 ms = msd[namems]
 i_r = bpd[namebp]
 
+entropia = numpy.zeros(tprev, dtype='float64')
+var = numpy.zeros((tprev), dtype='float64')
+
 if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
-        numofrun, verbose, args.seed, errmsg):
+        numofrun, verbose, True, args.seed, errmsg, entropia, \
+        var):
     for m in errmsg:
         print m
     exit(1)
