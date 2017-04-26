@@ -91,17 +91,20 @@ class main_window(QtGui.QMainWindow):
 
             progdialog.setWindowTitle("Running")
             progdialog.setWindowModality(QtCore.Qt.WindowModal)
+            progdialog.setMinimumDuration(0)
             progdialog.show()
             
             errmsg = []
 
-            mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
+            if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
                     self.__options_dialog__.getstep(), \
                     self.__options_dialog__.gettprev(), \
                     self.__options_dialog__.getnofrun(), \
-                    False, False, errmsg, progdialog.setValue,
-                    progdialog.setLabelText, progdialog.self)
+                    False, False, errmsg, progdialog)):
+                QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    errmsg[0])
 
             # TODO 
             # for i in range(0, 100):

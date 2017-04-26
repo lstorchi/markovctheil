@@ -17,8 +17,7 @@ sys.path.append("./module")
 import basicutils
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
-        numofrun, verbose, seed, errmsg, setval=None, \
-        setlbl=None, refself=None):
+        numofrun, verbose, seed, errmsg, setval=None):
 
    if seed:
        numpy.random.seed(9001)
@@ -35,6 +34,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    nk = numpy.zeros((rating,rating,countries), dtype='int64')
    num = numpy.zeros((rating,rating), dtype='int64')
    den = numpy.zeros(rating, dtype='int64')
+
+   if setval != None:
+        setval.setValue(0)
+        setval.setLabelText("Step 1")
    
    for k in range(countries):
        for t in range(time-1):
@@ -49,6 +52,12 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
        if verbose:
          basicutils.progress_bar(k+1, countries)
+
+       if setval != None:
+         setval.setValue(100.0*(float(k+1)/float(countries)))
+         if setval.wasCanceled():
+             errmsg.append("Cancelled!")
+             return False
    
    for i in range(rating):
        for j in range(rating):
@@ -268,6 +277,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    for i in range(rating):
        for j in range(1,rating):
            cdf[i, j] = pr[i, j] + cdf[i, j-1]
+
+   if setval != None:
+        setval.setValue(0)
+        setval.setLabelText("Step 2")
    
    for run in range(numofrun):
    
@@ -321,7 +334,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
            basicutils.progress_bar(run+1, numofrun)
 
        if setval != None:
-           setval(refself, float(run+1)/float(numofrun))
+           setval.setValue(100.0*(float(run+1)/float(numofrun)))
+           if setval.wasCanceled():
+             errmsg.append("Cancelled!")
+             return False
    
    if verbose:
      print " "
