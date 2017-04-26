@@ -4,6 +4,9 @@ import mainmkvcmp
 import scipy.io
 import options
 import numpy
+import os
+
+import os.path
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
@@ -14,6 +17,7 @@ class main_window(QtGui.QMainWindow):
     def __init__(self):
         self.__inputfile__ = ""
         self.__fileio__ = False
+        self.__entropiadone__ = False
 
         self.__namerm__ = "ratings"
         self.__nameir__ = "interest_rates"
@@ -27,6 +31,11 @@ class main_window(QtGui.QMainWindow):
         ofile.setShortcut("Ctrl+O")
         ofile.setStatusTip("Open file")
         ofile.connect(ofile, QtCore.SIGNAL('triggered()'), self.openfile)
+
+        savefile = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        savefile.setShortcut("Ctrl+S")
+        savefile.setStatusTip("Save file")
+        savefile.connect(savefile, QtCore.SIGNAL('triggered()'), self.savefile)
 
         sep = QtGui.QAction(self)
         sep.setSeparator(True)
@@ -47,6 +56,7 @@ class main_window(QtGui.QMainWindow):
         
         file = menubar.addMenu('&File')
         file.addAction(ofile)
+        file.addAction(savefile)
         file.addAction(sep)
         file.addAction(quit)
 
@@ -69,6 +79,22 @@ class main_window(QtGui.QMainWindow):
         self.setCentralWidget(maindialog)
 
         self.__options_dialog__ = options.optiondialog(self)
+
+    def savefile(self):
+
+        if self.__entropiadone__ :
+           tosave = QtGui.QFileDialog.getSaveFileName(self) 
+           if os.path.exists(str(tosave)):
+               os.remove(str(tosave))
+               
+           outf = open(str(tosave), "w")
+           
+           for t in range(self.__options_dialog__.gettprev()):
+               outf.write("%d %f %f \n"%(t+1, self.__entropia__[t], \
+                       self.__var__[t]))
+               
+           outf.close()
+ 
 
     def openfile(self):
 
@@ -117,16 +143,16 @@ class main_window(QtGui.QMainWindow):
 
             tprev = self.__options_dialog__.gettprev()
 
-            entropia = numpy.zeros(tprev, dtype='float64')
-            var = numpy.zeros((tprev), dtype='float64')
+            self.__entropia__ = numpy.zeros(tprev, dtype='float64')
+            self.__var__ = numpy.zeros((tprev), dtype='float64')
 
             if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
                     self.__options_dialog__.getstep(), \
                     self.__options_dialog__.gettprev(), \
                     self.__options_dialog__.getnofrun(), \
-                    False, False, False, errmsg, entropia, \
-                    var, progdialog)):
+                    False, False, False, errmsg, self.__entropia__, \
+                    self.__var__, progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])
@@ -139,7 +165,9 @@ class main_window(QtGui.QMainWindow):
             progdialog.setValue(100.0)
             progdialog.close()
 
-            self.plot(entropia)
+            self.__entropiadone__ = True
+
+            self.plot(self.__entropia__)
 
         else:
             QtGui.QMessageBox.critical( self, \
