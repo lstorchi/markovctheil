@@ -57,7 +57,16 @@ class main_window(QtGui.QMainWindow):
 
         self.__figure__ = plt.figure()
         self.__canvas__ = FigureCanvas(self.__figure__)
-        self.setCentralWidget(self.__canvas__)
+        self.__toolbar__ = NavigationToolbar(self.__canvas__, self)
+
+        layout = QtGui.QVBoxLayout()
+        layout.addWidget(self.__toolbar__)
+        layout.addWidget(self.__canvas__)
+
+        maindialog = QtGui.QWidget()
+        maindialog.setLayout(layout)
+
+        self.setCentralWidget(maindialog)
 
         self.__options_dialog__ = options.optiondialog(self)
 
