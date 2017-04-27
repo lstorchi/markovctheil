@@ -114,7 +114,7 @@ def extract_ti_mean (dat, step, rtnum, numofrun, fname = "", verbose = False):
     pdat, tdat, hdat, xdat, nbins = get_histo(dat, step)
 
     if fname != "" and verbose:
-      plt.hist(bb, normed=False, bins=nbins, facecolor='green')
+      plt.hist(dat, normed=False, bins=nbins, facecolor='green')
       plt.xlabel(fname)
       plt.ylabel("f(x)")
       plt.title(fname)

@@ -1,6 +1,7 @@
 from PyQt4 import QtGui, QtCore 
 
 import mainmkvcmp
+import plothist
 import scipy.io
 import options
 import numpy
@@ -30,7 +31,6 @@ class main_window(QtGui.QMainWindow):
         ofile.connect(ofile, QtCore.SIGNAL('triggered()'), self.openfile)
 
         self.__savefile__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
-        self.__savefile__.setShortcut("Ctrl+S")
         self.__savefile__.setStatusTip("Save file")
         self.__savefile__.connect(self.__savefile__ , QtCore.SIGNAL('triggered()'), \
                 self.savefile)
@@ -49,9 +49,9 @@ class main_window(QtGui.QMainWindow):
         run.setStatusTip("Run")
         self.connect(run, QtCore.SIGNAL('triggered()'), self.mainrun)
 
-        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot", self)
         self.__plots__.setShortcut("Ctrl+S")
-        self.__plots__.setStatusTip("Save file")
+        self.__plots__.setStatusTip("Plots ratings")
         self.__plots__.connect(self.__plots__ , QtCore.SIGNAL('triggered()'), \
                 self.plot_hist)
         self.__plots__.setEnabled(False)
@@ -171,6 +171,7 @@ class main_window(QtGui.QMainWindow):
 
             self.__entropia__ = numpy.zeros(tprev, dtype='float64')
             self.__var__ = numpy.zeros((tprev), dtype='float64')
+            self.__allratings__ = []
 
             if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
@@ -178,7 +179,7 @@ class main_window(QtGui.QMainWindow):
                     self.__options_dialog__.gettprev(), \
                     self.__options_dialog__.getnofrun(), \
                     False, False, False, errmsg, self.__entropia__, \
-                    self.__var__, progdialog)):
+                    self.__var__, self.__allratings__ , progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])
@@ -203,17 +204,18 @@ class main_window(QtGui.QMainWindow):
                     "Error occurs while opening input file")
 
     def plot(self, data):
-        ax = self.__figure__.add_subplot(111)
 
-        ax.hold(False)
-
-        ax.plot(data, '*-')
-
-        self.__canvas__.draw()
+        if self.__entropiadone__ :
+            ax = self.__figure__.add_subplot(111)
+            ax.hold(False)
+            ax.plot(data, '*-')
+            self.__canvas__.draw()
 
     def plot_hist (self):
 
-        return
+        if self.__entropiadone__ :
+            ploh = plothist.plohitwin(self)
+            ploh.show()
 
     def get_options (self):
 

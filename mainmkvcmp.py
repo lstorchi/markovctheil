@@ -18,7 +18,7 @@ import basicutils
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
-        entropia, var, setval=None):
+        entropia, var, allratings, setval=None):
 
    if seed:
        numpy.random.seed(9001)
@@ -144,7 +144,6 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    for i in range(len(ist)):
        y[i] = ist[i, 0:nn[0]]
    
-   allratings = []
    meanval = []
    tiv = []
 
