@@ -18,10 +18,7 @@ class main_window(QtGui.QMainWindow):
         self.__inputfile__ = ""
         self.__fileio__ = False
         self.__entropiadone__ = False
-
-        self.__namerm__ = "ratings"
-        self.__nameir__ = "interest_rates"
-        
+       
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
         self.setWindowTitle('Markov QT')
@@ -80,6 +77,8 @@ class main_window(QtGui.QMainWindow):
 
         self.__options_dialog__ = options.optiondialog(self)
 
+        self.__options_name_dialog__ = options.optionnamedialog(self)
+
     def savefile(self):
 
         if self.__entropiadone__ :
@@ -101,29 +100,35 @@ class main_window(QtGui.QMainWindow):
         self.__inputfile__ = QtGui.QFileDialog.getOpenFileName(self) 
         self.__fileio__ = False
 
+        self.__options_name_dialog__.exec_()
+
+
         msd = scipy.io.loadmat(str(self.__inputfile__))
         bpd = scipy.io.loadmat(str(self.__inputfile__))
         
-        if not(self.__namerm__ in msd.keys()):
+        if not(self.__options_name_dialog__.getratingname() in msd.keys()):
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
-            "Cannot find " + self.__namerm__ + " in " + self.__inputfile__)
+            "Cannot find " + self.__options_name_dialog__.getratingname()+ \
+            " in " + self.__inputfile__)
            return 
 
-        if not(self.__nameir__ in bpd.keys()):
+        if not(self.__options_name_dialog__.getiratingname() in bpd.keys()):
             QtGui.QMessageBox.critical( self, \
                     "ERROR", \
-                    "Cannot find " + self.__nameir__ + " in " + self.__inputfile__)
+                    "Cannot find " + self.__options_name_dialog__.getiratingname() \
+                    + " in " + self.__inputfile__)
             return 
         
-        if msd[self.__namerm__].shape[0] != bpd[self.__nameir__].shape[0]:
+        if msd[self.__options_name_dialog__.getratingname()].shape[0] != \
+                bpd[self.__options_name_dialog__.getiratingname()].shape[0]:
             QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     "wrong dim of the input matrix")
             return 
         
-        self.__rm__ = msd[self.__namerm__]
-        self.__ir__ = bpd[self.__nameir__]
+        self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
+        self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
         self.__fileio__ = True
 
     def mainrun(self):

@@ -89,3 +89,44 @@ class optiondialog(QtGui.QDialog):
     def getinftime (self):
         return self.__inftime__
 
+class optionnamedialog(QtGui.QDialog):
+
+    def __init__(self, parent=None):
+        self.__namerm__ = "ratings"
+        self.__nameir__ = "interest_rates"
+       
+        super(optionnamedialog, self).__init__(parent)
+
+        self.okbutton = QtGui.QPushButton('Ok');
+        self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
+        self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
+
+        labelratingname = QtGui.QLabel("Name of the rating matrix:: ", self)
+        self.ratingnametb = QtGui.QLineEdit(str(self.__namerm__), self)
+        self.ratingnametb.move(20, 20)
+        self.ratingnametb.resize(280,40)
+
+        labelinterest_ratesname = QtGui.QLabel("Name of the interest rating matrix:: ", self)
+        self.interest_ratestb = QtGui.QLineEdit(str(self.__nameir__), self)
+        self.interest_ratestb.move(20, 20)
+        self.interest_ratestb.resize(280,40)
+
+        self.grid = QtGui.QGridLayout(self)
+
+        self.grid.addWidget(labelratingname)
+        self.grid.addWidget(self.ratingnametb)
+
+        self.grid.addWidget(labelinterest_ratesname)
+        self.grid.addWidget(self.interest_ratestb)
+
+        self.grid.addWidget(self.okbutton)
+
+    def closedialog(self):
+        self.close()
+
+    def getratingname (self):
+        return self.__namerm__
+
+    def getiratingname (self):
+        return self.__nameir__
+
