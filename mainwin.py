@@ -107,42 +107,45 @@ class main_window(QtGui.QMainWindow):
     def openfile(self):
 
         self.__inputfile__ = QtGui.QFileDialog.getOpenFileName(self) 
-        self.__fileio__ = False
 
+        self.__fileio__ = False
+        
         self.__entropiadone__ = False
         self.__savefile__.setEnabled(False)
-
+        
         self.__plots__.setEnabled(False)
 
-        self.__options_name_dialog__.exec_()
+        if self.__inputfile__ != "":
 
-        msd = scipy.io.loadmat(str(self.__inputfile__))
-        bpd = scipy.io.loadmat(str(self.__inputfile__))
-        
-        if not(self.__options_name_dialog__.getratingname() in msd.keys()):
-           QtGui.QMessageBox.critical( self, \
-            "ERROR", \
-            "Cannot find " + self.__options_name_dialog__.getratingname()+ \
-            " in " + self.__inputfile__)
-           return 
-
-        if not(self.__options_name_dialog__.getiratingname() in bpd.keys()):
-            QtGui.QMessageBox.critical( self, \
-                    "ERROR", \
-                    "Cannot find " + self.__options_name_dialog__.getiratingname() \
-                    + " in " + self.__inputfile__)
-            return 
-        
-        if msd[self.__options_name_dialog__.getratingname()].shape[0] != \
-                bpd[self.__options_name_dialog__.getiratingname()].shape[0]:
-            QtGui.QMessageBox.critical( self, \
-                    "ERROR", \
-                    "wrong dim of the input matrix")
-            return 
-        
-        self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
-        self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
-        self.__fileio__ = True
+          self.__options_name_dialog__.exec_()
+          
+          msd = scipy.io.loadmat(str(self.__inputfile__))
+          bpd = scipy.io.loadmat(str(self.__inputfile__))
+          
+          if not(self.__options_name_dialog__.getratingname() in msd.keys()):
+             QtGui.QMessageBox.critical( self, \
+              "ERROR", \
+              "Cannot find " + self.__options_name_dialog__.getratingname()+ \
+              " in " + self.__inputfile__)
+             return 
+          
+          if not(self.__options_name_dialog__.getiratingname() in bpd.keys()):
+              QtGui.QMessageBox.critical( self, \
+                      "ERROR", \
+                      "Cannot find " + self.__options_name_dialog__.getiratingname() \
+                      + " in " + self.__inputfile__)
+              return 
+          
+          if msd[self.__options_name_dialog__.getratingname()].shape[0] != \
+                  bpd[self.__options_name_dialog__.getiratingname()].shape[0]:
+              QtGui.QMessageBox.critical( self, \
+                      "ERROR", \
+                      "wrong dim of the input matrix")
+              return 
+          
+          self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
+          self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
+          self.__fileio__ = True
 
     def mainrun(self):
 
