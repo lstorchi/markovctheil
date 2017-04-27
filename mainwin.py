@@ -49,6 +49,13 @@ class main_window(QtGui.QMainWindow):
         run.setStatusTip("Run")
         self.connect(run, QtCore.SIGNAL('triggered()'), self.mainrun)
 
+        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        self.__plots__.setShortcut("Ctrl+S")
+        self.__plots__.setStatusTip("Save file")
+        self.__plots__.connect(self.__plots__ , QtCore.SIGNAL('triggered()'), \
+                self.plot_hist)
+        self.__plots__.setEnabled(False)
+
         self.statusBar().show()
 
         menubar = self.menuBar()
@@ -61,6 +68,7 @@ class main_window(QtGui.QMainWindow):
 
         edit = menubar.addMenu('&Edit')
         edit.addAction(run)
+        edit.addAction(self.__plots__)
 
         help = menubar.addMenu('&Help')
 
@@ -95,7 +103,6 @@ class main_window(QtGui.QMainWindow):
                        self.__var__[t]))
                
            outf.close()
- 
 
     def openfile(self):
 
@@ -104,6 +111,8 @@ class main_window(QtGui.QMainWindow):
 
         self.__entropiadone__ = False
         self.__savefile__.setEnabled(False)
+
+        self.__plots__.setEnabled(False)
 
         self.__options_name_dialog__.exec_()
 
@@ -139,6 +148,8 @@ class main_window(QtGui.QMainWindow):
 
         self.__entropiadone__ = False
         self.__savefile__.setEnabled(False)
+
+        self.__plots__.setEnabled(False)
 
         if (self.__fileio__):
             self.__options_dialog__.exec_()
@@ -179,6 +190,7 @@ class main_window(QtGui.QMainWindow):
 
             self.__entropiadone__ = True
             self.__savefile__.setEnabled(True)
+            self.__plots__.setEnabled(True)
 
             self.plot(self.__entropia__)
 
@@ -195,6 +207,10 @@ class main_window(QtGui.QMainWindow):
         ax.plot(data, '*-')
 
         self.__canvas__.draw()
+
+    def plot_hist (self):
+
+        return
 
     def get_options (self):
 
