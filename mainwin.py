@@ -29,10 +29,12 @@ class main_window(QtGui.QMainWindow):
         ofile.setStatusTip("Open file")
         ofile.connect(ofile, QtCore.SIGNAL('triggered()'), self.openfile)
 
-        savefile = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
-        savefile.setShortcut("Ctrl+S")
-        savefile.setStatusTip("Save file")
-        savefile.connect(savefile, QtCore.SIGNAL('triggered()'), self.savefile)
+        self.__savefile__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        self.__savefile__.setShortcut("Ctrl+S")
+        self.__savefile__.setStatusTip("Save file")
+        self.__savefile__.connect(self.__savefile__ , QtCore.SIGNAL('triggered()'), \
+                self.savefile)
+        self.__savefile__.setEnabled(False)
 
         sep = QtGui.QAction(self)
         sep.setSeparator(True)
@@ -53,7 +55,7 @@ class main_window(QtGui.QMainWindow):
         
         file = menubar.addMenu('&File')
         file.addAction(ofile)
-        file.addAction(savefile)
+        file.addAction(self.__savefile__)
         file.addAction(sep)
         file.addAction(quit)
 
@@ -100,8 +102,10 @@ class main_window(QtGui.QMainWindow):
         self.__inputfile__ = QtGui.QFileDialog.getOpenFileName(self) 
         self.__fileio__ = False
 
-        self.__options_name_dialog__.exec_()
+        self.__entropiadone__ = False
+        self.__savefile__.setEnabled(False)
 
+        self.__options_name_dialog__.exec_()
 
         msd = scipy.io.loadmat(str(self.__inputfile__))
         bpd = scipy.io.loadmat(str(self.__inputfile__))
@@ -132,6 +136,9 @@ class main_window(QtGui.QMainWindow):
         self.__fileio__ = True
 
     def mainrun(self):
+
+        self.__entropiadone__ = False
+        self.__savefile__.setEnabled(False)
 
         if (self.__fileio__):
             self.__options_dialog__.exec_()
@@ -171,6 +178,7 @@ class main_window(QtGui.QMainWindow):
             progdialog.close()
 
             self.__entropiadone__ = True
+            self.__savefile__.setEnabled(True)
 
             self.plot(self.__entropia__)
 
