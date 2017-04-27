@@ -124,6 +124,6 @@ def extract_ti_mean (dat, step, rtnum, numofrun, fname = "", verbose = False):
     if fname != "":
       histo_to_file (xdat, hdat, fname+"_"+str(numofrun)+".txt")
 
-    return dat, numpy.mean(dat), tdat
+    return dat, numpy.mean(dat), tdat, nbins
 
 ###############################################################################

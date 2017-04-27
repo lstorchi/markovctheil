@@ -90,10 +90,11 @@ i_r = bpd[namebp]
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
 allratings = []
+allratingsnins = []
 
 if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
         numofrun, verbose, True, args.seed, errmsg, entropia, \
-        var, allratings):
+        var, allratings, allratingsnins):
     for m in errmsg:
         print m
     exit(1)

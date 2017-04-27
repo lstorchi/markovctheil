@@ -18,7 +18,8 @@ import basicutils
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
-        entropia, var, allratings, setval=None):
+        entropia, var, allratings, allratingsbins, \
+        setval=None):
 
    if seed:
        numpy.random.seed(9001)
@@ -153,20 +154,22 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "aaa"
  
-       a, b, c = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
-   
-   fname = ""
    
    if rating > 1:
        if outfiles:
            fname = "aa"
 
-       a, b, c = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -175,8 +178,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "a"
  
-       a, b, c = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -185,8 +190,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "bbb"
  
-       a, b, c = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -195,8 +202,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "bb"
  
-       a, b, c = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -205,8 +214,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "b"
  
-       a, b, c = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -215,8 +226,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "cc"
  
-       a, b, c = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)
@@ -225,8 +238,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        if outfiles:
            fname = "d"
  
-       a, b, c = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
+       a, b, c, d = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
                fname)
+
+       allratingsbins.append(d)
        allratings.append(a)
        meanval.append(b)
        tiv.append(c)

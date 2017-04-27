@@ -119,8 +119,14 @@ class main_window(QtGui.QMainWindow):
 
           self.__options_name_dialog__.exec_()
           
-          msd = scipy.io.loadmat(str(self.__inputfile__))
-          bpd = scipy.io.loadmat(str(self.__inputfile__))
+          try:
+              msd = scipy.io.loadmat(str(self.__inputfile__))
+              bpd = scipy.io.loadmat(str(self.__inputfile__))
+          except ValueError:
+             QtGui.QMessageBox.critical( self, \
+              "ERROR", \
+              "Error while opening " + self.__inputfile__ )
+             return
           
           if not(self.__options_name_dialog__.getratingname() in msd.keys()):
              QtGui.QMessageBox.critical( self, \
@@ -172,6 +178,7 @@ class main_window(QtGui.QMainWindow):
             self.__entropia__ = numpy.zeros(tprev, dtype='float64')
             self.__var__ = numpy.zeros((tprev), dtype='float64')
             self.__allratings__ = []
+            self.__allratingsnins__ = []
 
             if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
@@ -179,7 +186,8 @@ class main_window(QtGui.QMainWindow):
                     self.__options_dialog__.gettprev(), \
                     self.__options_dialog__.getnofrun(), \
                     False, False, False, errmsg, self.__entropia__, \
-                    self.__var__, self.__allratings__ , progdialog)):
+                    self.__var__, self.__allratings__ , self.__allratingsnins__, \
+                    progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])
@@ -214,7 +222,8 @@ class main_window(QtGui.QMainWindow):
     def plot_hist (self):
 
         if self.__entropiadone__ :
-            ploh = plothist.plohitwin(self)
+            ploh = plothist.plohitwin(self.__allratings__, \
+                    self.__allratingsnins__, self)
             ploh.show()
 
     def get_options (self):

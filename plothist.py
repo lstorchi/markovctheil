@@ -10,7 +10,7 @@ import basicutils
 
 class plohitwin (QtGui.QMainWindow):
 
-    def __init__(self, parent=None):
+    def __init__(self, allratings, allratingsnins, parent=None):
         super(plohitwin, self).__init__(parent)
 
         self.resize(640, 480) 
@@ -28,5 +28,16 @@ class plohitwin (QtGui.QMainWindow):
         maindialog.setLayout(layout)
 
         self.setCentralWidget(maindialog)
+
+        for i in range(len(allratings)):
+            ax = figure.add_subplot(2, 4, i+1)
+            ax.hold(False)
+            #ax.grid(True)
+            ax.hist(allratings[i], normed=False, \
+                    bins=allratingsnins[i], \
+                    facecolor='green')
+        
+        canvas.draw()
+
 
 
