@@ -22,7 +22,7 @@ class main_window(QtGui.QMainWindow):
        
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
-        self.setWindowTitle('Markov QT')
+        self.setWindowTitle('Forecasted dynamic Theil\'s entropy')
         self.statusBar().showMessage('Markov started') 
 
         ofile = QtGui.QAction(QtGui.QIcon("icons/open.png"), "Open", self)
@@ -49,12 +49,19 @@ class main_window(QtGui.QMainWindow):
         run.setStatusTip("Run")
         self.connect(run, QtCore.SIGNAL('triggered()'), self.mainrun)
 
-        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot", self)
+        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot CS distributions", self)
         self.__plots__.setShortcut("Ctrl+S")
-        self.__plots__.setStatusTip("Plots ratings")
+        self.__plots__.setStatusTip("Credit spread distributions")
         self.__plots__.connect(self.__plots__ , QtCore.SIGNAL('triggered()'), \
                 self.plot_hist)
         self.__plots__.setEnabled(False)
+
+        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrix", self)
+        self.__mats__.setShortcut("Ctrl+M")
+        self.__mats__.setStatusTip("View transition matrix")
+        self.__mats__.connect(self.__mats__ , QtCore.SIGNAL('triggered()'), \
+                self.view_mats)
+        self.__mats__.setEnabled(False)
 
         self.statusBar().show()
 
@@ -68,7 +75,8 @@ class main_window(QtGui.QMainWindow):
 
         edit = menubar.addMenu('&Edit')
         edit.addAction(run)
-        edit.addAction(self.__plots__)
+        edit.addAction(self.__plots__ )
+        edit.addAction(self.__mats__ )
 
         help = menubar.addMenu('&Help')
 
@@ -114,6 +122,7 @@ class main_window(QtGui.QMainWindow):
         self.__savefile__.setEnabled(False)
         
         self.__plots__.setEnabled(False)
+        self.__mats__.setEnabled(False)
 
         if self.__inputfile__ != "":
 
@@ -152,6 +161,7 @@ class main_window(QtGui.QMainWindow):
           self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
           self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
           self.__fileio__ = True
+          self.__mats__.setEnabled(True)
 
     def mainrun(self):
 
@@ -213,11 +223,24 @@ class main_window(QtGui.QMainWindow):
 
     def plot(self, data):
 
+        x = []
+        y = []
+        for i in range(1,self.__options_dialog__.gettprev()+1):
+            x.append(i)
+            y.append(data[i-1])
+        
         if self.__entropiadone__ :
             ax = self.__figure__.add_subplot(111)
             ax.hold(False)
-            ax.plot(data, '*-')
+            ax.plot(x, y, '*-')
+            #ax.scatter(x, y)
+            ax.set_ylabel('Time')
+            ax.set_xlabel('DT')
+            ax.set_xlim([2, self.__options_dialog__.gettprev()])
             self.__canvas__.draw()
+
+    def view_mats(self):
+        return 
 
     def plot_hist (self):
 

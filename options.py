@@ -18,20 +18,20 @@ class optiondialog(QtGui.QDialog):
         self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
         self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
 
-        self.inftcb = QtGui.QCheckBox("Simulate infinite time", self)
+        self.inftcb = QtGui.QCheckBox("Simulation using stationary distribution", self)
         self.inftcb.setChecked(self.__inftime__)
 
-        labelstep = QtGui.QLabel("Step: ", self)
+        labelstep = QtGui.QLabel("Bin width: ", self)
         self.steptb = QtGui.QLineEdit(str(self.__step__), self)
         self.steptb.move(20, 20)
         self.steptb.resize(280,40)
 
-        labeltprev = QtGui.QLabel("Tprev: ", self)
+        labeltprev = QtGui.QLabel("Forecasted period: ", self)
         self.tprevtb = QtGui.QLineEdit(str(self.__tprev__), self)
         self.tprevtb.move(20, 20)
         self.tprevtb.resize(280,40)
 
-        labelnofrun = QtGui.QLabel("Max num of iterations: ", self)
+        labelnofrun = QtGui.QLabel("Monte Carlo iterations: ", self)
         self.nofruntb = QtGui.QLineEdit(str(self.__nofrun__), self)
         self.nofruntb.move(20, 20)
         self.nofruntb.resize(280,40)
@@ -101,12 +101,12 @@ class optionnamedialog(QtGui.QDialog):
         self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
         self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
 
-        labelratingname = QtGui.QLabel("Name of the rating matrix:: ", self)
+        labelratingname = QtGui.QLabel("Name of the rating matrix: ", self)
         self.ratingnametb = QtGui.QLineEdit(str(self.__namerm__), self)
         self.ratingnametb.move(20, 20)
         self.ratingnametb.resize(280,40)
 
-        labelinterest_ratesname = QtGui.QLabel("Name of the interest rating matrix:: ", self)
+        labelinterest_ratesname = QtGui.QLabel("Name of the interest rates matrix: ", self)
         self.interest_ratestb = QtGui.QLineEdit(str(self.__nameir__), self)
         self.interest_ratestb.move(20, 20)
         self.interest_ratestb.resize(280,40)

@@ -39,7 +39,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
    if setval != None:
         setval.setValue(0)
-        setval.setLabelText("Step 1")
+        setval.setLabelText("Historical data analysis")
    
    for k in range(countries):
        for t in range(time-1):
@@ -345,7 +345,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
    if setval != None:
         setval.setValue(0)
-        setval.setLabelText("Step 2")
+        setval.setLabelText("Monte Carlo simulation")
    
    for run in range(numofrun):
    

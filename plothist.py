@@ -14,7 +14,7 @@ class plohitwin (QtGui.QMainWindow):
         super(plohitwin, self).__init__(parent)
 
         self.resize(640, 480) 
-        self.setWindowTitle('Plots')
+        self.setWindowTitle('CS distributions')
 
         figure = plt.figure()
         canvas = FigureCanvas(figure)
@@ -28,14 +28,19 @@ class plohitwin (QtGui.QMainWindow):
         maindialog.setLayout(layout)
 
         self.setCentralWidget(maindialog)
-
+        
+        k = 1
         for i in range(len(allratings)):
             ax = figure.add_subplot(2, 4, i+1)
-            ax.hold(False)
-            #ax.grid(True)
+            #ax.hold(False)
+            ax.set_title("K="+str(k))
+            ax.grid(True)
+            ax.set_ylabel('f(BP)')
+            ax.set_xlabel('BP(%)')
             ax.hist(allratings[i], normed=False, \
                     bins=allratingsnins[i], \
                     facecolor='green')
+            k = k + 1
         
         canvas.draw()
 
