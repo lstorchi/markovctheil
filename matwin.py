@@ -10,11 +10,11 @@ import basicutils
 
 class matable (QtGui.QMainWindow):
 
-    def __init__(self, mat, parent=None):
+    def __init__(self, mat, name, parent=None):
         super(matable, self).__init__(parent)
 
         self.resize(640, 480) 
-        self.setWindowTitle('Rating matrix')
+        self.setWindowTitle(name)
 
         self.__mat__ = []
 

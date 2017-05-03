@@ -57,9 +57,9 @@ class main_window(QtGui.QMainWindow):
                 self.plot_hist)
         self.__plots__.setEnabled(False)
 
-        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrix", self)
+        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrices", self)
         self.__mats__.setShortcut("Ctrl+M")
-        self.__mats__.setStatusTip("View transition matrix")
+        self.__mats__.setStatusTip("View transition matrices")
         self.__mats__.connect(self.__mats__ , QtCore.SIGNAL('triggered()'), \
                 self.view_mats)
         self.__mats__.setEnabled(False)
@@ -243,8 +243,8 @@ class main_window(QtGui.QMainWindow):
     def view_mats(self):
 
         if self.__fileio__ :
-            mw1 = matwin.matable(self.__rm__, self)
-            mw2 = matwin.matable(self.__ir__, self)
+            mw1 = matwin.matable(self.__rm__, "Rating matrix", self)
+            mw2 = matwin.matable(self.__ir__, "Interest rates matrix", self)
 
             mw1.show()
             mw2.show()
