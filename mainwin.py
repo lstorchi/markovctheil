@@ -58,7 +58,7 @@ class main_window(QtGui.QMainWindow):
                 self.plot_hist)
         self.__plots__.setEnabled(False)
 
-        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrices", self)
+        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrix", self)
         self.__mats__.setShortcut("Ctrl+M")
         self.__mats__.setStatusTip("View transition matrices")
         self.__mats__.connect(self.__mats__ , QtCore.SIGNAL('triggered()'), \
@@ -108,10 +108,35 @@ class main_window(QtGui.QMainWindow):
                
            outf = open(str(tosave), "w")
            
-           for t in range(self.__options_dialog__.gettprev()):
-               outf.write("%d %f %f \n"%(t+1, self.__entropia__[t], \
-                       self.__var__[t]))
-               
+           outf.write("X ")
+           for i in range(0, len(self.__meanval__)):
+               outf.write("K=%d "%(i+1))
+           outf.write("\n")
+
+           outf.write("E(BP) ")
+           for m in self.__meanval__:
+               outf.write("%f "%(m))
+           outf.write("\n")
+
+           outf.write("STD(BP) ")
+           for m in self.__stdeval__:
+               outf.write("%f "%(m))
+           outf.write("\n")
+
+           outf.write("\n")
+
+           if self.__options_dialog__.getinftime():
+                ev = self.__entropia__[1:]
+                m = numpy.mean(ev)
+                s = numpy.std(ev)
+                outf.write("Stationary value: " + \
+                        str(m) + " stdev: " + str(s))
+           else:
+                outf.write("t E(DT) STD(DT)\n")
+                for t in range(self.__options_dialog__.gettprev()):
+                    outf.write("%d %f %f \n"%(t+1, self.__entropia__[t], \
+                            self.__var__[t]))
+
            outf.close()
 
     def openfile(self):
@@ -133,6 +158,7 @@ class main_window(QtGui.QMainWindow):
 
         if self.__inputfile__ != "":
 
+          self.__options_name_dialog__.setWindowTitle("Matrices name")
           self.__options_name_dialog__.exec_()
           
           try:
@@ -168,12 +194,13 @@ class main_window(QtGui.QMainWindow):
           self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
           self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
           self.__fileio__ = True
-          self.__mats__.setEnabled(True)
 
     def mainrun(self):
 
         self.__entropiadone__ = False
         self.__savefile__.setEnabled(False)
+
+        self.__mats__.setEnabled(False)
 
         self.__plots__.setEnabled(False)
 
@@ -183,6 +210,8 @@ class main_window(QtGui.QMainWindow):
                 self.__ax__.cla()
                 self.__canvas__.draw()
                 self.__plot_done__ = False
+
+            self.__options_dialog__.setWindowTitle("Options")
 
             self.__options_dialog__.exec_()
 
@@ -199,8 +228,10 @@ class main_window(QtGui.QMainWindow):
             tprev = self.__options_dialog__.gettprev()
 
             self.__entropia__ = numpy.zeros(tprev, dtype='float64')
+            
+            rating = numpy.max(self.__rm__)
+            self.__pr__ = numpy.zeros((rating,rating), dtype='float64')
 
-            self.__pr__ = numpy.zeros((1,1), dtype='float64')
             self.__meanval__ = []
             self.__stdeval__ = []
  
@@ -231,12 +262,14 @@ class main_window(QtGui.QMainWindow):
             self.__entropiadone__ = True
             self.__savefile__.setEnabled(True)
             self.__plots__.setEnabled(True)
+            self.__mats__.setEnabled(True)
 
             if self.__options_dialog__.getinftime():
+                ev = self.__entropia__[1:]
                 QtGui.QMessageBox.information( self, \
                         "Value", "Stationary value: " +\
-                        str(numpy.mean(self.__entropia__)) + " stdev: " + \
-                        str(numpy.std(self.__entropia__)))
+                        str(numpy.mean(ev)) + " stdev: " + \
+                        str(numpy.std(ev)))
             else:
                 self.plot(self.__entropia__)
 
@@ -266,12 +299,10 @@ class main_window(QtGui.QMainWindow):
 
     def view_mats(self):
 
-        if self.__fileio__ :
-            mw1 = matwin.matable(self.__rm__, "Rating matrix", self)
-            mw2 = matwin.matable(self.__ir__, "Interest rates matrix", self)
+        if self.__entropiadone__ :
+            mw = matwin.matable(self.__pr__, "Transition matrix", self)
 
-            mw1.show()
-            mw2.show()
+            mw.show()
   
         return 
 

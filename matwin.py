@@ -20,9 +20,9 @@ class matable (QtGui.QMainWindow):
 
         self.__table__ = QtGui.QTableWidget(len(mat), len(mat[0]), self) 
 
-        for i in range(len(mat)):
+        for i in range(mat.shape[0]):
             self.__mat__.append([])
-            for j in range(len(mat[0])):
+            for j in range(mat.shape[1]):
                 newitem = QtGui.QTableWidgetItem()
                 newitem.setText(str(mat[i, j]))
                 # not editable
