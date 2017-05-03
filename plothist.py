@@ -44,5 +44,3 @@ class plohitwin (QtGui.QMainWindow):
         
         canvas.draw()
 
-
-

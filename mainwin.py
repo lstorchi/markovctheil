@@ -4,6 +4,7 @@ import mainmkvcmp
 import plothist
 import scipy.io
 import options
+import matwin
 import numpy
 import os
 
@@ -240,6 +241,14 @@ class main_window(QtGui.QMainWindow):
             self.__canvas__.draw()
 
     def view_mats(self):
+
+        if self.__fileio__ :
+            mw1 = matwin.matable(self.__rm__, self)
+            mw2 = matwin.matable(self.__ir__, self)
+
+            mw1.show()
+            mw2.show()
+  
         return 
 
     def plot_hist (self):
