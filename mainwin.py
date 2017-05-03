@@ -20,6 +20,7 @@ class main_window(QtGui.QMainWindow):
         self.__inputfile__ = ""
         self.__fileio__ = False
         self.__entropiadone__ = False
+        self.__plot_done__ = False
        
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
@@ -125,6 +126,11 @@ class main_window(QtGui.QMainWindow):
         self.__plots__.setEnabled(False)
         self.__mats__.setEnabled(False)
 
+        if self.__plot_done__ :
+          self.__ax__.cla()
+          self.__canvas__.draw()
+          self.__plot_done__ = False
+
         if self.__inputfile__ != "":
 
           self.__options_name_dialog__.exec_()
@@ -172,6 +178,12 @@ class main_window(QtGui.QMainWindow):
         self.__plots__.setEnabled(False)
 
         if (self.__fileio__):
+
+            if self.__plot_done__ :
+                self.__ax__.cla()
+                self.__canvas__.draw()
+                self.__plot_done__ = False
+
             self.__options_dialog__.exec_()
 
             progdialog = QtGui.QProgressDialog(
@@ -215,7 +227,13 @@ class main_window(QtGui.QMainWindow):
             self.__savefile__.setEnabled(True)
             self.__plots__.setEnabled(True)
 
-            self.plot(self.__entropia__)
+            if self.__options_dialog__.getinftime():
+                QtGui.QMessageBox.information( self, \
+                        "Value", "Stationary value: " +\
+                        str(numpy.mean(self.__entropia__)) + " stdev: " + \
+                        str(numpy.std(self.__entropia__)))
+            else:
+                self.plot(self.__entropia__)
 
         else:
             QtGui.QMessageBox.critical( self, \
@@ -231,14 +249,15 @@ class main_window(QtGui.QMainWindow):
             y.append(data[i-1])
         
         if self.__entropiadone__ :
-            ax = self.__figure__.add_subplot(111)
-            ax.hold(False)
-            ax.plot(x, y, '*-')
-            #ax.scatter(x, y)
-            ax.set_ylabel('Time')
-            ax.set_xlabel('DT')
-            ax.set_xlim([2, self.__options_dialog__.gettprev()])
+            self.__ax__  = self.__figure__.add_subplot(111)
+            self.__ax__.hold(False)
+            self.__ax__.plot(x, y, '*-')
+            #self.__ax__.scatter(x, y)
+            self.__ax__.set_ylabel('Time')
+            self.__ax__.set_xlabel('DT')
+            self.__ax__.set_xlim([2, self.__options_dialog__.gettprev()])
             self.__canvas__.draw()
+            self.__plot_done__ = True
 
     def view_mats(self):
 
