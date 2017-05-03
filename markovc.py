@@ -89,13 +89,22 @@ i_r = bpd[namebp]
 
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
+
+rating = numpy.max(ms)
+
+pr = numpy.zeros((rating,rating), dtype='float64')
+meanval = []
+stdeval = []
+ 
 allratings = []
 allratingsnins = []
 
 if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
         numofrun, verbose, True, args.seed, errmsg, entropia, \
-        var, allratings, allratingsnins):
+        var, allratings, allratingsnins, pr, meanval, stdeval):
     for m in errmsg:
         print m
     exit(1)
+
+
 

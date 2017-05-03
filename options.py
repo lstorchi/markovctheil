@@ -101,12 +101,12 @@ class optionnamedialog(QtGui.QDialog):
         self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
         self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
 
-        labelratingname = QtGui.QLabel("Name of the rating matrix: ", self)
+        labelratingname = QtGui.QLabel("Name of the transition probability matrix: ", self)
         self.ratingnametb = QtGui.QLineEdit(str(self.__namerm__), self)
         self.ratingnametb.move(20, 20)
         self.ratingnametb.resize(280,40)
 
-        labelinterest_ratesname = QtGui.QLabel("Name of the interest rates matrix: ", self)
+        labelinterest_ratesname = QtGui.QLabel("Name of the rewards matrix: ", self)
         self.interest_ratestb = QtGui.QLineEdit(str(self.__nameir__), self)
         self.interest_ratestb.move(20, 20)
         self.interest_ratestb.resize(280,40)

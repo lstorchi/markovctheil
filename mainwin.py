@@ -199,6 +199,11 @@ class main_window(QtGui.QMainWindow):
             tprev = self.__options_dialog__.gettprev()
 
             self.__entropia__ = numpy.zeros(tprev, dtype='float64')
+
+            self.__pr__ = numpy.zeros((1,1), dtype='float64')
+            self.__meanval__ = []
+            self.__stdeval__ = []
+ 
             self.__var__ = numpy.zeros((tprev), dtype='float64')
             self.__allratings__ = []
             self.__allratingsnins__ = []
@@ -210,7 +215,7 @@ class main_window(QtGui.QMainWindow):
                     self.__options_dialog__.getnofrun(), \
                     False, False, False, errmsg, self.__entropia__, \
                     self.__var__, self.__allratings__ , self.__allratingsnins__, \
-                    progdialog)):
+                    self.__pr__, self.__meanval__, self.__stdeval__, progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])
@@ -253,8 +258,8 @@ class main_window(QtGui.QMainWindow):
             self.__ax__.hold(False)
             self.__ax__.plot(x, y, '*-')
             #self.__ax__.scatter(x, y)
-            self.__ax__.set_ylabel('Time')
-            self.__ax__.set_xlabel('DT')
+            self.__ax__.set_xlabel('Time')
+            self.__ax__.set_ylabel('DT')
             self.__ax__.set_xlim([2, self.__options_dialog__.gettprev()])
             self.__canvas__.draw()
             self.__plot_done__ = True
