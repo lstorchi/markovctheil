@@ -103,8 +103,7 @@ ms1 = ms1d[namems1]
 ms2 = ms2d[namems2]
 time1 = len(ms1[1,:])
 time2 = len(ms2[1,:])
-print ms1
-print ms2
+
 countries1 = ms1d[namems1].shape[0]
 countries2 = ms2d[namems2].shape[0]
 
@@ -163,7 +162,7 @@ else:
             Num2[i][j] = iNum2[i][j]
             Pr2[i][j] = iPr2[i][j]
 
-print"ms", Pr1, "sp", Pr2
+#print"ms", Pr1, "sp", Pr2
 #mat_to_stdout(Num1)
 #print ""
 #mat_to_stdout(Pr2)

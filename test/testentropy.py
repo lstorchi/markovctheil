@@ -10,7 +10,7 @@ import os
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-filename = "entropy_1000000.txt"
+filename = "entropy_100.txt"
 a = 0.1
 
 if len(sys.argv) != 3:
