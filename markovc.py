@@ -20,25 +20,25 @@ import basicutils
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-m","--rmat-filename", help="Rating mattrix filename", \
+parser.add_argument("-m","--rmat-filename", help="Transition probability matrix filename", \
         type=str, required=True, dest="rmatfilename")
-parser.add_argument("-b", "--imat-filename", help="Interest rates matrix filename", \
+parser.add_argument("-b", "--imat-filename", help="Rewards matrix filename", \
         type=str, required=True, dest="imatfilename")
-parser.add_argument("-s", "--step", help="Step ", \
+parser.add_argument("-s", "--step", help="Bin width ", \
         type=float, required=False, default=0.25, dest="step")
-parser.add_argument("-t", "--time-prev", help="Time prev ", \
+parser.add_argument("-t", "--time-prev", help="Forecasted period ", \
         type=int, required=False, default=37, dest="tprev")
-parser.add_argument("-n", "--max-run", help="Num. of run required ", \
+parser.add_argument("-n", "--max-run", help="Monte carlo iterations ", \
         type=int, required=True, dest="maxrun")
-parser.add_argument("-M", "--name-of-matrix", help="Name of MS matrix ", \
+parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matrix ", \
         type=str, required=False, default="ms", dest="nameofmatrix")
-parser.add_argument("-B", "--name-of-bpmatrix", help="Name of BP matrix ", \
+parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix ", \
         type=str, required=False, default="i_r", dest="nameofbpmatrix")
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
-parser.add_argument("-i", "--time-inf", help="Simulate infinie time", \
+parser.add_argument("-i", "--time-inf", help="Simulation using stationary distribution", \
         default=False, action="store_true", dest="timeinf")
-parser.add_argument("-S", "--seed", help="using a seed for the random generator", \
+parser.add_argument("-S", "--seed", help="Using a seed for the random generator", \
         default=False, action="store_true", dest="seed")
 
 if len(sys.argv) == 1:
