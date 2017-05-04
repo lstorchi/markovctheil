@@ -1,6 +1,7 @@
 import sys
-import mainwin
 from PyQt4 import QtGui
+
+import mainwin
 
 def main():
     app = QtGui.QApplication(sys.argv)
