@@ -261,30 +261,13 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
          errmsg.append("Cancelled!")
          return False
    
-   if rating == 1:
-       fval, pval = scipy.stats.f_oneway (allratings[0])
-   elif rating == 2:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1])
-   elif rating == 3:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2])
-   elif rating == 4: 
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2], allratings[3])
-   elif rating == 5:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2], allratings[3], allratings[4])
-   elif rating == 6:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2], allratings[3], allratings[4], allratings[5])
-   elif rating == 7:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2], allratings[3], allratings[4], allratings[5], \
-               allratings[6])
-   elif rating == 8:
-       fval, pval = scipy.stats.f_oneway (allratings[0], allratings[1], \
-               allratings[2], allratings[3], allratings[4], allratings[5], \
-               allratings[6], allratings[7])
+   args = [] 
+
+   for i in range(len(allratings)):
+       args.append(allratings[i])
+
+   fval, pval = scipy.stats.f_oneway (*args)
+
    if verbose:
      print " "
    
