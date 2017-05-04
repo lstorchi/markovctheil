@@ -1,4 +1,4 @@
-Forecasted dynamic Theil\'s entropy
+Minimal version of Forecasted dynamic Theil's entropy software:
 
 to run the GUI:
 
