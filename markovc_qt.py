@@ -1,6 +1,7 @@
 import sys
 from PyQt4 import QtGui
 
+sys.path.append("./module")
 import mainwin
 
 def main():

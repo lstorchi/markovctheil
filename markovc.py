@@ -13,9 +13,9 @@ import os.path
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-import mainmkvcmp
 
 sys.path.append("./module")
+import mainmkvcmp
 import basicutils
 
 parser = argparse.ArgumentParser()

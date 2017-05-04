@@ -1,7 +1,6 @@
 from PyQt4 import QtCore, QtGui
 import sys
 
-sys.path.append("./module")
 import basicutils
 
 class optiondialog(QtGui.QDialog):

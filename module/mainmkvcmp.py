@@ -13,7 +13,6 @@ import os.path
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
-sys.path.append("./module")
 import basicutils
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
