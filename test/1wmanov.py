@@ -97,15 +97,23 @@ for i in range(2, 2+N):
     ar.append(allratings)
     am.append(meanval)
 
-if N == 3:
-    for j in range(0, minrat):
-        fval, pval = scipy.stats.f_oneway (ar[0][j], ar[1][j], ar[2][j])
 
-        print fval, pval
+for j in range(0, minrat):
+    args = []
+    for i in range(N):
+        args.append(ar[i][j])
 
-
-    print "Mean: "
-    fval, pval = scipy.stats.f_oneway (am[0], am[1], am[2])
+    print i+1
+    fval, pval = scipy.stats.f_oneway (*args)
     print fval, pval
+
+
+args = []
+for i in range(N):
+    args.append(am[i])
+
+print "Mean: "
+fval, pval = scipy.stats.f_oneway (*args)
+print fval, pval
 
 
