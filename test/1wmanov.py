@@ -102,8 +102,9 @@ for j in range(0, minrat):
     args = []
     for i in range(N):
         args.append(ar[i][j])
+        #print ar[i][j]
 
-    print i+1
+    print j+1
     fval, pval = scipy.stats.f_oneway (*args)
     print fval, pval
 
