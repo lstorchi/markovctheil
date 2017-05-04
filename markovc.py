@@ -36,8 +36,6 @@ def vct_to_file (bpm, oufilename):
 
 ###############################################################################
 
-
-
 def mat_to_file (bpm, oufilename):
 
     if os.path.exists(oufilename):
@@ -106,8 +104,8 @@ run = 100000
 tprev = 37 # mesi previsione
 namems = 'ms'
 namebp = 'i_r'
-#timeinf = False
-timeinf = True
+timeinf = False
+#timeinf = True
 
 if len(sys.argv) != 6 and len(sys.argv) != 7:
     print "usage: ", sys.argv[0], \
@@ -128,7 +126,7 @@ else:
       run = int(sys.argv[5])
       namems = sys.argv[6]
 
-#numpy.random.seed(9001)
+numpy.random.seed(9001)
 
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
