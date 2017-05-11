@@ -26,7 +26,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
    countries = rm.shape[0]
    rating = numpy.max(rm)
-   time = len(rm[1,:])
+   time = rm.shape[1]
    
    if (rating <= 0) or (rating > 8):
        errmsg.append("rating " + rating + " is not a valid value")
