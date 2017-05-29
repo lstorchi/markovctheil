@@ -1,6 +1,8 @@
 Minimal version of Forecasted dynamic Theil's entropy software:
+To run the program you need Python 2.7.x, PyQt4, matplotlib, 
+numpy and scipy. 
 
-to run the GUI:
+To run the GUI:
 
 python markovc_qt.py 
 
@@ -29,3 +31,5 @@ optional arguments:
   -v, --verbose         increase output verbosity
   -i, --time-inf        Simulation using stationary distribution
   -S, --seed            Using a seed for the random generator
+
+
