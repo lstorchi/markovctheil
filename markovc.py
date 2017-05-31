@@ -71,17 +71,17 @@ msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
 
 if not(namems in msd.keys()):
-    print "Cannot find " + namems + " in " + filename1
-    print msd.keys()
+    print ("Cannot find " + namems + " in " + filename1)
+    print (msd.keys())
     exit(1)
 
 if not(namebp in bpd.keys()):
-    print "Cannot find " + namebp + " in " + filename2
-    print bpd.keys()
+    print ("Cannot find " + namebp + " in " + filename2)
+    print (bpd.keys())
     exit(1)
 
 if msd[namems].shape[0] != bpd[namebp].shape[0]:
-    print "wrong dim of the input matrix"
+    print ("wrong dim of the input matrix")
     exit(1)
 
 ms = msd[namems]
@@ -103,5 +103,5 @@ if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
         numofrun, verbose, True, args.seed, errmsg, entropia, \
         var, allratings, allratingsnins, pr, meanval, stdeval):
     for m in errmsg:
-        print m
+        print (m)
     exit(1)

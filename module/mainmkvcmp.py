@@ -73,8 +73,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    if timeinf: # matrice delle probabilita' diventa stazionaria tempo elevato 
        if verbose:
-         print ""
-         print "Solve ..."
+         print ("")
+         print ("Solve ...")
 
        ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(pr)
        a = numpy.zeros((rating+1,rating), dtype='float64')
@@ -95,15 +95,15 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
                pr[i, j] = x[0][j] 
 
    if verbose:
-     print " "
-     print "Solve SVD "
+     print (" ")
+     print ("Solve SVD ")
    
    npr = pr - numpy.identity(rating, dtype='float64')
    s, v, d = numpy.linalg.svd(npr)
    
    if verbose:
-       print " "
-       print "mean value: ", numpy.mean(v)
+       print (" ")
+       print ("mean value: ", numpy.mean(v))
    
    for i in range(len(ir)):
        for j in range(len(ir[0])):
@@ -268,7 +268,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    fval, pval = scipy.stats.f_oneway (*args)
 
    if verbose:
-     print " "
+     print (" ")
    
    oufilename = "1wayanova_"+str(numofrun)+".txt"
    
@@ -393,7 +393,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
              return False
    
    if verbose:
-     print " "
+     print (" ")
    
    oufilename = "entropy_"+str(numofrun)+".txt"
 
