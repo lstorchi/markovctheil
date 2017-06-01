@@ -2,7 +2,7 @@ Minimal version of Forecasted dynamic Theil's entropy software:
 To run the program you need Python 3, PyQt4, matplotlib, 
 numpy and scipy. 
 
-The code has been tested and developed under Linucx, but once installed the needed 
+The code has been tested and developed under Linux OS, but once installed the needed 
 packages should work also under Mac OS X and Windows OS.
 
 To run the GUI:
