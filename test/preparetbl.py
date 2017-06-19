@@ -20,6 +20,11 @@ df = pandas.read_excel(file)
 #print the column names
 cn = df.columns
 
+cnames = []
+
+for name in df[cn[0]].values:
+    cnames.append(name.replace(",", " "))
+
 count = len(df[cn[0]].values)
 
 mat = numpy.zeros((count, len(cn)-1))
@@ -41,19 +46,18 @@ for i in range(1,len(cn)):
             mat[j,c] = v
         else:
             mat[j,c] = float('nan')
-            print "Error in value ", v
+            #print "Error in value ", v
         j = j + 1
     c = c + 1
 
-print mat
-
-
-for k in range(mat.shape[1]):
+for k in range(mat.shape[0]):
+    sys.stdout.write("%s ,"%(cnames[k]))
     for i in range(0,len(dates)):
         y0 = int(dates[i][0])
         m0 = int(dates[i][1])
         ld = calendar.monthrange(y0,m0)
 
-        for j in range(ld[1]):
-            sys.stdout.write("%f , "%(mat[i,k]))
+        for j in range(ld[1]-1):
+            sys.stdout.write("%f , "%(mat[k,i]))
+        sys.stdout.write("%f "%(mat[k,i]))
     sys.stdout.write("\n")
