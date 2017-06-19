@@ -57,7 +57,6 @@ for k in range(mat.shape[0]):
         m0 = int(dates[i][1])
         ld = calendar.monthrange(y0,m0)
 
-        for j in range(ld[1]-1):
+        for j in range(ld[1]):
             sys.stdout.write("%f , "%(mat[k,i]))
-        sys.stdout.write("%f "%(mat[k,i]))
-    sys.stdout.write("\n")
+    sys.stdout.write(" %s \n"%(cnames[k]))
