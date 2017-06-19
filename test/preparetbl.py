@@ -35,7 +35,7 @@ for i in range(1,len(cn)):
     values = df[cn[i]].values
     #print values
     j = 0
-    for k in range(1, len(values)):
+    for k in range(0, len(values)):
         v = values[k]
         if (basicutils.is_float(v)):
             mat[j,c] = v
@@ -45,15 +45,15 @@ for i in range(1,len(cn)):
         j = j + 1
     c = c + 1
 
-#print mat
+print mat
 
-for i in range(0,len(dates)):
-    y0 = int(dates[i][0])
-    m0 = int(dates[i][1])
-    ld = calendar.monthrange(y0,m0)
 
-    for k in range(mat.shape[0]):
+for k in range(mat.shape[1]):
+    for i in range(0,len(dates)):
+        y0 = int(dates[i][0])
+        m0 = int(dates[i][1])
+        ld = calendar.monthrange(y0,m0)
+
         for j in range(ld[1]):
-            sys.stdout.write("%f , "%(mat[k,i]))
+            sys.stdout.write("%f , "%(mat[i,k]))
     sys.stdout.write("\n")
-
