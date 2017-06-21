@@ -15,6 +15,8 @@ def basic_repter (sep):
 
     val = [] 
 
+    nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
+
     for i in range(1, len(sep)):
         date1 = sep[i-1][1]
         vdate1 = date1.split()
@@ -39,6 +41,44 @@ def basic_repter (sep):
 
 #####################################################################
 
+def dump_file (count, values):
+
+     sep = []
+     moody = []
+     fitch = [] 
+     
+     for v in values:
+         if len(v) == 3:
+           if v[0] == "S&P":
+               sep.append([v[1], v[2]])
+           elif v[0] == "Moody\'s":
+               moody.append([v[1], v[2]])
+           elif v[0] == "Fitch":
+               fitch.append([v[1], v[2]])
+         elif len(v) == 4:
+           if v[0] == "S&P":
+               sep.append([v[1], v[3]])
+           elif v[0] == "Moody\'s":
+               moody.append([v[1], v[3]])
+           elif v[0] == "Fitch":
+               fitch.append([v[1], v[3]])
+     
+     vsep = basic_repter (sep)
+     vmoody = basic_repter (moody)
+     vfitch = basic_repter (fitch)
+     
+     outfilename = count+"_data.mat"
+     
+     if os.path.exists(outfilename):
+         print "File ", outfilename, " exist, removing it "
+         os.remove(outfilename)
+     
+     datadict = mdict={'sep': vsep , 'moody': vmoody , 'fitch': vfitch}
+     
+     scipy.io.savemat(outfilename, datadict)
+
+#####################################################################
+
 file = ""
 
 if len(sys.argv) == 2:
@@ -47,35 +87,17 @@ else:
     print "Usage ", sys.argv[0] , " filename "
     exit(1)
 
-df = pandas.read_excel(file)
+df = pandas.read_excel(file, header=[0, 1])
 
 #print the column names
 cn = df.columns
 
-nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
+countries = set()
+for v in cn:
+    countries.add(v[0])
 
-sep = []
-moody = []
-fitch = [] 
+for c in countries:
+    vals = df[c].values
+    #print vals
+    dump_file (c, vals)
 
-for i, v in  enumerate(df[cn[0]].values):
-    if v == "S&P":
-        sep.append([df[cn[1]].values[i], df[cn[2]].values[i]])
-    elif v == "Moody\'s":
-        moody.append([df[cn[1]].values[i], df[cn[2]].values[i]])
-    elif v == "Fitch":
-        fitch.append([df[cn[1]].values[i], df[cn[2]].values[i]])
-
-vsep = basic_repter (sep)
-vmoody = basic_repter (moody)
-vfitch = basic_repter (fitch)
-
-outfilename = "data.mat"
-
-if os.path.exists(outfilename):
-    print "File ", outfilename, " exist, removing it "
-    os.remove(outfilename)
-
-datadict = mdict={'sep': vsep , 'moody': vmoody , 'fitch': vfitch}
-
-scipy.io.savemat(outfilename, datadict)
