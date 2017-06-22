@@ -11,7 +11,7 @@ import basicutils
 
 #####################################################################
 
-def basic_repter (sep):
+def basic_repter (values):
 
     val = [] 
 
@@ -28,8 +28,8 @@ def basic_repter (sep):
     m2 = 5 
     d2 = 31
     y2 = 2017
-    for i in range(0, len(sep)):
-        date1 = sep[i][1]
+    for i in range(0, len(values)):
+        date1 = values[i][1]
         vdate1 = date1.split()
         m1 = nametonum[vdate1[0]]
         d1 = int(vdate1[1])
@@ -39,7 +39,7 @@ def basic_repter (sep):
         da2 = datetime.date(y2, m2, d2)
         delta = da2 - da1
         for j in range(delta.days): # -1 is really neeeded
-            val.append(rat2num[sep[i][0]])
+            val.append(rat2num[values[i][0]])
 
         m2 = m1
         d2 = d1
@@ -49,7 +49,7 @@ def basic_repter (sep):
 
 #####################################################################
 
-def dump_file (count, values):
+def dump_file (count, values, verbose = False):
 
      sep = []
      moody = []
@@ -60,6 +60,8 @@ def dump_file (count, values):
      tododfitch = True
 
      nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
+     
+     print "Running ... " + count
 
      for v in values:
          if (v[0] == "S&P" ) or (v[0] == "Moody\'s") or \
@@ -98,13 +100,20 @@ def dump_file (count, values):
                     tododfitch = False
      
      #print c 
-     #print "SeP"
+     if verbose:
+       print "S&P"
+       print sep
      vsep = basic_repter (sep)
-     #print "Mod"
+     #print vsep
+     if verbose:
+       print "Moody\'s"
+       print moody
      vmoody = basic_repter (moody)
-     #print "fitch"
+     #print vmoody
+     if verbose:
+       print "Fitch"
+       print fitch
      vfitch = basic_repter (fitch)
-     #print "" 
 
      outfilename = count+"_data.mat"
      

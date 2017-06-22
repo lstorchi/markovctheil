@@ -8,6 +8,19 @@ import scipy.io
 sys.path.append("../module")
 import basicutils
 
+startingdate = {\
+        "Bulgaria"       :(1, 1, 2007), \
+        "Czech Republic" :(1, 5, 2004), \
+        "Croatia"        :(1, 7, 2013), \
+        "Latvia"         :(1, 5, 2004), \
+        "Lithuana"       :(1, 5, 2004), \
+        "Hungary"        :(1, 5, 2004), \
+        "Malta"          :(1, 5, 2004), \
+        "poland"         :(1, 5, 2004), \
+        "Romania"        :(1, 1, 2007), \
+        "Slovenia"       :(1, 5, 2004), \
+        "Slovakia"       :(1, 5, 2004)}
+
 file = ""
 
 if len(sys.argv) == 2:
@@ -17,8 +30,6 @@ else:
     exit(1)
 
 df = pandas.read_excel(file)
-
-#print the column names
 cn = df.columns
 
 cnames = []
@@ -51,15 +62,20 @@ for i in range(1,len(cn)):
         j = j + 1
     c = c + 1
 
+print mat, dates, cnames
+
+"""
+for c, date in startingdate.iteritems():
+    print c, date
+    for d in dates:
+      y0 = int(dates[i][0])
+      m0 = int(dates[i][1])
+      ld = calendar.monthrange(y0,m0)
+"""
+
 tot = 0
 
-y0 = int(dates[0][0])
-m0 = int(dates[0][1])
-ld = calendar.monthrange(y0,m0)
-
-tot = tot + ld[1] - 1
-
-for i in range(1,len(dates)):
+for i in range(0,len(dates)):
     y0 = int(dates[i][0])
     m0 = int(dates[i][1])
     ld = calendar.monthrange(y0,m0)
@@ -71,16 +87,7 @@ nmat = numpy.zeros((count, tot))
 for k in range(mat.shape[0]):
     aidx = 0
 
-    y0 = int(dates[0][0])
-    m0 = int(dates[0][1])
-    ld = calendar.monthrange(y0,m0) 
-
-    i = 0
-    for j in range(ld[1]-1):
-        nmat[k, aidx] = mat[k,i]
-        aidx = aidx + 1
-
-    for i in range(1,len(dates)):
+    for i in range(0,len(dates)):
         y0 = int(dates[i][0])
         m0 = int(dates[i][1])
         ld = calendar.monthrange(y0,m0)
@@ -89,4 +96,8 @@ for k in range(mat.shape[0]):
             nmat[k, aidx] = mat[k,i]
             aidx = aidx + 1
 
-scipy.io.savemat('data.mat', mdict={'nmat': nmat})
+# remove the first column
+
+nmat2 = [ row[1:] for row in nmat ]
+
+scipy.io.savemat('data.mat', mdict={'nmat': nmat2})
