@@ -39,7 +39,7 @@ def basic_repter (sep):
         da2 = datetime.date(y2, m2, d2)
         delta = da2 - da1
         for j in range(delta.days): # -1 is really neeeded
-            val.append(rat2num[sep[i-1][0]])
+            val.append(rat2num[sep[i][0]])
 
         m2 = m1
         d2 = d1
