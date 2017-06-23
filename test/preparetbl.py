@@ -14,7 +14,7 @@ startingdate = {\
         "Czech Republic" :(1, 5, 2004), \
         "Croatia"        :(1, 7, 2013), \
         "Latvia"         :(1, 5, 2004), \
-        "Lithuana"       :(1, 5, 2004), \
+        "Lithuania"      :(1, 5, 2004), \
         "Hungary"        :(1, 5, 2004), \
         "Malta"          :(1, 5, 2004), \
         "Poland"         :(1, 5, 2004), \
@@ -64,6 +64,8 @@ for i in range(1,len(cn)):
     c = c + 1
 
 #print mat, dates, cnames
+
+print cnames
 
 for c, date in startingdate.iteritems():
     print c, date
