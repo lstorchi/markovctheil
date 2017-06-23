@@ -116,12 +116,21 @@ def dump_file (count, values, verbose = False):
      vfitch = basic_repter (fitch)
 
      outfilename = count+"_data.mat"
+
+     # remove 
+     avsep = []
+     for i in range(len(vsep)-324):
+         avsep.append(vsep[i])
+
+     avfitch = []
+     for i in range(len(vfitch)-179):
+         avfitch.append(vfitch[i]) 
      
      if os.path.exists(outfilename):
          print "File ", outfilename, " exist, removing it "
          os.remove(outfilename)
      
-     datadict = mdict={'sep': vsep , 'moody': vmoody , 'fitch': vfitch}
+     datadict = mdict={'sep': avsep , 'moody': vmoody , 'fitch': avfitch}
      
      scipy.io.savemat(outfilename, datadict)
 
