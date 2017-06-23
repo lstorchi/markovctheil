@@ -1,3 +1,4 @@
+import os
 import sys 
 import numpy
 import pandas
@@ -16,7 +17,7 @@ startingdate = {\
         "Lithuana"       :(1, 5, 2004), \
         "Hungary"        :(1, 5, 2004), \
         "Malta"          :(1, 5, 2004), \
-        "poland"         :(1, 5, 2004), \
+        "Poland"         :(1, 5, 2004), \
         "Romania"        :(1, 1, 2007), \
         "Slovenia"       :(1, 5, 2004), \
         "Slovakia"       :(1, 5, 2004)}
@@ -62,18 +63,38 @@ for i in range(1,len(cn)):
         j = j + 1
     c = c + 1
 
-print mat, dates, cnames
+#print mat, dates, cnames
 
-"""
 for c, date in startingdate.iteritems():
     print c, date
-    for d in dates:
-      y0 = int(dates[i][0])
-      m0 = int(dates[i][1])
-      ld = calendar.monthrange(y0,m0)
-"""
+    m0 = date[1]
+    y0 = date[2]
+    idx = -1
+
+    for ridx in range(len(cnames)):
+        if cnames[ridx].find(c) != -1:
+            cidx = -1
+            for cidx in range(len(dates)):
+                y = int(dates[cidx][0])
+                m = int(dates[cidx][1])
+
+                if (y >= y0 ) and (m >= m0):
+                    break
+
+            if cidx >= 0:
+                for i in range(cidx):
+                    mat[ridx, i] = float('nan')
+           
+            print ridx, cidx
+            break
 
 tot = 0
+
+for i in range(0,len(cnames)):
+    sys.stdout.write(cnames[i] + " ")
+    for j in range(0,mat.shape[1]):
+        sys.stdout.write("%5.2f "%(mat[i,j])) 
+    sys.stdout.write("\n")
 
 for i in range(0,len(dates)):
     y0 = int(dates[i][0])
@@ -100,4 +121,10 @@ for k in range(mat.shape[0]):
 
 nmat2 = [ row[1:] for row in nmat ]
 
-scipy.io.savemat('data.mat', mdict={'nmat': nmat2})
+outfilename = "data.mat"
+
+if os.path.exists(outfilename):
+    print "File ", outfilename, " exist, removing it "
+    os.remove(outfilename)
+
+scipy.io.savemat(outfilename, mdict={'nmat': nmat2})
