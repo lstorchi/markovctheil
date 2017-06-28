@@ -481,12 +481,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    
    for i in range(rating):
        for j in range(rating):
-           if i!=j :
-               a(i,j)=float(num[i,j]/v[i])
+           if (i != j):
+               a[i,j] = float(num[i,j]/v[i])
 
    for i in range(rating):
-       a[i,i] = float(-sum(a[i])
-
+       a[i,i] = float(-sum(a[i]))
+   
    for t in range(time):
        pr[i,j,t] = scipy.linalg.expm(t*a)
 

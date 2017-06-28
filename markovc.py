@@ -36,6 +36,8 @@ parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix
         type=str, required=False, default="i_r", dest="nameofbpmatrix")
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
+parser.add_argument("-c", "--continuous", help="continuous time simulation", \
+        default=False, action="store_true")
 parser.add_argument("-i", "--time-inf", help="Simulation using stationary distribution", \
         default=False, action="store_true", dest="timeinf")
 parser.add_argument("-S", "--seed", help="Using a seed for the random generator", \
@@ -50,6 +52,7 @@ args = parser.parse_args()
 namebp = args.nameofbpmatrix
 timeinf = args.timeinf
 verbose = args.verbose
+continuous = args.cotinuous 
 filename1 = args.rmatfilename
 filename2 = args.imatfilename
 step = args.step
@@ -99,9 +102,17 @@ stdeval = []
 allratings = []
 allratingsnins = []
 
-if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
-        numofrun, verbose, True, args.seed, errmsg, entropia, \
-        var, allratings, allratingsnins, pr, meanval, stdeval):
-    for m in errmsg:
-        print (m)
-    exit(1)
+if continuous:
+    if not mainmkvcmp.main_mkc_comp_cont (ms, i_r, timeinf, step, tprev, \
+            numofrun, verbose, True, args.seed, errmsg, entropia, \
+            var, allratings, allratingsnins, pr, meanval, stdeval):
+        for m in errmsg:
+            print (m)
+        exit(1)
+else:
+    if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
+            numofrun, verbose, True, args.seed, errmsg, entropia, \
+            var, allratings, allratingsnins, pr, meanval, stdeval):
+        for m in errmsg:
+            print (m)
+        exit(1)
