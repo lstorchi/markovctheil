@@ -449,7 +449,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        numpy.random.seed(9001)
 
    countries = rm.shape[0]
-   time = len(rm[1,:])
+   time = rm.shape[1]
    rating = numpy.max(rm)
    
    nk = numpy.zeros((rating, rating, countries), dtype='int64')
@@ -458,21 +458,21 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    a = numpy.zeros((rating, rating), dtype='int64')
    
    for c in range(countries):
-       v0 = data[c,0]
+       v0 = rm[c,0]
        ts = 0
        for t in range(time):
-           if (data[c,t] != v0):
-               change[c,v]=change[c,v0]+ts
+           if (rm[c,t] != v0):
+               change[c,v0] += ts
            else:
                ts=ts+1
 
-   v = sum(change[v0])
+   v = numpy.sum(change, axis=0)
    
    for c in range(countries):
        for t in range(time-1):
            for i in range (rating):
                for j in range(rating):
-                   if (data[c,t] == i+1) and (data[c,t+1] == j+1):
+                   if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
                        nk[i,j,c]=nk[i,j,c]+1
                    num[i,j]= sum(nk[i,j])
    
@@ -487,7 +487,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        a[i,i] = float(-sum(a[i]))
    
    for t in range(time):
-       pr[i,j,t] = scipy.linalg.expm(t*a)
+       pr[:,:,t] = scipy.linalg.expm(t*a)
 
    if verbose:
      print (" ")

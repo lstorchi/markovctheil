@@ -96,6 +96,7 @@ var = numpy.zeros((tprev), dtype='float64')
 rating = numpy.max(ms)
 
 pr = numpy.zeros((rating,rating), dtype='float64')
+ 
 meanval = []
 stdeval = []
  
@@ -103,6 +104,8 @@ allratings = []
 allratingsnins = []
 
 if continuous:
+    time = ms.shape[1]
+    pr = numpy.zeros((rating,rating,time), dtype='float64')
     if not mainmkvcmp.main_mkc_comp_cont (ms, i_r, timeinf, step, tprev, \
             numofrun, verbose, True, args.seed, errmsg, entropia, \
             var, allratings, allratingsnins, pr, meanval, stdeval):
