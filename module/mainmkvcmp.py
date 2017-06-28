@@ -452,15 +452,14 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    time = len(rm[1,:])
    rating = numpy.max(rm)
    
-   nk=numpy.zeros((rating,rating,countrie), dtype='int64')
-   num=numpy.zerps((rating,rating), dtype='int64')
-   change=numpy.zeros((countries,rating), dtype='int64')
-   a=numpy.zeros((rating,rating), dtype='int64')
-   pr=numpy.zeros((rating,rating), dtype='int64')
+   nk = numpy.zeros((rating, rating, countries), dtype='int64')
+   num = numpy.zeros((rating, rating), dtype='int64')
+   change = numpy.zeros((countries, rating), dtype='int64')
+   a = numpy.zeros((rating, rating), dtype='int64')
    
    for c in range(countries):
-       v0=data[c,0]
-       ts=0
+       v0 = data[c,0]
+       ts = 0
        for t in range(time):
            if (data[c,t] != v0):
                change[c,v]=change[c,v0]+ts
