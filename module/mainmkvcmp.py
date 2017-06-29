@@ -451,55 +451,72 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    countries = rm.shape[0]
    time = rm.shape[1]
    rating = numpy.max(rm)
-   
+  
+   print "time: ", time
+   print "rating: ", rating
+   print "countries: ", countries
+
    nk = numpy.zeros((rating, rating, countries), dtype='int64')
    num = numpy.zeros((rating, rating), dtype='int64')
    change = numpy.zeros((countries, rating), dtype='int64')
-   a = numpy.zeros((rating, rating), dtype='int64')
+   a = numpy.zeros((rating, rating), dtype='float64')
+
+   print rm
    
    for c in range(countries):
        v0 = rm[c,0]
        ts = 0
        for t in range(time):
            if (rm[c,t] != v0):
-               change[c,v0] += ts
+               change[c,v0-1] += ts
+               v0 = rm[c,t]
+               ts = 0
            else:
                ts=ts+1
 
+       change[c,v0-1] = change[c, v0-1] + ts;
+
+   print change
+
    v = numpy.sum(change, axis=0)
-   
+
    for c in range(countries):
        for t in range(time-1):
            for i in range (rating):
                for j in range(rating):
                    if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
                        nk[i,j,c]=nk[i,j,c]+1
-                   num[i,j]= sum(nk[i,j])
+                   
+   for i in range(nk.shape[0]):
+       for j in range(nk.shape[1]):
+           val = 0.0
+           for c in range(nk.shape[2]):
+               val += nk[i,j,c]
+           num[i,j] = val
    
-   print 'num of transition', num
-   
-   for i in range(rating):
-       for j in range(rating):
-           if (i != j):
-               a[i,j] = float(num[i,j]/v[i])
+   print 'num of transition'
+   print num
+   print "v: ", v
 
    for i in range(rating):
-       a[i,i] = float(-sum(a[i]))
+       for j in range(rating):
+           if i != j:
+               a[i,j] = float(num[i,j])/float(v[i])
+           
+   q = numpy.sum(a, axis=1)
+   for i in range(rating):
+       a[i, i] = -1.0 * q[i] 
+
+
+   #testrow = numpy.sum(a, axis=1)
+   #print testrow
+
+   print "A: "
+   print a
    
    for t in range(time):
        pr[:,:,t] = scipy.linalg.expm(t*a)
 
-   if verbose:
-     print (" ")
-     print ("Solve SVD ")
-   
-   npr = pr - numpy.identity(rating, dtype='float64')
-   s, v, d = numpy.linalg.svd(npr)
-   
-   if verbose:
-       print (" ")
-       print ("mean value: ", numpy.mean(v))
-   
    for i in range(len(ir)):
        for j in range(len(ir[0])):
            if math.isnan(ir[i, j]):
