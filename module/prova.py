@@ -27,7 +27,7 @@ for c in range(countries)
           change[c,v]=change[c,v0]+ts
        else
 	  ts=ts+1
-v=sum(change[v0])
+v=numpy.sum(change[v0])
 
 for c in range(countries) 
     for t in range(time-1)
