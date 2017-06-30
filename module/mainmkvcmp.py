@@ -451,54 +451,88 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    countries = rm.shape[0]
    time = rm.shape[1]
    rating = numpy.max(rm)
-   
-   nk = numpy.zeros((rating, rating, countries), dtype='int64')
-   num = numpy.zeros((rating, rating), dtype='int64')
-   change = numpy.zeros((countries, rating), dtype='int64')
-   a = numpy.zeros((rating, rating), dtype='int64')
+  
+   #print "time: ", time
+   #print "rating: ", rating
+   #print "countries: ", countries
+
+   nk = numpy.zeros((rating, rating, countries), dtype='float64')
+   num = numpy.zeros((rating, rating), dtype='float64')
+   change = numpy.zeros((countries, rating), dtype='float64')
+   amtx = numpy.zeros((rating, rating), dtype='float64')
+
+   #print rm
    
    for c in range(countries):
        v0 = rm[c,0]
-       ts = 0
+       ts = 0.0e0
        for t in range(time):
            if (rm[c,t] != v0):
-               change[c,v0] += ts
+               change[c,v0-1] += ts
+               v0 = rm[c,t]
+               ts = 0.0e0
            else:
-               ts=ts+1
+               ts = ts + 1.0e0
+
+       change[c,v0-1] = change[c, v0-1] + ts;
+
+   #print change
 
    v = numpy.sum(change, axis=0)
-   
+
    for c in range(countries):
        for t in range(time-1):
            for i in range (rating):
                for j in range(rating):
                    if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
-                       nk[i,j,c]=nk[i,j,c]+1
-                   num[i,j]= sum(nk[i,j])
+                       nk[i,j,c] = nk[i,j,c] + 1.0e0
+
+       if verbose:
+         basicutils.progress_bar(c+1, countries)
+ 
+                   
+   for i in range(nk.shape[0]):
+       for j in range(nk.shape[1]):
+           val = 0.0e0
+           for c in range(nk.shape[2]):
+               val += nk[i,j,c]
+           num[i,j] = val
    
-   print 'num of transition', num
-   
+   #print 'num of transition'
+   #print num
+   #print "v: ", v
+
    for i in range(rating):
        for j in range(rating):
-           if (i != j):
-               a[i,j] = float(num[i,j]/v[i])
-
+           if i != j:
+               amtx[i,j] = num[i,j]/v[i]
+           
+   q = numpy.sum(amtx, axis=1)
    for i in range(rating):
-       a[i,i] = float(-sum(a[i]))
+       amtx[i, i] = -1.0e0 * q[i] 
+
+   testrow = numpy.sum(amtx, axis=1)
+   for t in testrow:
+       if math.fabs(t) > 1e-19 :
+           print "Error in A matrix "
+           exit(1)
+
+   #print testrow
+
+   #print "A: "
+   #print amtx
    
    for t in range(time):
-       pr[:,:,t] = scipy.linalg.expm(t*a)
+       pr[:,:,t] = scipy.linalg.expm(t*amtx)
 
-   if verbose:
-     print (" ")
-     print ("Solve SVD ")
-   
-   npr = pr - numpy.identity(rating, dtype='float64')
-   s, v, d = numpy.linalg.svd(npr)
-   
-   if verbose:
-       print (" ")
-       print ("mean value: ", numpy.mean(v))
+   for t in range(pr.shape[2]):
+       testrow = numpy.sum(pr[:,:,t], axis=1)
+       for v in testrow:
+           diff = math.fabs(v - 1.0) 
+           if diff > 2e-15 :
+               print "Error in PR matrix at ", t+1, " diff ", diff
+               print testrow
+               exit(1)
    
    for i in range(len(ir)):
        for j in range(len(ir[0])):
@@ -705,5 +739,55 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
          errmsg.append("Cancelled!")
          return False
    
+
+   p = numpy.zeros((rating, rating), dtype='float64')
+
+   for x in range(rating):
+       for y in range(rating):
+           if x != y:
+               if q[x] > 0.0:
+                   p[x,y] = amtx[x,y] / q[x]
+           else:
+               p[x,y] = 0.0
+
+   cdf = numpy.zeros((rating, rating), dtype='float64')
+   mc =  numpy.zeros((countries,tprev), dtype='float64')
+
+   for x in range(rating):
+       cdf[x,0] = p[x,0]
+       for y in range(1,rating):
+           cdf[x,y] = p[x,y] + cdf[x,y-1]
+
+   rnumb = numpy.random.rand(rating)
+
+   for i in range(rm.shape[0]):
+       mc[i, 0] = rm[i, rm.shape[1]-1]
+
+   invx = numpy.zeros(rating, dtype='float64')
+   for x in range(rating):
+       if q[x] != 0.0:
+           invx[x] = -1.0 * math.log(1.0 - rnumb[x], math.e) / q[x]
+       else:
+           invx[x] = float(tprev + 1)
+
+   print invx
+ 
+   for t in range(1, tprev):
+       
+       refrating = []
+       for x in range(rating):
+           if invx[x] <= tprev:
+               refrating.append(x + 1)
+
+       if len(refrating) == 0:
+           for c in range(countries):
+               mc[c, t] = mc[c, t - 1]
+       else:
+           for c in range(countries):
+               if not (mc[c, t - 1] in refrating):
+                   mc[c, t] = mc[c, t - 1]
+               else:
+                   # todo 
+                   print "todo"
 
    return True
