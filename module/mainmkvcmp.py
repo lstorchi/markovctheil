@@ -452,31 +452,31 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    time = rm.shape[1]
    rating = numpy.max(rm)
   
-   print "time: ", time
-   print "rating: ", rating
-   print "countries: ", countries
+   #print "time: ", time
+   #print "rating: ", rating
+   #print "countries: ", countries
 
-   nk = numpy.zeros((rating, rating, countries), dtype='int64')
-   num = numpy.zeros((rating, rating), dtype='int64')
-   change = numpy.zeros((countries, rating), dtype='int64')
+   nk = numpy.zeros((rating, rating, countries), dtype='float64')
+   num = numpy.zeros((rating, rating), dtype='float64')
+   change = numpy.zeros((countries, rating), dtype='float64')
    a = numpy.zeros((rating, rating), dtype='float64')
 
-   print rm
+   #print rm
    
    for c in range(countries):
        v0 = rm[c,0]
-       ts = 0
+       ts = 0.0e0
        for t in range(time):
            if (rm[c,t] != v0):
                change[c,v0-1] += ts
                v0 = rm[c,t]
-               ts = 0
+               ts = 0.0e0
            else:
-               ts=ts+1
+               ts = ts + 1.0e0
 
        change[c,v0-1] = change[c, v0-1] + ts;
 
-   print change
+   #print change
 
    v = numpy.sum(change, axis=0)
 
@@ -485,38 +485,56 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            for i in range (rating):
                for j in range(rating):
                    if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
-                       nk[i,j,c]=nk[i,j,c]+1
+                       nk[i,j,c] = nk[i,j,c] + 1.0e0
+
+       if verbose:
+         basicutils.progress_bar(c+1, countries)
+ 
                    
    for i in range(nk.shape[0]):
        for j in range(nk.shape[1]):
-           val = 0.0
+           val = 0.0e0
            for c in range(nk.shape[2]):
                val += nk[i,j,c]
            num[i,j] = val
    
-   print 'num of transition'
-   print num
-   print "v: ", v
+   #print 'num of transition'
+   #print num
+   #print "v: ", v
 
    for i in range(rating):
        for j in range(rating):
            if i != j:
-               a[i,j] = float(num[i,j])/float(v[i])
+               a[i,j] = num[i,j]/v[i]
            
    q = numpy.sum(a, axis=1)
    for i in range(rating):
-       a[i, i] = -1.0 * q[i] 
+       a[i, i] = -1.0e0 * q[i] 
 
 
-   #testrow = numpy.sum(a, axis=1)
+   testrow = numpy.sum(a, axis=1)
+   for t in testrow:
+       if math.fabs(t) > 1e-19 :
+           print "Error in A matrix "
+           exit(1)
+
    #print testrow
 
-   print "A: "
-   print a
+   #print "A: "
+   #print a
    
    for t in range(time):
        pr[:,:,t] = scipy.linalg.expm(t*a)
 
+   for t in range(pr.shape[2]):
+       testrow = numpy.sum(pr[:,:,t], axis=1)
+       for v in testrow:
+           diff = math.fabs(v - 1.0) 
+           if diff > 2e-15 :
+               print "Error in PR matrix at ", t+1, " diff ", diff
+               print testrow
+               exit(1)
+   
    for i in range(len(ir)):
        for j in range(len(ir[0])):
            if math.isnan(ir[i, j]):
