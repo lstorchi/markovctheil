@@ -459,7 +459,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    nk = numpy.zeros((rating, rating, countries), dtype='float64')
    num = numpy.zeros((rating, rating), dtype='float64')
    change = numpy.zeros((countries, rating), dtype='float64')
-   a = numpy.zeros((rating, rating), dtype='float64')
+   amtx = numpy.zeros((rating, rating), dtype='float64')
 
    #print rm
    
@@ -505,14 +505,13 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    for i in range(rating):
        for j in range(rating):
            if i != j:
-               a[i,j] = num[i,j]/v[i]
+               amtx[i,j] = num[i,j]/v[i]
            
-   q = numpy.sum(a, axis=1)
+   q = numpy.sum(amtx, axis=1)
    for i in range(rating):
-       a[i, i] = -1.0e0 * q[i] 
+       amtx[i, i] = -1.0e0 * q[i] 
 
-
-   testrow = numpy.sum(a, axis=1)
+   testrow = numpy.sum(amtx, axis=1)
    for t in testrow:
        if math.fabs(t) > 1e-19 :
            print "Error in A matrix "
@@ -521,10 +520,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #print testrow
 
    #print "A: "
-   #print a
+   #print amtx
    
    for t in range(time):
-       pr[:,:,t] = scipy.linalg.expm(t*a)
+       pr[:,:,t] = scipy.linalg.expm(t*amtx)
 
    for t in range(pr.shape[2]):
        testrow = numpy.sum(pr[:,:,t], axis=1)
@@ -740,5 +739,55 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
          errmsg.append("Cancelled!")
          return False
    
+
+   p = numpy.zeros((rating, rating), dtype='float64')
+
+   for x in range(rating):
+       for y in range(rating):
+           if x != y:
+               if q[x] > 0.0:
+                   p[x,y] = amtx[x,y] / q[x]
+           else:
+               p[x,y] = 0.0
+
+   cdf = numpy.zeros((rating, rating), dtype='float64')
+   mc =  numpy.zeros((countries,tprev), dtype='float64')
+
+   for x in range(rating):
+       cdf[x,0] = p[x,0]
+       for y in range(1,rating):
+           cdf[x,y] = p[x,y] + cdf[x,y-1]
+
+   rnumb = numpy.random.rand(rating)
+
+   for i in range(rm.shape[0]):
+       mc[i, 0] = rm[i, rm.shape[1]-1]
+
+   invx = numpy.zeros(rating, dtype='float64')
+   for x in range(rating):
+       if q[x] != 0.0:
+           invx[x] = -1.0 * math.log(1.0 - rnumb[x], math.e) / q[x]
+       else:
+           invx[x] = float(tprev + 1)
+
+   print invx
+ 
+   for t in range(1, tprev):
+       
+       refrating = []
+       for x in range(rating):
+           if invx[x] <= tprev:
+               refrating.append(x + 1)
+
+       if len(refrating) == 0:
+           for c in range(countries):
+               mc[c, t] = mc[c, t - 1]
+       else:
+           for c in range(countries):
+               if not (mc[c, t - 1] in refrating):
+                   mc[c, t] = mc[c, t - 1]
+               else:
+                   # todo 
+                   print "todo"
 
    return True
