@@ -778,6 +778,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for x in range(rating):
            if invx[x] <= tprev:
                refrating.append(x + 1)
+	       rnd = numpy.random.rand(refrating)
 
        if len(refrating) == 0:
            for c in range(countries):
@@ -787,7 +788,41 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                if not (mc[c, t - 1] in refrating):
                    mc[c, t] = mc[c, t - 1]
                else:
-                   # todo 
-                   print "todo"
+		   for i in range(refrating):
+			if (rnd[i]<=cdf[mc[c,t-1],0]):
+			   mc[c,t]=1
+			for x in range(1,rating)
+			    if (cdf[mc[c,t],x-1]<rnd[i)] and  (rnd[i] <= cdf[mc[c,t], x]):
+                            mc[c,t] = x + 1
+			invx[i] = -1.0 * math.log(1.0 - rnumb[i], math.e) / q[i]
+
+	for c in range(countries):
+             for i in range(rating):
+                 if mc[c, t] == i+1:
+                     bp[c, t, run] = meanval[i]
+                     cont[i, t, run] = cont[i, t, run] + 1
+                     tot[i, t, run] = cont[i, t, run] * meanval[i]
+
+           summa = 0.0
+           for x in range(bp.shape[0]):
+               summa += bp[x, t, run]
+           r_prev[t, run] = summa
+
+       for t in range(tprev):
+           for i in range(rating):
+                ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
+                if ac[i, t, run] != 0.0:
+                    t1[t, run] += (ac[i, t, run]*tiv[i])
+                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
+                    if cont[i, t, run] != 0:
+                       term[t, run] += ac[i, t, run]* \
+                               math.log(float(countries)/(float(rating)*cont[i, t, run]))
+
+           entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
+
+	for t in range(tprev):
+       entropia[t] =numpy.mean(entr[t])
+       var[t] = numpy.std(entr[t])
+
 
    return True
