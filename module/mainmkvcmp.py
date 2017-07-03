@@ -546,7 +546,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        testrow = numpy.sum(pr[:,:,t], axis=1)
        for v in testrow:
            diff = math.fabs(v - 1.0) 
-           if diff > 2e-15 :
+           if diff > 1e-13 :
                print "Error in PR matrix at ", t+1, " diff ", diff
                print testrow
                exit(1)
