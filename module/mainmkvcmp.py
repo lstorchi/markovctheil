@@ -27,8 +27,8 @@ def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
            for t in range(tstart+1, endtime):
                mc[c, t] = mc[c, tstart]
            
-           if t+1 < tprev:
-               mc[c, t+1] = j + 1
+           if endtime < tprev:
+               mc[c, endtime] = j + 1
            
            break
 
@@ -777,49 +777,135 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    for x in range(rating):
        cdf[x,x] = -1.0
 
-   for i in range(rm.shape[0]):
-       mc[i, 0] = rm[i, rm.shape[1]-1]
+   bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
+   cont = numpy.zeros((rating,tprev,numofrun), dtype='int')
+   r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
+   tot = numpy.zeros((rating,tprev,numofrun), dtype='float64')
+   ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
+   term = numpy.zeros((tprev,numofrun), dtype='float64')
+   entr = numpy.zeros((tprev,numofrun), dtype='float64')
+   t1 = numpy.zeros((tprev,numofrun), dtype='float64')
+   t2 = numpy.zeros((tprev,numofrun), dtype='float64')
 
-   endtimexc = numpy.zeros(countries, dtype='int')
+   for run in range(numofrun):
 
-   for c in range(countries):
-       todo = True
+       for i in range(rm.shape[0]):
+           mc[i, 0] = rm[i, rm.shape[1]-1]
        
-       rnumb = numpy.random.rand(rating)
-
-       while todo:
-          tstart = endtimexc[c]
-          startrating = mc[c, tstart]
-          
-          if q[startrating-1] != 0.0:
-              invx = -1.0 * math.log(1.0 - rnumb[startrating-1], \
-                      math.e) / q[startrating-1]
-          else:
-              invx = float(tprev + 1)
-          
-          if (invx + tstart) >= tprev:
-              for t in range(tstart, tprev):
-                  mc[c, t] = mc[c, tstart]
-              todo = False
-          else:
-              endtime = int(invx) + tstart
+       endtimexc = numpy.zeros(countries, dtype='int')
+       
+       for c in range(countries):
+           todo = True
+           
+           rnumb = random.random()
+       
+           while todo:
+              tstart = endtimexc[c]
+              startrating = mc[c, tstart]
               
-              evolve_country (mc, c, tstart, endtime, cdf, startrating, \
-                      rating, tprev)
-          
-              endtimexc[c] = endtime
+              if q[startrating-1] != 0.0:
+                  invx = -1.0 * math.log(1.0 - rnumb, \
+                          math.e) / q[startrating-1]
+              else:
+                  invx = float(tprev + 1)
+              
+              if (invx + tstart) >= tprev:
+                  for t in range(tstart, tprev):
+                      mc[c, t] = mc[c, tstart]
+                  todo = False
+              else:
+                  endtime = int(invx) + tstart
+                  
+                  evolve_country (mc, c, tstart, endtime, cdf, startrating, \
+                          rating, tprev)
+              
+                  endtimexc[c] = endtime
 
+       """ 
+       for c in range(countries):
+           oldv = mc[c, 0]
+           sys.stdout.write( "Cont: %d startr: %f ==> "%(c, oldv))
+           for j in range(tprev):
+               if mc[c, j] != oldv:
+                 sys.stdout.write( "[%d] %f "%(j , mc[c, j]))
+                 oldv = mc[c, j]
+       
+           print " lastv: ", mc[c, tprev-1]
+       """
    
- 
- 
-   for c in range(countries):
-       oldv = mc[c, 0]
-       sys.stdout.write( "Cont: %d startr: %f ==> "%(c, oldv))
-       for j in range(tprev):
-           if mc[c, j] != oldv:
-             sys.stdout.write( "[%d] %f "%(j , mc[c, j]))
-             oldv = mc[c, j]
+       for t in range(tprev):
+           for c in range(countries):
+               for i in range(rating):
+                   if mc[c, t] == i+1:
+                       bp[c, t, run] = meanval[i]
+                       cont[i, t, run] = cont[i, t, run] + 1
+                       tot[i, t, run] = cont[i, t, run] * meanval[i]
+               
+           summa = 0.0
+           for a in range(bp.shape[0]):
+               summa += bp[a, t, run]
+           r_prev[t, run] = summa
+   
+       for t in range(tprev):
+           for i in range(rating):
+                ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
+                if ac[i, t, run] != 0.0:
+                    t1[t, run] += (ac[i, t, run]*tiv[i])
+                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
+                    if cont[i, t, run] != 0:
+                       term[t, run] += ac[i, t, run]* \
+                               math.log(float(countries)/(float(rating)*cont[i, t, run]))
+    
+           entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
+   
+       if verbose:
+           basicutils.progress_bar(run+1, numofrun)
 
-       print " lastv: ", mc[c, tprev-1]
+       if setval != None:
+           setval.setValue(100.0*(float(run+1)/float(numofrun)))
+           if setval.wasCanceled():
+             errmsg.append("Cancelled!")
+             return False
+   
+   if verbose:
+     print (" ")
+   
+   oufilename = "entropy_"+str(numofrun)+".txt"
+
+   for t in range(tprev):
+       entropia[t] =numpy.mean(entr[t])
+       var[t] = numpy.std(entr[t])
+
+   if outfiles:
+   
+     if os.path.exists(oufilename):
+         os.remove(oufilename)
+   
+     outf = open(oufilename, "w")
+  
+     for t in range(tprev):
+         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+    
+     outf.close()
+   
+   acm = numpy.zeros((rating,tprev), dtype='float64')
+   for i in range(acm.shape[0]):
+       for j in range(acm.shape[1]):
+           acm[i, j] = numpy.mean(ac[i, j])
+   
+   oufilename = "acm_"+str(numofrun)+".txt"
+   
+   if outfiles:
+     basicutils.mat_to_file (acm, oufilename)
+   
+   bpm = numpy.zeros((countries,tprev), dtype='float64')
+   for i in range(bpm.shape[0]):
+       for j in range(bpm.shape[1]):
+           bpm[i, j] = numpy.mean(bp[i, j])
+   
+   oufilename = "bpm_"+str(numofrun)+".txt"
+  
+   if outfiles:
+     basicutils.mat_to_file (bpm, oufilename)
 
    return True
