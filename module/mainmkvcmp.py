@@ -3,6 +3,7 @@ import numpy.random
 import scipy.stats
 import scipy.io
 import argparse
+import random
 import numpy
 import math
 import sys
@@ -14,6 +15,22 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 import basicutils
+
+#####################################################################
+
+def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
+        tprev):
+
+   rnd = random.random()
+   for j in range(rating):
+       if rnd <= cdf[ratidx-1, j]:
+           for t in range(tstart+1, endtime):
+               mc[c, t] = mc[c, tstart]
+           
+           if t+1 < tprev:
+               mc[c, t+1] = j + 1
+           
+           break
 
 #####################################################################
 
@@ -757,74 +774,52 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for y in range(1,rating):
            cdf[x,y] = p[x,y] + cdf[x,y-1]
 
-   rnumb = numpy.random.rand(rating)
+   for x in range(rating):
+       cdf[x,x] = -1.0
 
    for i in range(rm.shape[0]):
        mc[i, 0] = rm[i, rm.shape[1]-1]
 
-   invx = numpy.zeros(rating, dtype='float64')
-   for x in range(rating):
-       if q[x] != 0.0:
-           invx[x] = -1.0 * math.log(1.0 - rnumb[x], math.e) / q[x]
-       else:
-           invx[x] = float(tprev + 1)
+   endtimexc = numpy.zeros(countries, dtype='int')
 
-   #print invx
- 
-   for t in range(1, tprev):
+   for c in range(countries):
+       todo = True
        
-       refrating = []
-       for x in range(rating):
-           if invx[x] <= tprev:
-               refrating.append(x + 1)
-	       
-       rnd = numpy.random.rand(len(refrating))
+       rnumb = numpy.random.rand(rating)
 
-       if len(refrating) == 0:
-           for c in range(countries):
-               mc[c, t] = mc[c, t - 1]
-       else:
-           for c in range(countries):
-               if not (mc[c, t - 1] in refrating):
-                   mc[c, t] = mc[c, t - 1]
-               else:
-		   for i in range(refrating):
-                       if (rnd[i] <= cdf[mc[c,t-1],0]):
-                            mc[c,t] = 1
-			
-                       for x in range(1,rating + 1):
-			    if (cdf[mc[c,t-1],x-1] < rnd[x]) and  (rnd[x] <= cdf[mc[c,t-1], x]):
-                                mc[c,t] = x + 1
-       		invx[x] = -1.0 * math.log(1.0 - rnumb[x], math.e) / q[x]
+       while todo:
+          tstart = endtimexc[c]
+          startrating = mc[c, tstart]
+          
+          if q[startrating-1] != 0.0:
+              invx = -1.0 * math.log(1.0 - rnumb[startrating-1], \
+                      math.e) / q[startrating-1]
+          else:
+              invx = float(tprev + 1)
+          
+          if (invx + tstart) >= tprev:
+              for t in range(tstart, tprev):
+                  mc[c, t] = mc[c, tstart]
+              todo = False
+          else:
+              endtime = int(invx) + tstart
+              
+              evolve_country (mc, c, tstart, endtime, cdf, startrating, \
+                      rating, tprev)
+          
+              endtimexc[c] = endtime
 
-######################################################################################################################################
-	for c in range(countries):
-             for i in range(rating):
-                 if mc[c, t] == i+1:
-                     bp[c, t, run] = meanval[i]
-                     cont[i, t, run] = cont[i, t, run] + 1
-                     tot[i, t, run] = cont[i, t, run] * meanval[i]
+   
+ 
+ 
+   for c in range(countries):
+       oldv = mc[c, 0]
+       sys.stdout.write( "Cont: %d startr: %f ==> "%(c, oldv))
+       for j in range(tprev):
+           if mc[c, j] != oldv:
+             sys.stdout.write( "[%d] %f "%(j , mc[c, j]))
+             oldv = mc[c, j]
 
-           summa = 0.0
-           for x in range(bp.shape[0]):
-               summa += bp[x, t, run]
-           r_prev[t, run] = summa
-
-       for t in range(tprev):
-           for i in range(rating):
-                ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
-                if ac[i, t, run] != 0.0:
-                    t1[t, run] += (ac[i, t, run]*tiv[i])
-                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
-                    if cont[i, t, run] != 0:
-                       term[t, run] += ac[i, t, run]* \
-                               math.log(float(countries)/(float(rating)*cont[i, t, run]))
-
-           entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
-
-	for t in range(tprev):
-       entropia[t] =numpy.mean(entr[t])
-       var[t] = numpy.std(entr[t])
-
+       print " lastv: ", mc[c, tprev-1]
 
    return True
