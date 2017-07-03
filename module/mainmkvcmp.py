@@ -738,7 +738,6 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
      if setval.wasCanceled():
          errmsg.append("Cancelled!")
          return False
-   
 
    p = numpy.zeros((rating, rating), dtype='float64')
 
@@ -751,7 +750,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                p[x,y] = 0.0
 
    cdf = numpy.zeros((rating, rating), dtype='float64')
-   mc =  numpy.zeros((countries,tprev), dtype='float64')
+   mc =  numpy.zeros((countries,tprev), dtype='int')
 
    for x in range(rating):
        cdf[x,0] = p[x,0]
@@ -770,7 +769,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        else:
            invx[x] = float(tprev + 1)
 
-   print invx
+   #print invx
  
    for t in range(1, tprev):
        
@@ -778,7 +777,8 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for x in range(rating):
            if invx[x] <= tprev:
                refrating.append(x + 1)
-	       rnd = numpy.random.rand(refrating)
+	       
+       rnd = numpy.random.rand(len(refrating))
 
        if len(refrating) == 0:
            for c in range(countries):
@@ -789,11 +789,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                    mc[c, t] = mc[c, t - 1]
                else:
 		   for i in range(refrating):
-			if (rnd[i]<=cdf[mc[c,t-1],0]):
-			   mc[c,t]=1
-			for x in range(1,rating)
-			    if (cdf[mc[c,t],x-1]<rnd[i)] and  (rnd[i] <= cdf[mc[c,t], x]):
-                            mc[c,t] = x + 1
+                       if (rnd[i] <= cdf[mc[c,t-1],0]):
+                            mc[c,t] = 1
+			
+                       for x in range(1,rating + 1):
+			    if (cdf[mc[c,t],x-1] < rnd[i]) and  (rnd[i] <= cdf[mc[c,t], x]):
+                                mc[c,t] = x + 1
 			invx[i] = -1.0 * math.log(1.0 - rnumb[i], math.e) / q[i]
 
 	for c in range(countries):
