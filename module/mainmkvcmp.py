@@ -334,15 +334,14 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    xm = numpy.zeros((countries,tprev), dtype='float64')
    cdf = numpy.zeros((rating,rating), dtype='float64')
-   x = numpy.zeros((countries,tprev,numofrun), dtype='int')
    cont = numpy.zeros((rating,tprev,numofrun), dtype='int')
    r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
    term = numpy.zeros((tprev,numofrun), dtype='float64')
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
-   xi = numpy.random.rand(countries,tprev,numofrun)
-  
+
+ 
    for i in range (rating):
        cdf[i, 0] = pr[i, 0]
    
@@ -355,32 +354,35 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         setval.setLabelText("Monte Carlo simulation")
    
    for run in range(numofrun):
+
+       x = numpy.zeros((countries,tprev), dtype='int')
+       xi = numpy.random.rand(countries,tprev)
    
        for c in range(countries):
-           x[c, 0, run] = rm[c, time-1]
+           x[c, 0] = rm[c, time-1]
    
        for c in range(countries):
-           if xi[c, 0, run] <= cdf[x[c, 0, run]-1, 0]:
-               x[c, 1, run] = 1
+           if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
+               x[c, 1] = 1
    
            for k in range(1,rating):
-               if (cdf[x[c, 0, run]-1, k-1] < xi[c, 0, run]) and \
-                       (xi[c, 0, run] <= cdf[x[c, 0, run]-1, k] ):
-                  x[c, 1, run] = k + 1
+               if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
+                       (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
+                  x[c, 1] = k + 1
    
            for t in range(2,tprev):
-               if xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, 0]:
-                   x[c, t, run] = 1
+               if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
+                   x[c, t] = 1
    
                for k in range(1,rating):
-                   if (cdf[x[c, t-1, run]-1, k-1] < xi[c, t-1, run]) \
-                           and (xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, k]):
-                     x[c, t, run] = k + 1
+                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
+                           and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
+                     x[c, t] = k + 1
    
        for t in range(tprev):
            for c in range(countries):
                for i in range(rating):
-                   if x[c, t, run] == i+1:
+                   if x[c, t] == i+1:
                        bp[c, t, run] = meanval[i]
                        cont[i, t, run] = cont[i, t, run] + 1
                        tot[i, t, run] = cont[i, t, run] * meanval[i]
@@ -798,7 +800,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            todo = True
            
            rnumb = random.random()
-       
+
            while todo:
               tstart = endtimexc[c]
               startrating = mc[c, tstart]
@@ -820,6 +822,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                           rating, tprev)
               
                   endtimexc[c] = endtime
+
+                  if endtime >= tprev:
+                      todo = False
 
        """ 
        for c in range(countries):
