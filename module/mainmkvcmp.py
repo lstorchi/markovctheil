@@ -807,6 +807,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    counter = 0
    mcount = 0
 
+   meanperrating = []
+   for i in range(rating):
+       meanperrating.append(0)
+
    for run in range(numofrun):
 
        for i in range(rm.shape[0]):
@@ -849,6 +853,19 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
                   if endtime >= tprev:
                       todo = False
+       
+       if verbose:
+
+           percnt = []
+           for rat in range(rating):
+               percnt.append(0)
+               for i in range(mc.shape[0]):
+                   for j in range(mc.shape[1]):
+                       if mc[i, j] == rat+1:
+                           percnt[rat] += 1
+
+           for rat in range(rating):
+               meanperrating[rat] += percnt[rat]
 
        counter += 1
        if counter == 100:
@@ -907,6 +924,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    if verbose:
      print (" ")
    
+     for i in range(rating):
+         print i+1 , " ", float(meanperrating[i])/float(numofrun*countries)
+
+
    oufilename = "entropy_"+str(numofrun)+".txt"
 
    for t in range(tprev):
