@@ -95,6 +95,10 @@ def get_histo (v, step):
     minh = min(v)
     maxh = max(v)
     nbins = int ((maxh - minh) / step)
+
+    if nbins == 0:
+        nbins = 1
+    
     h, xh = numpy.histogram(v, bins=nbins, range=(minh, maxh))
     p = h/float(sum(h))
 

@@ -21,7 +21,10 @@ import basicutils
 def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
         tprev):
 
-   rnd = random.random()
+   rnd = 0.0
+   while rnd == 0.0:
+       rnd = random.random()
+   
    for j in range(rating):
        if rnd <= cdf[ratidx-1, j]:
            for t in range(tstart+1, endtime):
@@ -540,6 +543,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    #print "A: "
    #print amtx
+
+   if outfiles:
+       basicutils.mat_to_file (amtx, "amtx_"+str(numofrun)+".txt")
    
    for t in range(time):
        pr[:,:,t] = scipy.linalg.expm(t*amtx)
@@ -548,7 +554,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        testrow = numpy.sum(pr[:,:,t], axis=1)
        for v in testrow:
            diff = math.fabs(v - 1.0) 
-           if diff > 1e-13 :
+           if diff > 5e-13 :
                print "Error in PR matrix at ", t+1, " diff ", diff
                print testrow
                exit(1)
@@ -698,6 +704,13 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        stdeval.append(e)
        meanval.append(b)
        tiv.append(c)
+
+   if outfiles:
+       oufname = "mean_stdval_"+str(numofrun)+".txt"
+       fp = open(oufname, "w")
+       for i in range(len(meanval)):
+           fp.write("%2d %15.7f %15.7f \n"%(i+1, meanval[i], stdeval[i]))
+       fp.close()
    
    fval = 0.0
    pval = 0.0
@@ -758,27 +771,21 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
          errmsg.append("Cancelled!")
          return False
 
-   p = numpy.zeros((rating, rating), dtype='float64')
+   pmtx = numpy.zeros((rating, rating), dtype='float64')
 
    for x in range(rating):
        for y in range(rating):
            if x != y:
                if q[x] > 0.0:
-                   p[x,y] = amtx[x,y] / q[x]
+                   pmtx[x,y] = amtx[x,y] / q[x]
            else:
-               p[x,y] = 0.0
+               pmtx[x,y] = 0.0
+
+   if outfiles:
+       basicutils.mat_to_file (pmtx, "pmtx_"+str(numofrun)+".txt")
 
    cdf = numpy.zeros((rating, rating), dtype='float64')
    mc =  numpy.zeros((countries,tprev), dtype='int')
-
-   for x in range(rating):
-       cdf[x,0] = p[x,0]
-       for y in range(1,rating):
-           cdf[x,y] = p[x,y] + cdf[x,y-1]
-
-   for x in range(rating):
-       cdf[x,x] = -1.0
-
    bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
    cont = numpy.zeros((rating,tprev,numofrun), dtype='int')
    r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
@@ -788,6 +795,17 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
+
+   for x in range(rating):
+       cdf[x,0] = pmtx[x,0]
+       for y in range(1,rating):
+           cdf[x,y] = pmtx[x,y] + cdf[x,y-1]
+
+   for x in range(rating):
+       cdf[x,x] = 0.0
+
+   counter = 0
+   mcount = 0
 
    for run in range(numofrun):
 
@@ -799,8 +817,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for c in range(countries):
            todo = True
            
-           rnumb = random.random()
-
+           rnumb = 0.0
+           while rnumb == 0.0:
+               rnumb = random.random()
+ 
            while todo:
               tstart = endtimexc[c]
               startrating = mc[c, tstart]
@@ -811,12 +831,16 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
               else:
                   invx = float(tprev + 1)
               
-              if (invx + tstart) >= tprev:
+              iinvx = int(invx + 0.5)
+              if iinvx == 0:
+                  iinvx = 1
+
+              if (iinvx + tstart) >= tprev:
                   for t in range(tstart, tprev):
                       mc[c, t] = mc[c, tstart]
                   todo = False
               else:
-                  endtime = int(invx) + tstart
+                  endtime = int(iinvx) + tstart
                   
                   evolve_country (mc, c, tstart, endtime, cdf, startrating, \
                           rating, tprev)
@@ -825,6 +849,14 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
                   if endtime >= tprev:
                       todo = False
+
+       counter += 1
+       if counter == 100:
+           counter = 0
+           if outfiles:
+               mcount += 1
+               basicutils.mat_to_file (mc, "mc_"+str(numofrun)+"_"+\
+                       str(mcount)+".txt")
 
        """ 
        for c in range(countries):
