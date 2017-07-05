@@ -18,6 +18,35 @@ import basicutils
 
 #####################################################################
 
+def mean_t_inrating (mc, rating):
+
+    meanval = []
+
+    lenrating = []
+    numofrati = []
+
+    for r in range(rating):
+        lenrating.append(0)
+        numofrati.append(0)
+        for i in range(mc.shape[0]):
+            cont = 0
+            for j in range(mc.shape[1]):
+                if mc[i,j] == r+1:
+                    cont += 1 
+                else:
+                    if cont != 0:
+                        lenrating[r] += cont
+                        numofrati[r] += 1
+                    cont = 0
+        if (numofrati[r] == 0):
+            meanval.append(0)
+        else:
+            meanval.append(float(lenrating[r])/float(numofrati[r]))
+    
+    return meanval
+
+#####################################################################
+
 def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
         tprev):
 
@@ -473,6 +502,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    countries = rm.shape[0]
    time = rm.shape[1]
    rating = numpy.max(rm)
+
+   if verbose:
+       meanv = mean_t_inrating (rm, rating)
+       for r in meanv:
+           print r
   
    #print "time: ", time
    #print "rating: ", rating
@@ -807,9 +841,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    counter = 0
    mcount = 0
 
-   meanperrating = []
-   for i in range(rating):
-       meanperrating.append(0)
+   totalratinglen = []
+   for r in range(rating):
+       totalratinglen.append(0)
 
    for run in range(numofrun):
 
@@ -855,17 +889,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                       todo = False
        
        if verbose:
-
-           percnt = []
-           for rat in range(rating):
-               percnt.append(0)
-               for i in range(mc.shape[0]):
-                   for j in range(mc.shape[1]):
-                       if mc[i, j] == rat+1:
-                           percnt[rat] += 1
-
-           for rat in range(rating):
-               meanperrating[rat] += percnt[rat]
+           meanv = mean_t_inrating (mc, rating)
+           for m in range(len(meanv)):
+               totalratinglen[m] += meanv[m]
 
        counter += 1
        if counter == 100:
@@ -920,13 +946,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            if setval.wasCanceled():
              errmsg.append("Cancelled!")
              return False
-   
-   if verbose:
-     print (" ")
-   
-     for i in range(rating):
-         print i+1 , " ", float(meanperrating[i])/float(numofrun*countries)
 
+   if verbose:
+       print ""
+       for m in totalratinglen:
+           print m / float(numofrun)
+   
 
    oufilename = "entropy_"+str(numofrun)+".txt"
 
