@@ -40,7 +40,6 @@ def mean_t_inrating (mc, rating):
                         numofrati[r] += 1
                     cont = 0
 
-
             if cont != 0:
                numofrati[r] += 1
                lenrating[r] += cont
@@ -511,13 +510,16 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    rating = numpy.max(rm)
 
    if verbose:
+       outfp = open("average_rat_class_hist_"+str(numofrun)+".txt", "w")
        meanv = mean_t_inrating (rm, rating)
-       print "Average time in a rating class: "
+
+       outfp.write("Average time in a rating class: ")
        i = 1
        for r in meanv:
-           print i, " ", r
+           outfp.write("%d %f \n"%(i, r))
            i += 1
-       print " "
+
+       outfp.close()
   
    #print "time: ", time
    #print "rating: ", rating
@@ -979,14 +981,15 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
              return False
 
    if verbose:
-       print ""
-       print ""
-       print "Average time in a rating class: "
+
+       outfp = open("average_rat_class_"+str(numofrun)+".txt", "w")
+ 
+       outfp.write( "Average time in a rating class: ")
        i = 1
        for m in totalratinglen:
-           print i, " ", m / float(numofrun)
+           outfp.write( "%d %f \n"%(i, m / float(numofrun)))
            i += 1
-       print " "
+       outfp.close()
  
    oufilename = "entropy_"+str(numofrun)+".txt"
 
