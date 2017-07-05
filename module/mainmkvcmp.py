@@ -28,6 +28,7 @@ def mean_t_inrating (mc, rating):
     for r in range(rating):
         lenrating.append(0)
         numofrati.append(0)
+        cont = 0
         for i in range(mc.shape[0]):
             cont = 0
             for j in range(mc.shape[1]):
@@ -38,6 +39,12 @@ def mean_t_inrating (mc, rating):
                         lenrating[r] += cont
                         numofrati[r] += 1
                     cont = 0
+
+
+            if cont != 0:
+               numofrati[r] += 1
+               lenrating[r] += cont
+
         if (numofrati[r] == 0):
             meanval.append(0)
         else:
@@ -52,7 +59,7 @@ def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
 
    rnd = 0.0
    while rnd == 0.0:
-       rnd = random.random()
+       rnd = random.uniform(0.0, 1.0)
    
    for j in range(rating):
        if rnd <= cdf[ratidx-1, j]:
@@ -505,8 +512,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    if verbose:
        meanv = mean_t_inrating (rm, rating)
+       print "Average time in a rating class: "
+       i = 1
        for r in meanv:
-           print r
+           print i, " ", r
+           i += 1
+       print " "
   
    #print "time: ", time
    #print "rating: ", rating
@@ -532,27 +543,44 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
        change[c,v0-1] = change[c, v0-1] + ts;
 
-   #print change
+   if outfiles:
+       basicutils.mat_to_file (chage, "chage_"+str(numofrun)+".txt")
 
    v = numpy.sum(change, axis=0)
 
    for c in range(countries):
-       for t in range(time-1):
+      #refrat = rm[c,0]
+      #nk[refrat-1,refrat-1,c] += 1
+
+      for t in range(time-1):
+
+      #    if (rm[c,t] == refrat):
+      #        nk[refrat-1,refrat-1,c] += 1
+      #    elif (rm[c,t] != refrat):
+      #        newrefrat = rm[c,t]
+      #        nk[newrefrat-1,refrat-1,c] += 1
+      #        refrat = newrefrat
            for i in range (rating):
                for j in range(rating):
                    if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
                        nk[i,j,c] = nk[i,j,c] + 1.0e0
 
-       if verbose:
+                  
+      if verbose:
          basicutils.progress_bar(c+1, countries)
- 
-                   
+
+   #for c in range(countries):
+   #print nk[:,:, 6]
+
    for i in range(nk.shape[0]):
        for j in range(nk.shape[1]):
            val = 0.0e0
            for c in range(nk.shape[2]):
                val += nk[i,j,c]
            num[i,j] = val
+
+   if outfiles:
+       basicutils.mat_to_file (num, "num_"+str(numofrun)+".txt")
    
    #print 'num of transition'
    #print num
@@ -574,7 +602,6 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            exit(1)
 
    #print testrow
-
    #print "A: "
    #print amtx
 
@@ -838,6 +865,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    for x in range(rating):
        cdf[x,x] = 0.0
 
+   if outfiles:
+       basicutils.mat_to_file (cdf, "cdf_"+str(numofrun)+".txt")
+       basicutils.vct_to_file (q, "q_"+str(numofrun)+".txt")
+
    counter = 0
    mcount = 0
 
@@ -857,7 +888,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            
            rnumb = 0.0
            while rnumb == 0.0:
-               rnumb = random.random()
+               rnumb = random.uniform(0.0, 1.0)
  
            while todo:
               tstart = endtimexc[c]
@@ -868,7 +899,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                           math.e) / q[startrating-1]
               else:
                   invx = float(tprev + 1)
-              
+
               iinvx = int(invx + 0.5)
               if iinvx == 0:
                   iinvx = 1
@@ -949,10 +980,14 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    if verbose:
        print ""
+       print ""
+       print "Average time in a rating class: "
+       i = 1
        for m in totalratinglen:
-           print m / float(numofrun)
-   
-
+           print i, " ", m / float(numofrun)
+           i += 1
+       print " "
+ 
    oufilename = "entropy_"+str(numofrun)+".txt"
 
    for t in range(tprev):
