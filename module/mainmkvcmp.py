@@ -544,7 +544,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        change[c,v0-1] = change[c, v0-1] + ts;
 
    if outfiles:
-       basicutils.mat_to_file (chage, "chage_"+str(numofrun)+".txt")
+       basicutils.mat_to_file (change, "change_"+str(numofrun)+".txt")
 
    v = numpy.sum(change, axis=0)
 
