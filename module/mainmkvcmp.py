@@ -16,6 +16,9 @@ import matplotlib.pyplot as plt
 
 import basicutils
 
+MINRND = 0.0001
+MAXRND = 0.9999
+
 #####################################################################
 
 def mean_t_inrating (mc, rating):
@@ -56,9 +59,7 @@ def mean_t_inrating (mc, rating):
 def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
         tprev):
 
-   rnd = 0.0
-   while rnd == 0.0:
-       rnd = random.uniform(0.0, 1.0)
+   rnd = random.uniform(MINRND, MAXRND)
    
    for j in range(rating):
        if rnd <= cdf[ratidx-1, j]:
@@ -503,7 +504,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
         setval=None):
 
    if seed:
-       numpy.random.seed(9001)
+       random.seed(9001)
 
    countries = rm.shape[0]
    time = rm.shape[1]
@@ -865,7 +866,13 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            cdf[x,y] = pmtx[x,y] + cdf[x,y-1]
 
    for x in range(rating):
-       cdf[x,x] = 0.0
+       cdf[x,x] = 0.0e0
+
+    
+   #for i in range(rating):
+   #    for j in range(1,rating):
+   #        if math.fabs(1.0e0 - cdf[i, j]) < 1.0e-15:
+   #            cdf[i, j] = 1.0e0
 
    if outfiles:
        basicutils.mat_to_file (cdf, "cdf_"+str(numofrun)+".txt")
@@ -888,9 +895,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for c in range(countries):
            todo = True
            
-           rnumb = 0.0
-           while rnumb == 0.0:
-               rnumb = random.uniform(0.0, 1.0)
+           rnumb = random.uniform(MINRND, MAXRND)
  
            while todo:
               tstart = endtimexc[c]
