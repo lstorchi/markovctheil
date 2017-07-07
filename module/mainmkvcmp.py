@@ -73,6 +73,46 @@ def evolve_country (mc, c, tstart, endtime, cdf, ratidx, rating, \
 
 #####################################################################
 
+def generate_mc (mc, tprev, countries, cdf, rating, q):
+       
+   endtimexc = numpy.zeros(countries, dtype='int')
+   
+   for c in range(countries):
+       todo = True
+       
+       while todo:
+          tstart = endtimexc[c]
+          startrating = mc[c, tstart]
+
+          rnumb = random.uniform(MINRND, MAXRND)
+          
+          if q[startrating-1] != 0.0:
+              invx = -1.0 * math.log(1.0 - rnumb, \
+                      math.e) / q[startrating-1]
+          else:
+              invx = float(tprev + 10)
+   
+          iinvx = int(invx + 0.5)
+          if iinvx == 0:
+              iinvx = 1
+   
+          if (iinvx + tstart) >= tprev:
+              for t in range(tstart, tprev):
+                  mc[c, t] = mc[c, tstart]
+              todo = False
+          else:
+              endtime = int(iinvx) + tstart
+              
+              evolve_country (mc, c, tstart, endtime, cdf, startrating, \
+                      rating, tprev)
+          
+              endtimexc[c] = endtime
+   
+              if endtime >= tprev:
+                  todo = False
+       
+#####################################################################
+
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
@@ -510,8 +550,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    time = rm.shape[1]
    rating = numpy.max(rm)
 
-   if verbose:
-       outfp = open("average_rat_class_hist_"+str(numofrun)+".txt", "w")
+   if outfiles:
+       oufilename = "average_rat_class_hist_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+ 
+       outfp = open(oufilename, "w")
        meanv = mean_t_inrating (rm, rating)
 
        outfp.write("Average time in a rating class: ")
@@ -532,7 +576,15 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    amtx = numpy.zeros((rating, rating), dtype='float64')
 
    #print rm
+
+   #for c in range(countries):
+   #    for t in range(time):
+   #        if rm[c, t] == 0:
+   #            print c, t
    
+   if verbose:
+       print "Compute change matrix" 
+
    for c in range(countries):
        v0 = rm[c,0]
        ts = 0.0e0
@@ -540,37 +592,54 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            if (rm[c,t] != v0):
                change[c,v0-1] += ts
                v0 = rm[c,t]
-               ts = 0.0e0
+               ts = 1.0e0
            else:
                ts = ts + 1.0e0
 
        change[c,v0-1] = change[c, v0-1] + ts;
 
+   sumchange = numpy.sum(change, axis=1)
+
+   for s in sumchange:
+       if int(s) != time:
+           print "Error in change matrix"
+           return False
+
    if outfiles:
-       basicutils.mat_to_file (change, "change_"+str(numofrun)+".txt")
+       oufilename = "change_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+ 
+       basicutils.mat_to_file (change, oufilename)
 
    v = numpy.sum(change, axis=0)
 
+   #for c in range(countries):
+   #   for t in range(time-1):
+   #        for i in range (rating):
+   #            for j in range(rating):
+   #                if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
+   #                    nk[i,j,c] = nk[i,j,c] + 1.0e0
+   #
+
+   #nnk = numpy.zeros((rating, rating, countries), dtype='float64')
+
+   if verbose:
+       print "Compute transition matrix" 
+   
    for c in range(countries):
-      #refrat = rm[c,0]
-      #nk[refrat-1,refrat-1,c] += 1
-
-      for t in range(time-1):
-
-      #    if (rm[c,t] == refrat):
-      #        nk[refrat-1,refrat-1,c] += 1
-      #    elif (rm[c,t] != refrat):
-      #        newrefrat = rm[c,t]
-      #        nk[newrefrat-1,refrat-1,c] += 1
-      #        refrat = newrefrat
-           for i in range (rating):
-               for j in range(rating):
-                   if (rm[c,t] == i+1) and (rm[c,t+1] == j+1):
-                       nk[i,j,c] = nk[i,j,c] + 1.0e0
-
-                  
-      if verbose:
-         basicutils.progress_bar(c+1, countries)
+       for t in range(1, time):
+           ridx = rm[c,t] - 1
+           nridx = rm[c,t-1] - 1
+           nk[nridx,ridx,c] += 1
+   
+   #    if verbose:
+   #       basicutils.progress_bar(c+1, countries)
+   #for c in range(countries):
+   #    for i in range (rating):
+   #        for j in range(rating):
+   #            if nk[i,j,c] != nnk[i,j,c]:
+   #                print i,j,c
 
    #for c in range(countries):
    #print nk[:,:, 6]
@@ -583,11 +652,17 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            num[i,j] = val
 
    if outfiles:
-       basicutils.mat_to_file (num, "num_"+str(numofrun)+".txt")
+       oufilename = "num_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+
+       basicutils.mat_to_file (num, oufilename)
    
    #print 'num of transition'
    #print num
    #print "v: ", v
+
+   print "Compute generator matrix"
 
    for i in range(rating):
        for j in range(rating):
@@ -600,8 +675,8 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    testrow = numpy.sum(amtx, axis=1)
    for t in testrow:
-       if math.fabs(t) > 1e-19 :
-           print "Error in A matrix "
+       if math.fabs(t) > 1e-18 :
+           print "Error in A matrix ", math.fabs(t)
            exit(1)
 
    #print testrow
@@ -609,10 +684,18 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #print amtx
 
    if outfiles:
-       basicutils.mat_to_file (amtx, "amtx_"+str(numofrun)+".txt")
+       oufilename = "amtx_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+
+       basicutils.mat_to_file (amtx, oufilename)
    
+   if verbose:
+       print "Compute transition probability matrix"
+
    for t in range(time):
        pr[:,:,t] = scipy.linalg.expm(t*amtx)
+   
 
    for t in range(pr.shape[2]):
        testrow = numpy.sum(pr[:,:,t], axis=1)
@@ -629,7 +712,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
               ir[i, j] = float('inf')
    
    benchmark = numpy.amin(ir, 0)
-   
+
+   if verbose:
+       print "Compute reward matrix"
+
    r = numpy.zeros((countries,time), dtype='float64') 
    
    for i in range(countries):
@@ -649,7 +735,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
      if setval.wasCanceled():
          errmsg.append("Cancelled!")
          return False
-   
+
+   if verbose:
+       print "Compute credit spread distribution"
+
    for i in range(rating):
        for j in range(countries):
            for k in range(time):
@@ -792,9 +881,6 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    fval, pval = scipy.stats.f_oneway (*args)
 
-   if verbose:
-     print (" ")
-   
    oufilename = "1wayanova_"+str(numofrun)+".txt"
    
    if outfiles:
@@ -817,6 +903,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    
    R_t = numpy.sum(r, axis=0)
    T_t = numpy.zeros(time, dtype='float64')
+
+   if verbose:
+       print "Compute historical entropy" 
    
    for t in range(time):
        for k in range(countries):
@@ -824,9 +913,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            if s_t[k, t] != 0:
                T_t[t] += s_t[k, t]*math.log(float(countries) * s_t[k, t])
    
-   oufilename = "entropy_histi_"+str(numofrun)+".txt"
    
    if outfiles:
+     oufilename = "entropy_histi_"+str(numofrun)+".txt"
+     if os.path.exists(oufilename):
+        os.remove(oufilename)
+
      basicutils.vct_to_file(T_t, oufilename)
 
    if setval != None:
@@ -834,6 +926,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
      if setval.wasCanceled():
          errmsg.append("Cancelled!")
          return False
+
+   if verbose:
+       print "Compute embedded markov chain" 
 
    pmtx = numpy.zeros((rating, rating), dtype='float64')
 
@@ -846,7 +941,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                pmtx[x,y] = 0.0
 
    if outfiles:
-       basicutils.mat_to_file (pmtx, "pmtx_"+str(numofrun)+".txt")
+       oufilename = "pmtx_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+           os.remove(oufilename)
+
+       basicutils.mat_to_file (pmtx, oufilename)
 
    cdf = numpy.zeros((rating, rating), dtype='float64')
    mc =  numpy.zeros((countries,tprev), dtype='int')
@@ -875,8 +974,17 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #            cdf[i, j] = 1.0e0
 
    if outfiles:
-       basicutils.mat_to_file (cdf, "cdf_"+str(numofrun)+".txt")
-       basicutils.vct_to_file (q, "q_"+str(numofrun)+".txt")
+       oufilename = "cdf_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+           os.remove(oufilename)
+
+       basicutils.mat_to_file (cdf, oufilename)
+
+       oufilename = "q_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+           os.remove(oufilename)
+
+       basicutils.vct_to_file (q, oufilename)
 
    counter = 0
    mcount = 0
@@ -885,46 +993,16 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    for r in range(rating):
        totalratinglen.append(0)
 
+   if verbose:
+       print "Start Monte Carlo simulation" 
+       print ""
+
    for run in range(numofrun):
 
        for i in range(rm.shape[0]):
            mc[i, 0] = rm[i, rm.shape[1]-1]
-       
-       endtimexc = numpy.zeros(countries, dtype='int')
-       
-       for c in range(countries):
-           todo = True
-           
-           rnumb = random.uniform(MINRND, MAXRND)
- 
-           while todo:
-              tstart = endtimexc[c]
-              startrating = mc[c, tstart]
-              
-              if q[startrating-1] != 0.0:
-                  invx = -1.0 * math.log(1.0 - rnumb, \
-                          math.e) / q[startrating-1]
-              else:
-                  invx = float(tprev + 1)
 
-              iinvx = int(invx + 0.5)
-              if iinvx == 0:
-                  iinvx = 1
-
-              if (iinvx + tstart) >= tprev:
-                  for t in range(tstart, tprev):
-                      mc[c, t] = mc[c, tstart]
-                  todo = False
-              else:
-                  endtime = int(iinvx) + tstart
-                  
-                  evolve_country (mc, c, tstart, endtime, cdf, startrating, \
-                          rating, tprev)
-              
-                  endtimexc[c] = endtime
-
-                  if endtime >= tprev:
-                      todo = False
+       generate_mc (mc, tprev, countries, cdf, rating, q)
        
        if verbose:
            meanv = mean_t_inrating (mc, rating)
@@ -936,8 +1014,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            counter = 0
            if outfiles:
                mcount += 1
-               basicutils.mat_to_file (mc, "mc_"+str(numofrun)+"_"+\
-                       str(mcount)+".txt")
+               oufilename = "mc_"+str(numofrun)+"_"+str(mcount)+".txt"
+               if os.path.exists(oufilename):
+                   os.remove(oufilename)
+
+               basicutils.mat_to_file (mc, oufilename)
 
        """ 
        for c in range(countries):
@@ -986,8 +1067,15 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
              return False
 
    if verbose:
+       print ""
 
-       outfp = open("average_rat_class_"+str(numofrun)+".txt", "w")
+   if outfiles:
+
+       oufilename = "average_rat_class_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+           os.remove(oufilename)
+
+       outfp = open(oufilename, "w")
  
        outfp.write( "Average time in a rating class: ")
        i = 1
@@ -1022,6 +1110,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    oufilename = "acm_"+str(numofrun)+".txt"
    
    if outfiles:
+     if os.path.exists(oufilename):
+         os.remove(oufilename)
+ 
      basicutils.mat_to_file (acm, oufilename)
    
    bpm = numpy.zeros((countries,tprev), dtype='float64')
@@ -1032,6 +1123,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    oufilename = "bpm_"+str(numofrun)+".txt"
   
    if outfiles:
+     if os.path.exists(oufilename):
+         os.remove(oufilename)
+
      basicutils.mat_to_file (bpm, oufilename)
 
    return True
