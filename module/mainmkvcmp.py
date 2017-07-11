@@ -949,11 +949,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    cdf = numpy.zeros((rating, rating), dtype='float64')
    mc =  numpy.zeros((countries,tprev), dtype='int')
-   bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
-   cont = numpy.zeros((rating,tprev,numofrun), dtype='int')
    r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
-   tot = numpy.zeros((rating,tprev,numofrun), dtype='float64')
-   ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    term = numpy.zeros((tprev,numofrun), dtype='float64')
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
@@ -1031,29 +1027,34 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        
            print " lastv: ", mc[c, tprev-1]
        """
+
+       bp = numpy.zeros((countries,tprev), dtype='float64')
+       cont = numpy.zeros((rating,tprev), dtype='int')
+       tot = numpy.zeros((rating,tprev), dtype='float64')
+       ac = numpy.zeros((rating,tprev), dtype='float64')
    
        for t in range(tprev):
            for c in range(countries):
                for i in range(rating):
                    if mc[c, t] == i+1:
-                       bp[c, t, run] = meanval[i]
-                       cont[i, t, run] = cont[i, t, run] + 1
-                       tot[i, t, run] = cont[i, t, run] * meanval[i]
+                       bp[c, t] = meanval[i]
+                       cont[i, t] = cont[i, t] + 1
+                       tot[i, t] = cont[i, t] * meanval[i]
                
            summa = 0.0
            for a in range(bp.shape[0]):
-               summa += bp[a, t, run]
+               summa += bp[a, t]
            r_prev[t, run] = summa
    
        for t in range(tprev):
            for i in range(rating):
-                ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
-                if ac[i, t, run] != 0.0:
-                    t1[t, run] += (ac[i, t, run]*tiv[i])
-                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
-                    if cont[i, t, run] != 0:
-                       term[t, run] += ac[i, t, run]* \
-                               math.log(float(countries)/(float(rating)*cont[i, t, run]))
+                ac[i, t] = tot[i, t]/r_prev[t, run]
+                if ac[i, t] != 0.0:
+                    t1[t, run] += (ac[i, t]*tiv[i])
+                    t2[t, run] += (ac[i, t]*math.log(float(rating)*ac[i, t]))
+                    if cont[i, t] != 0:
+                       term[t, run] += ac[i, t]* \
+                               math.log(float(countries)/(float(rating)*cont[i, t]))
     
            entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
    
