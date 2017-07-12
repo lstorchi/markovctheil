@@ -16,8 +16,8 @@ import matplotlib.pyplot as plt
 
 import basicutils
 
-MINRND = 0.0001
-MAXRND = 0.9999
+MINRND = 0.0001e0
+MAXRND = 0.9999e0
 
 #####################################################################
 
@@ -558,7 +558,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        outfp = open(oufilename, "w")
        meanv = mean_t_inrating (rm, rating)
 
-       outfp.write("Average time in a rating class: ")
+       outfp.write("Average time in a rating class: \n")
        i = 1
        for r in meanv:
            outfp.write("%d %f \n"%(i, r))
@@ -1078,7 +1078,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
        outfp = open(oufilename, "w")
  
-       outfp.write( "Average time in a rating class: ")
+       outfp.write( "Average time in a rating class: \n")
        i = 1
        for m in totalratinglen:
            outfp.write( "%d %f \n"%(i, m / float(numofrun)))
