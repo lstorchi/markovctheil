@@ -1134,7 +1134,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
 #####################################################################
 
-def comp_rocof (rm, dim, verbose, outfiles, errmsg):
+def comp_rocof (rm, dim, absorb, verbose, outfiles, errmsg):
 
    countries = rm.shape[0]
    time = rm.shape[1]
@@ -1220,6 +1220,10 @@ def comp_rocof (rm, dim, verbose, outfiles, errmsg):
            print "Error in A matrix ", math.fabs(t)
            exit(1)
 
+   if absorb:
+       for i in range(rating):
+           amtx[rating -1, i] = 0.0e0
+
    if outfiles:
        oufilename = "amtx_"+str(numofrun)+".txt"
        if os.path.exists(oufilename):
@@ -1277,8 +1281,6 @@ def comp_rocof (rm, dim, verbose, outfiles, errmsg):
 
            if i == j:
                sub_namtx[i, j] = 0.0 
-
-   print sub_namtx 
 
    sub_dpr = numpy.zeros((dim, dim, time), dtype='float64')
 

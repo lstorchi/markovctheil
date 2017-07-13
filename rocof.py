@@ -26,6 +26,8 @@ parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matr
         type=str, required=False, default="ms", dest="nameofmatrix")
 parser.add_argument("-d", "--dimension", help="Specify dim value ", \
         type=int, required=False, default=3)
+parser.add_argument("-a", "--absorb", help="Absord set to true", \
+        required=False, default=False, action="store_true")
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 
@@ -52,10 +54,12 @@ if not(namems in msd.keys()):
 
 ms = msd[namems]
 
+absorb = args.absorb
+
 errmsg = []
 dim = args.dimension
 
-val = mainmkvcmp.comp_rocof (ms, dim, \
+val = mainmkvcmp.comp_rocof (ms, dim, absorb, \
         verbose, False, errmsg)
 
 time = ms.shape[1]
