@@ -662,7 +662,8 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #print num
    #print "v: ", v
 
-   print "Compute generator matrix"
+   if verbose:
+       print "Compute generator matrix"
 
    for i in range(rating):
        for j in range(rating):
@@ -1130,3 +1131,171 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
      basicutils.mat_to_file (bpm, oufilename)
 
    return True
+
+#####################################################################
+
+def comp_rocof (rm, dim, verbose, outfiles, errmsg):
+
+   countries = rm.shape[0]
+   time = rm.shape[1]
+   rating = numpy.max(rm)
+
+   pr = numpy.zeros((rating,rating,time), dtype='float64')
+
+   nk = numpy.zeros((rating, rating, countries), dtype='float64')
+   num = numpy.zeros((rating, rating), dtype='float64')
+   change = numpy.zeros((countries, rating), dtype='float64')
+   amtx = numpy.zeros((rating, rating), dtype='float64')
+
+   if verbose:
+       print "Compute change matrix" 
+
+   for c in range(countries):
+       v0 = rm[c,0]
+       ts = 0.0e0
+       for t in range(time):
+           if (rm[c,t] != v0):
+               change[c,v0-1] += ts
+               v0 = rm[c,t]
+               ts = 1.0e0
+           else:
+               ts = ts + 1.0e0
+
+       change[c,v0-1] = change[c, v0-1] + ts;
+
+   sumchange = numpy.sum(change, axis=1)
+
+   for s in sumchange:
+       if int(s) != time:
+           print "Error in change matrix"
+           return False
+
+   if outfiles:
+       oufilename = "change_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+ 
+       basicutils.mat_to_file (change, oufilename)
+
+   v = numpy.sum(change, axis=0)
+
+   if verbose:
+       print "Compute transition matrix" 
+   
+   for c in range(countries):
+       for t in range(1, time):
+           ridx = rm[c,t] - 1
+           nridx = rm[c,t-1] - 1
+           nk[nridx,ridx,c] += 1
+   
+   for i in range(nk.shape[0]):
+       for j in range(nk.shape[1]):
+           val = 0.0e0
+           for c in range(nk.shape[2]):
+               val += nk[i,j,c]
+           num[i,j] = val
+
+   if outfiles:
+       oufilename = "num_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+
+       basicutils.mat_to_file (num, oufilename)
+   
+   if verbose:
+       print "Compute generator matrix"
+
+   for i in range(rating):
+       for j in range(rating):
+           if i != j:
+               amtx[i,j] = num[i,j]/v[i]
+           
+   q = numpy.sum(amtx, axis=1)
+   for i in range(rating):
+       amtx[i, i] = -1.0e0 * q[i] 
+
+   testrow = numpy.sum(amtx, axis=1)
+   for t in testrow:
+       if math.fabs(t) > 1e-18 :
+           print "Error in A matrix ", math.fabs(t)
+           exit(1)
+
+   if outfiles:
+       oufilename = "amtx_"+str(numofrun)+".txt"
+       if os.path.exists(oufilename):
+         os.remove(oufilename)
+
+       basicutils.mat_to_file (amtx, oufilename)
+   
+   if verbose:
+       print "Compute transition probability matrix"
+
+   for t in range(time):
+       pr[:,:,t] = scipy.linalg.expm(t*amtx)
+   
+   for t in range(pr.shape[2]):
+       testrow = numpy.sum(pr[:,:,t], axis=1)
+       for v in testrow:
+           diff = math.fabs(v - 1.0) 
+           if diff > 5e-13 :
+               print "Error in PR matrix at ", t+1, " diff ", diff
+               print testrow
+               exit(1)
+                  
+                  
+   namtx = numpy.zeros((rating-1, rating-1), dtype='float64')
+
+   for i in range(rating - 1):
+       for j in range(rating - 1):
+           namtx[i, j] = amtx[i, j]
+
+
+   npr = numpy.zeros((rating-1,rating-1,time), dtype='float64')
+
+   for t in range(time):
+       npr[:,:,t] = scipy.linalg.expm(t*namtx)
+ 
+   sum_npr = numpy.sum(npr, axis=1)
+
+   dpr = numpy.zeros((rating-1,rating-1,time), dtype='float64')
+
+   for t in range(time):
+       for i in range(rating - 1):
+           for j in range(rating - 1):
+               dpr[i, j] = pr[i, j, t] / sum_npr[i]
+
+   if dim > (rating - 1):
+       print "Wrong dim"
+       return None
+   
+   sub_namtx = numpy.zeros((dim, dim), dtype='float64')
+
+   for i in range(dim):
+       for j in range(dim):
+           start = rating - 1 - dim
+           sub_namtx[i, j] = namtx[start + i, start + j]
+
+           if i == j:
+               sub_namtx[i, j] = 0.0 
+
+   print sub_namtx 
+
+   sub_dpr = numpy.zeros((dim, dim, time), dtype='float64')
+
+   for t in range(time):
+       for i in range(dim):
+           for j in range(dim):
+               start = rating - 1 - dim
+               sub_dpr[i, j, t] = npr[i, j, t]
+
+   mtx_mult = numpy.zeros((dim, dim, time), dtype='float64')
+
+   for t in range(time):
+       mtx_mult[:, :, t] = numpy.dot(sub_dpr[:, :, t], sub_namtx)
+   
+   results = numpy.zeros((dim, time), dtype='float64')
+   for t in range(time):
+       results[:,t] = numpy.sum(mtx_mult[:, :, t], axis=1)
+   
+
+   return results
