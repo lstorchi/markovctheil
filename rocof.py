@@ -24,6 +24,8 @@ parser.add_argument("-m","--rmat-filename", help="Transition probability matrix 
         type=str, required=True, dest="rmatfilename")
 parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matrix ", \
         type=str, required=False, default="ms", dest="nameofmatrix")
+parser.add_argument("-d", "--dimension", help="Specify dim value ", \
+        type=int, required=False, default=3)
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 
@@ -51,7 +53,7 @@ if not(namems in msd.keys()):
 ms = msd[namems]
 
 errmsg = []
-dim = 3
+dim = args.dimension
 
 val = mainmkvcmp.comp_rocof (ms, dim, \
         verbose, False, errmsg)
