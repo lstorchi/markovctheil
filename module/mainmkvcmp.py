@@ -955,6 +955,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
+   ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
 
    for x in range(rating):
        cdf[x,0] = pmtx[x,0]
@@ -1032,7 +1033,6 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        bp = numpy.zeros((countries,tprev), dtype='float64')
        cont = numpy.zeros((rating,tprev), dtype='int')
        tot = numpy.zeros((rating,tprev), dtype='float64')
-       ac = numpy.zeros((rating,tprev), dtype='float64')
    
        for t in range(tprev):
            for c in range(countries):
@@ -1049,12 +1049,12 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    
        for t in range(tprev):
            for i in range(rating):
-                ac[i, t] = tot[i, t]/r_prev[t, run]
-                if ac[i, t] != 0.0:
-                    t1[t, run] += (ac[i, t]*tiv[i])
-                    t2[t, run] += (ac[i, t]*math.log(float(rating)*ac[i, t]))
+                ac[i, t, run] = tot[i, t]/r_prev[t, run]
+                if ac[i, t, run] != 0.0:
+                    t1[t, run] += (ac[i, t, run]*tiv[i])
+                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
                     if cont[i, t] != 0:
-                       term[t, run] += ac[i, t]* \
+                       term[t, run] += ac[i, t, run]* \
                                math.log(float(countries)/(float(rating)*cont[i, t]))
     
            entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
@@ -1107,7 +1107,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    acm = numpy.zeros((rating,tprev), dtype='float64')
    for i in range(acm.shape[0]):
        for j in range(acm.shape[1]):
-           acm[i, j] = numpy.mean(ac[i, j])
+           acm[i, j] = numpy.mean(ac[i, j, :])
    
    oufilename = "acm_"+str(numofrun)+".txt"
    
