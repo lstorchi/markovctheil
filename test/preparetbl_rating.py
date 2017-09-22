@@ -25,8 +25,8 @@ def basic_repter (values):
 
     nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
 
-    m2 = 5 
-    d2 = 31
+    m2 = 6 
+    d2 = 30
     y2 = 2017
     for i in range(0, len(values)):
         date1 = values[i][1]
