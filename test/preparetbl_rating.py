@@ -125,14 +125,10 @@ def dump_file (count, values, verbose = False):
      avfitch = []
      for i in range(len(vfitch)-179):
          avfitch.append(vfitch[i]) 
-     
-     if os.path.exists(outfilename):
-         print "File ", outfilename, " exist, removing it "
-         os.remove(outfilename)
-     
+    
      datadict = mdict={'sep': avsep , 'moody': vmoody , 'fitch': avfitch}
-     
-     scipy.io.savemat(outfilename, datadict)
+
+     return outfilename, datadict
 
 #####################################################################
 
@@ -153,7 +149,54 @@ countries = set()
 for v in cn:
     countries.add(v[0])
 
+
+filenames = []
+datadicts = []
+
 for c in countries:
     vals = df[c].values
-    dump_file (c, vals)
+    outfilename, datadict = dump_file (c, vals)
+    
+    filenames.append(outfilename)
+    datadicts.append(datadict)
 
+maxsep = 0
+maxmoody = 0
+maxfitch = 0
+for d in datadicts:
+    if len(d["sep"]) > maxsep:
+        maxsep = len(d["sep"])
+    if len(d["moody"]) > maxmoody:
+        maxmoody = len(d["moody"])
+    if len(d["fitch"]) > maxfitch:
+        maxfitch = len(d["fitch"])
+
+print "Max S&P ", maxsep, "Max Moodys ", maxmoody, "Max Fitch ", maxfitch
+
+for d in datadicts:
+    l = len(d["sep"])
+    if l < maxsep:
+        v = d["sep"][l-1]
+        for j in range(maxsep-l):
+            d["sep"].append(v)
+
+    l = len(d["moody"])
+    if l < maxmoody:
+        v = d["moody"][l-1]
+        for j in range(maxmoody-l):
+            d["moody"].append(v)
+
+    l = len(d["fitch"])
+    if l < maxfitch:
+        v = d["fitch"][l-1]
+        for j in range(maxfitch-l):
+            d["fitch"].append(v)
+
+
+for i in range(len(filenames)):
+
+    if os.path.exists(filenames[i]):
+         print "File ", filenames[i], " exist, removing it "
+         os.remove(filenames[i])
+ 
+    scipy.io.savemat(filenames[i], datadicts[i])
