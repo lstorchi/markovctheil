@@ -10,17 +10,34 @@ sys.path.append("../module")
 import basicutils
 
 startingdate = {\
-        "Bulgaria"       :(1, 1, 2007), \
-        "Czech Republic" :(1, 5, 2004), \
-        "Croatia"        :(1, 7, 2013), \
-        "Latvia"         :(1, 5, 2004), \
-        "Lithuania"      :(1, 5, 2004), \
-        "Hungary"        :(1, 5, 2004), \
-        "Malta"          :(1, 5, 2004), \
-        "Poland"         :(1, 5, 2004), \
-        "Romania"        :(1, 1, 2007), \
-        "Slovenia"       :(1, 5, 2004), \
-        "Slovakia"       :(1, 5, 2004)}
+        'Belgium'        :(27, 11, 1998), \
+        'Bulgaria'       :(27, 11, 1998), \
+        'Czech Republic' :(27, 11, 1998), \
+        'Denmark'        :(27, 11, 1998), \
+        'Germany'        :(27, 11, 1998), \
+        'Ireland'        :(27, 11, 1998), \
+        'Greece'         :(27, 11, 1998), \
+        'Spain'          :(27, 11, 1998), \
+        'France'         :(27, 11, 1998), \
+        'Croatia'        :(27, 11, 1998), \
+        'Italy'          :(27, 11, 1998), \
+        'Latvia'         :(27, 11, 1998), \
+        'Lithuania'      :(27, 11, 1998), \
+        'Luxembourg'     :(27, 11, 1998), \
+        'Hungary'        :(27, 11, 1998), \
+        'Malta'          :(27, 11, 1998), \
+        'Netherlands'    :(27, 11, 1998), \
+        'Austria'        :(27, 11, 1998), \
+        'Poland'         :(27, 11, 1998), \
+        'Portugal'       :(27, 11, 1998), \
+        'Romania'        :(27, 11, 1998), \
+        'Slovenia'       :(27, 11, 1998), \
+        'Slovakia'       :(27, 11, 1998), \
+        'Finland'        :(27, 11, 1998), \
+        'Sweden'         :(27, 11, 1998), \
+        'United Kingdom' :(27, 11, 1998)}
+
+
 
 file = ""
 
