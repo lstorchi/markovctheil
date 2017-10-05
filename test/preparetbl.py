@@ -10,32 +10,32 @@ sys.path.append("../module")
 import basicutils
 
 startingdate = {\
-        'Belgium'        :(27, 11, 1998), \
-        'Bulgaria'       :(27, 11, 1998), \
-        'Czech Republic' :(27, 11, 1998), \
-        'Denmark'        :(27, 11, 1998), \
-        'Germany'        :(27, 11, 1998), \
-        'Ireland'        :(27, 11, 1998), \
-        'Greece'         :(27, 11, 1998), \
-        'Spain'          :(27, 11, 1998), \
-        'France'         :(27, 11, 1998), \
-        'Croatia'        :(27, 11, 1998), \
-        'Italy'          :(27, 11, 1998), \
-        'Latvia'         :(27, 11, 1998), \
-        'Lithuania'      :(27, 11, 1998), \
-        'Luxembourg'     :(27, 11, 1998), \
-        'Hungary'        :(27, 11, 1998), \
-        'Malta'          :(27, 11, 1998), \
-        'Netherlands'    :(27, 11, 1998), \
-        'Austria'        :(27, 11, 1998), \
-        'Poland'         :(27, 11, 1998), \
-        'Portugal'       :(27, 11, 1998), \
-        'Romania'        :(27, 11, 1998), \
-        'Slovenia'       :(27, 11, 1998), \
-        'Slovakia'       :(27, 11, 1998), \
-        'Finland'        :(27, 11, 1998), \
-        'Sweden'         :(27, 11, 1998), \
-        'United Kingdom' :(27, 11, 1998)}
+        'Belgium'        :(23, 11, 1998), \
+        'Bulgaria'       :(23, 11, 1998), \
+        'Czech Republic' :(23, 11, 1998), \
+        'Denmark'        :(23, 11, 1998), \
+        'Germany'        :(23, 11, 1998), \
+        'Ireland'        :(23, 11, 1998), \
+        'Greece'         :(23, 11, 1998), \
+        'Spain'          :(23, 11, 1998), \
+        'France'         :(23, 11, 1998), \
+        'Croatia'        :(23, 11, 1998), \
+        'Italy'          :(23, 11, 1998), \
+        'Latvia'         :(23, 11, 1998), \
+        'Lithuania'      :(23, 11, 1998), \
+        'Luxembourg'     :(23, 11, 1998), \
+        'Hungary'        :(23, 11, 1998), \
+        'Malta'          :(23, 11, 1998), \
+        'Netherlands'    :(23, 11, 1998), \
+        'Austria'        :(23, 11, 1998), \
+        'Poland'         :(23, 11, 1998), \
+        'Portugal'       :(23, 11, 1998), \
+        'Romania'        :(23, 11, 1998), \
+        'Slovenia'       :(23, 11, 1998), \
+        'Slovakia'       :(23, 11, 1998), \
+        'Finland'        :(23, 11, 1998), \
+        'Sweden'         :(23, 11, 1998), \
+        'United Kingdom' :(23, 11, 1998)}
 
 
 
@@ -138,7 +138,9 @@ for k in range(mat.shape[0]):
 
 # remove the first column
 
-nmat2 = [ row[1:] for row in nmat ]
+nmat2 = [ row[22:] for row in nmat ]
+
+#print len(nmat2), len(nmat2[0])
 
 outfilename = "data.mat"
 

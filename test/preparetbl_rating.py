@@ -175,15 +175,51 @@ df = pandas.read_excel(file, header=[0, 1])
 #print the column names
 cn = df.columns
 
+print cn
+
+order = [\
+    'Belgium', \
+    'Bulgaria', \
+    'Czech Republic', \
+    'Denmark', \
+    'Germany', \
+    'Ireland', \
+    'Greece', \
+    'Spain', \
+    'France', \
+    'Croatia', \
+    'Italy', \
+    'Latvia', \
+    'Lithuania', \
+    'Luxembourg', \
+    'Hungary', \
+    'Malta', \
+    'Netherlands', \
+    'Austria', \
+    'poland', \
+    'Portugal', \
+    'Romania', \
+    'Slovenia', \
+    'Slovakia', \
+    'Finland', \
+    'Sweden', \
+    'UK']
+
 countries = set()
 for v in cn:
     countries.add(v[0])
+
+ordercountries = []
+for c1 in order:
+    for c2 in countries:
+        if c2.find(c1) != -1:
+            ordercountries.append(c2)
 
 
 filenames = []
 datadicts = []
 
-for c in countries:
+for c in ordercountries:
     vals = df[c].values
     outfilename, datadict = dump_file (c, vals)
     
