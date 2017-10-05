@@ -9,6 +9,36 @@ import os.path
 sys.path.append("../module")
 import basicutils
 
+DFINAL = 30
+MFINAL = 6
+YFINAL = 2017
+
+DINIT = 23
+MINIT = 11
+YINIT = 1998
+
+#####################################################################
+
+def storeandwritemat (name, datadicts, final):
+
+   sepmtx = []
+   for d in datadicts:
+       l = len(d[name])
+       if l < final:
+           print "Error in dimension"
+   
+       row = []
+       for j in range(final):
+           row.append(d[name][j])
+       sepmtx.append(row)
+   
+   if os.path.exists(name + ".mat"):
+        print "File sep.mat exist, removing it "
+        os.remove(name + ".mat")
+   
+   dsepmtx = {name : sepmtx}
+   scipy.io.savemat(name+".mat", dsepmtx)
+
 #####################################################################
 
 def basic_repter (values):
@@ -25,9 +55,9 @@ def basic_repter (values):
 
     nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
 
-    m2 = 6 
-    d2 = 30
-    y2 = 2017
+    m2 = MFINAL 
+    d2 = DFINAL
+    y2 = YFINAL
     for i in range(0, len(values)):
         date1 = values[i][1]
         vdate1 = date1.split()
@@ -173,25 +203,42 @@ for d in datadicts:
 
 print "Max S&P ", maxsep, "Max Moodys ", maxmoody, "Max Fitch ", maxfitch
 
+realmax = max(maxsep, max(maxmoody, maxfitch))
+
 for d in datadicts:
     l = len(d["sep"])
-    if l < maxsep:
+    if l < realmax:
         v = d["sep"][l-1]
-        for j in range(maxsep-l):
+        for j in range(realmax-l):
             d["sep"].append(v)
 
     l = len(d["moody"])
-    if l < maxmoody:
+    if l < realmax:
         v = d["moody"][l-1]
-        for j in range(maxmoody-l):
+        for j in range(realmax-l):
             d["moody"].append(v)
 
     l = len(d["fitch"])
-    if l < maxfitch:
+    if l < realmax:
         v = d["fitch"][l-1]
-        for j in range(maxfitch-l):
+        for j in range(realmax-l):
             d["fitch"].append(v)
 
+
+da1 = datetime.date(YFINAL, MFINAL, DFINAL)
+da2 = datetime.date(YINIT, MINIT, DINIT)
+delta = da1 - da2
+
+final = delta.days + 1
+
+storeandwritemat ("sep", datadicts, final)
+storeandwritemat ("moody", datadicts, final)
+storeandwritemat ("fitch", datadicts, final)
+
+for f in filenames:
+    print f
+
+exit(1)
 
 for i in range(len(filenames)):
 
