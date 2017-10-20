@@ -15,6 +15,7 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 sys.path.append("./module")
+import basicutils
 
 filename1 = ""
 filename2 = ""
@@ -104,5 +105,7 @@ for s in range(0,DIM):
                 T[t,s] += E_r[i,t] * math.log(float(countries) * E_r[i,t])
 
     es += 0.05
+
+basicutils.mat_to_file(T, "tmtx.txt")
 
 print es
