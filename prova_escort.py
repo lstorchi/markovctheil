@@ -54,6 +54,11 @@ countries = rm.shape[0]
 rating = numpy.max(rm)
 time = rm.shape[1]
 
+for i in range(len(ir)):
+       for j in range(len(ir[0])):
+           if math.isnan(ir[i, j]):
+              ir[i, j] = float('inf')
+
 benchmark = numpy.amin(ir, 0)
 r = numpy.zeros((countries,time), dtype='float64')
 
@@ -61,26 +66,41 @@ for i in range(countries):
     for j in range(time):
         r[i, j] = ir[i, j] - benchmark[j]
 
+for i in range(len(ir)):
+       for j in range(len(r[0])):
+           if (ir[i, j] == float('Inf')):
+              ir[i, j] = float('0')
+
+
+for i in range(len(r)):
+       for j in range(len(r[0])):
+           if (r[i, j] == float('Inf')):
+              r[i, j] = float('0')
+
+
 R = numpy.sum(r, axis=0)
 Ri = numpy.sum(ir, axis=0)
+
+
 
 rc = numpy.zeros((rating,time), dtype='float64')
 ri = numpy.zeros((rating,time), dtype='float64')
 s_r = numpy.zeros((rating,time), dtype='float64')
 s_i = numpy.zeros((rating,time), dtype='float64')
 
-for i in range(rating):
-    for t in range(time):
 
-        for j in range(countries):
+for t in range(time):
+    for j in range(countries):
+        for i in range(0,6):
             if rm[j,t] == i:
-                rc[i,t] = rc[i,t] + r[j,t] #totale credt spread pagati dalla classe di rating i
-                ri[i,t] = ri[i,t] + ir[j,t] #totale interest rates  pagati dalla classe di rating i
+                rc[i,t] += r[j,t] #totale credt spread pagati dalla classe di rating i
+                ri[i,t] += ir[j,t] #totale interest rates  pagati dalla classe di rating i
 	
         s_r[i,t] = rc[i,t] / R[t]
 	s_i[i,t] = ri[i,t] / Ri[t]
-
 print "Done "
+
+
 
 DIM = 11
 #DIM = 401
@@ -88,6 +108,7 @@ DIM = 11
 T = numpy.zeros((time,DIM), dtype='float64')
 p_s = numpy.zeros((rating,time), dtype='float64')
 E_r = numpy.zeros((rating,time), dtype='float64')
+r_s = numpy.zeros((time), dtype='float64')
  
 s = 0
 es = 0.05
@@ -106,6 +127,9 @@ for s in range(0,DIM):
 
     es += 0.05
 
+
+
 basicutils.mat_to_file(T, "tmtx.txt")
 
+print rc
 print es
