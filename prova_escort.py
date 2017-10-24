@@ -1,9 +1,7 @@
 import numpy.linalg
-import numpy.random
 import scipy.stats
 import scipy.io
 import argparse
-import random
 import numpy
 import math
 import sys
@@ -50,6 +48,9 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 rm = msd[namems]
 ir = bpd[namebp]
 
+rm=rm[:,0:-6]
+ir=ir[:,0:-6]
+
 countries = rm.shape[0]
 rating = numpy.max(rm)
 time = rm.shape[1]
@@ -69,17 +70,17 @@ for i in range(countries):
 for i in range(len(ir)):
        for j in range(len(r[0])):
            if (ir[i, j] == float('Inf')):
-              ir[i, j] = float('0')
+               ir[i, j] = 0
 
 
 for i in range(len(r)):
        for j in range(len(r[0])):
            if (r[i, j] == float('Inf')):
-              r[i, j] = float('0')
+               r[i, j] = 0
 
 
 R = numpy.sum(r, axis=0)
-Ri = numpy.sum(ir, axis=0)
+R_i = numpy.sum(ir, axis=0)
 
 
 
@@ -91,16 +92,15 @@ s_i = numpy.zeros((rating,time), dtype='float64')
 
 for t in range(time):
     for j in range(countries):
-        for i in range(0,6):
+        for i in range(rating):
             if rm[j,t] == i:
-                rc[i,t] += r[j,t] #totale credt spread pagati dalla classe di rating i
-                ri[i,t] += ir[j,t] #totale interest rates  pagati dalla classe di rating i
+                rc[i,t] = rc[i,t] + r[j,t] #totale credt spread pagati dalla classe di rating i
+                ri[i,t] = ri[i,t] + ir[j,t] #totale interest rates  pagati dalla classe di rating i
 	
         s_r[i,t] = rc[i,t] / R[t]
-	s_i[i,t] = ri[i,t] / Ri[t]
+	s_i[i,t] = ri[i,t] / R_i[t]
+
 print "Done "
-
-
 
 DIM = 11
 #DIM = 401
@@ -112,24 +112,28 @@ r_s = numpy.zeros((time), dtype='float64')
  
 s = 0
 es = 0.05
-for s in range(0,DIM):
 
-    for i in range(rating):
-        for t in range(time):        
-            p_s[i,t] = s_i[i,t]**es
-            r_s = numpy.sum(p_s, axis=0)
-      	    E_r[i,t] = p_s[i,t]/r_s[t]
+
+for i in range(rating):
+    for t in range(time):        
+        p_s[i,t] = s_i[i,t]**es
+
+r_s = numpy.sum(p_s, axis=0)
+      	    
+for s in range(0,DIM):
 
     for t in range(time):
         for i in range(rating):
+	    E_r[i,t] = p_s[i,t]/r_s[t]
             if E_r[i,t] != 0:
                 T[t,s] += E_r[i,t] * math.log(float(countries) * E_r[i,t])
 
     es += 0.05
 
+print(rc.shape)
+
+basicutils.mat_to_file(rc, "rcmtx.txt")
+
+basicutils.mat_to_file(p_s, "psrmtx.txt")
 
 
-basicutils.mat_to_file(T, "tmtx.txt")
-
-print rc
-print es
