@@ -40,7 +40,7 @@ def vct_to_file (bpm, oufilename):
     outf = open(oufilename, "w")
 
     for i in range(bpm.shape[0]):
-        outf.write(" %20.10f "%(bpm[i]))
+        outf.write(" %5.3f "%(bpm[i]))
     outf.write("\n")
         
     outf.close()
@@ -56,7 +56,7 @@ def mat_to_file (bpm, oufilename):
 
     for i in range(bpm.shape[0]):
         for j in range(bpm.shape[1]):
-            outf.write(" %20.10f "%(bpm[i, j]))
+            outf.write(" %5.2f "%(bpm[i, j]))
         outf.write("\n")
         
     outf.close()
