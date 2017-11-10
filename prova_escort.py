@@ -105,10 +105,10 @@ for i in range(rating):
         if s_r[i,t] != 0.0:
             Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
 
-print "Done "
+#print "Done "
 
-DIM = 11
-#DIM = 401
+#DIM = 11
+DIM = 401
 
 T = numpy.zeros((time,DIM), dtype='float64')
 p_s = numpy.zeros((rating,time), dtype='float64')
@@ -134,6 +134,12 @@ for s in range(0,DIM):
 	    E_r[i,t] = p_s[i,t]/r_s[t]
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
+
+    for t in range(time):
+        if math.fabs(T[t,s] - Te[t]) <= 0.12:
+            print t, s
+        #else:
+        #    print  math.fabs(T[t,s] - Te[t]) 
    
     for t in range(time):
 	 for i in range(rating):
@@ -142,6 +148,7 @@ for s in range(0,DIM):
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
 	 d_s[t,s] = d_t[t,s] - sh[t,s ]**2	
          T_ds[t,s] = Te[t] + d_s[t,s]/2
+
     es += 0.05
 
 
