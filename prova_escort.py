@@ -122,7 +122,6 @@ T_ds = numpy.zeros((time,DIM), dtype='float64') #area sottostante la curva che m
 s = 0
 es = 0.05
 
-
 for i in range(rating):
     for t in range(time):        
         p_s[i,t] = s_i[i,t]**es
