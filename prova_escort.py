@@ -122,13 +122,13 @@ T_ds = numpy.zeros((time,DIM), dtype='float64') #area sottostante la curva che m
 s = 0
 es = 0.05
 
-for i in range(rating):
-    for t in range(time):        
-        p_s[i,t] = s_i[i,t]**es
-
 r_s = numpy.sum(p_s, axis=0) #escort distribution
       	    
 for s in range(0,DIM):
+
+    for i in range(rating):
+        for t in range(time):        
+            p_s[i,t] = s_i[i,t]**es
 
     for i in range(rating):
         for t in range(time):
@@ -144,7 +144,7 @@ for s in range(0,DIM):
             print T[t,s], Te[t]
    
     for i in range(rating):
-        tfor t in range(time):
+        for t in range(time):
 	    if E_r[i,t] != 0.0:
 		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
