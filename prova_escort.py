@@ -129,8 +129,9 @@ for i in range(rating):
 r_s = numpy.sum(p_s, axis=0) #escort distribution
       	    
 for s in range(0,DIM):
-    for t in range(time):
-        for i in range(rating):
+
+    for i in range(rating):
+        for t in range(time):
 	    E_r[i,t] = p_s[i,t]/r_s[t]
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
@@ -139,16 +140,16 @@ for s in range(0,DIM):
         if math.fabs(T[t,s] - Te[t]) <= 0.12:
             print t, s, es
         else:
-            print  math.fabs(T[t,s] - Te[t]) 
+            print math.fabs(T[t,s] - Te[t]) 
             print T[t,s], Te[t]
    
-    for t in range(time):
-	 for i in range(rating):
+    for i in range(rating):
+        tfor t in range(time):
 	    if E_r[i,t] != 0.0:
 		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
-	 d_s[t,s] = d_t[t,s] - sh[t,s ]**2	
-         T_ds[t,s] = Te[t] + d_s[t,s]/2
+	d_s[t,s] = d_t[t,s] - sh[t,s ]**2
+        T_ds[t,s] = Te[t] + d_s[t,s]/2
 
     es += 0.05
 
