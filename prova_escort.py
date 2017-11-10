@@ -97,10 +97,13 @@ for t in range(time):
                 rc[i,t] = rc[i,t] + r[j,t] # assign credit spread value relating to the rating class
                 ri[i,t] = ri[i,t] + ir[j,t] # assign interest rate value relating to the rating class 
 	
-        s_r[i,t] = rc[i,t] / R[t]           # share of credit spread paid by rating class (spread paid by claas i / total spread)
-        s_i[i,t] = ri[i,t] / R_i[t]         # share of interest rate  paid by rating class (interest rate paid by claas i / total interest rate)
+            s_r[i,t] = rc[i,t] / R[t] # share of credit spread paid by rating class 
+                                      # (spread paid by claas i / total spread)
+            s_i[i,t] = ri[i,t] / R_i[t] # share of interest rate  paid by rating class 
+                                        # (interest rate paid by claas i / total interest rate)
 
-    Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
+            if s_r[i,t] != 0.0:
+                Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
 
 print "Done "
 
