@@ -88,17 +88,19 @@ rc = numpy.zeros((rating,time), dtype='float64')
 ri = numpy.zeros((rating,time), dtype='float64')
 s_r = numpy.zeros((rating,time), dtype='float64')
 s_i = numpy.zeros((rating,time), dtype='float64')
-
+Te = numpy.zeros((time), dtype='float64')
 
 for t in range(time):
     for j in range(countries):
         for i in range(rating):
             if rm[j,t] == i:
-                rc[i,t] = rc[i,t] + r[j,t] #totale credt spread pagati dalla classe di rating i
-                ri[i,t] = ri[i,t] + ir[j,t] #totale interest rates  pagati dalla classe di rating i
+                rc[i,t] = rc[i,t] + r[j,t] # assign credit spread value relating to the rating class
+                ri[i,t] = ri[i,t] + ir[j,t] # assign interest rate value relating to the rating class 
 	
-        s_r[i,t] = rc[i,t] / R[t]
-	s_i[i,t] = ri[i,t] / R_i[t]
+        s_r[i,t] = rc[i,t] / R[t]           # share of credit spread paid by rating class (spread paid by claas i / total spread)
+        s_i[i,t] = ri[i,t] / R_i[t]         # share of interest rate  paid by rating class (interest rate paid by claas i / total interest rate)
+
+    Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
 
 print "Done "
 
@@ -109,7 +111,11 @@ T = numpy.zeros((time,DIM), dtype='float64')
 p_s = numpy.zeros((rating,time), dtype='float64')
 E_r = numpy.zeros((rating,time), dtype='float64')
 r_s = numpy.zeros((time), dtype='float64')
- 
+d_t = numpy.zeros((time,DIM), dtype='float64')
+sh = numpy.zeros((time,DIM), dtype='float64') #shannon entropy
+d_s = numpy.zeros((time,DIM), dtype='float64') #deritata rispetto a es dell'entropia calcolata con le escort distribution
+T_ds = numpy.zeros((time,DIM), dtype='float64') #area sottostante la curva che misura l'entropia cn escorto dis.
+
 s = 0
 es = 0.05
 
@@ -118,22 +124,27 @@ for i in range(rating):
     for t in range(time):        
         p_s[i,t] = s_i[i,t]**es
 
-r_s = numpy.sum(p_s, axis=0)
+r_s = numpy.sum(p_s, axis=0) #escort distribution
       	    
 for s in range(0,DIM):
-
     for t in range(time):
         for i in range(rating):
 	    E_r[i,t] = p_s[i,t]/r_s[t]
-            if E_r[i,t] != 0:
-                T[t,s] += E_r[i,t] * math.log(float(countries) * E_r[i,t])
-
+            if E_r[i,t] != 0.0:
+                T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
+   
+    for t in range(time):
+	 for i in range(rating):
+	    if E_r[i,t] != 0.0:
+		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
+		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
+	 d_s[t,s] = d_t[t,s] - sh[t,s ]**2	
+         T_ds[t,s] = Te[t] + d_s[t,s]/2
     es += 0.05
 
-print(rc.shape)
 
+print R
 basicutils.mat_to_file(rc, "rcmtx.txt")
-
-basicutils.mat_to_file(p_s, "psrmtx.txt")
+#basicutils.mat_to_file(R_i, "Rimtx.txt")
 
 
