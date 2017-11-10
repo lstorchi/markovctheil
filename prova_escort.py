@@ -138,8 +138,9 @@ for s in range(0,DIM):
     for t in range(time):
         if math.fabs(T[t,s] - Te[t]) <= 0.12:
             print t, s, es
-        #else:
-        #    print  math.fabs(T[t,s] - Te[t]) 
+        else:
+            print  math.fabs(T[t,s] - Te[t]) 
+            print T[t,s], Te[t]
    
     for t in range(time):
 	 for i in range(rating):
