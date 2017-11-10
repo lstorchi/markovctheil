@@ -48,8 +48,8 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 rm = msd[namems]
 ir = bpd[namebp]
 
-rm=rm[:,0:-6]
-ir=ir[:,0:-6]
+rm = rm[:,0:-6]
+ir = ir[:,0:-6]
 
 countries = rm.shape[0]
 rating = numpy.max(rm)
@@ -72,7 +72,6 @@ for i in range(len(ir)):
            if (ir[i, j] == float('Inf')):
                ir[i, j] = 0
 
-
 for i in range(len(r)):
        for j in range(len(r[0])):
            if (r[i, j] == float('Inf')):
@@ -87,22 +86,24 @@ s_r = numpy.zeros((rating,time), dtype='float64')
 s_i = numpy.zeros((rating,time), dtype='float64')
 Te = numpy.zeros((time), dtype='float64')
 
-for t in range(time):
-    for j in range(countries):
-        for i in range(rating):
-            if rm[j,t] == i:
+basicutils.mat_to_file(rm, "rm.txt")
+
+for i in range(rating):
+    for t in range(time):
+        for j in range(countries):
+            if rm[j,t] == i+1:
                 rc[i,t] = rc[i,t] + r[j,t] # assign credit spread value relating 
                                            # to the rating class
                 ri[i,t] = ri[i,t] + ir[j,t] # assign interest rate value relating 
                                             # to the rating class 
 	
-            s_r[i,t] = rc[i,t] / R[t] # share of credit spread paid by rating class 
-                                      # (spread paid by claas i / total spread)
-            s_i[i,t] = ri[i,t] / R_i[t] # share of interest rate  paid by rating class 
-                                        # (interest rate paid by claas i / total interest rate)
+        s_r[i,t] = rc[i,t] / R[t] # share of credit spread paid by rating class 
+                                  # (spread paid by claas i / total spread)
+        s_i[i,t] = ri[i,t] / R_i[t] # share of interest rate  paid by rating class 
+                                    # (interest rate paid by claas i / total interest rate)
 
-            if s_r[i,t] != 0.0:
-                Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
+        if s_r[i,t] != 0.0:
+            Te[t] += s_r[i,t] * math.log(float(rating) * s_r[i,t])
 
 print "Done "
 
@@ -148,5 +149,3 @@ for s in range(0,DIM):
 print R
 basicutils.mat_to_file(rc, "rcmtx.txt")
 #basicutils.mat_to_file(R_i, "Rimtx.txt")
-
-
