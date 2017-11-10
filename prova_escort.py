@@ -78,11 +78,8 @@ for i in range(len(r)):
            if (r[i, j] == float('Inf')):
                r[i, j] = 0
 
-
 R = numpy.sum(r, axis=0)
 R_i = numpy.sum(ir, axis=0)
-
-
 
 rc = numpy.zeros((rating,time), dtype='float64')
 ri = numpy.zeros((rating,time), dtype='float64')
@@ -94,8 +91,10 @@ for t in range(time):
     for j in range(countries):
         for i in range(rating):
             if rm[j,t] == i:
-                rc[i,t] = rc[i,t] + r[j,t] # assign credit spread value relating to the rating class
-                ri[i,t] = ri[i,t] + ir[j,t] # assign interest rate value relating to the rating class 
+                rc[i,t] = rc[i,t] + r[j,t] # assign credit spread value relating 
+                                           # to the rating class
+                ri[i,t] = ri[i,t] + ir[j,t] # assign interest rate value relating 
+                                            # to the rating class 
 	
             s_r[i,t] = rc[i,t] / R[t] # share of credit spread paid by rating class 
                                       # (spread paid by claas i / total spread)
