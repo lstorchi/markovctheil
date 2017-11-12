@@ -86,7 +86,7 @@ s_r = numpy.zeros((rating,time), dtype='float64')
 s_i = numpy.zeros((rating,time), dtype='float64')
 Te = numpy.zeros((time), dtype='float64')
 
-basicutils.mat_to_file(rm, "rm.txt")
+#basicutils.mat_to_file(rm, "rm.txt")
 
 for i in range(rating):
     for t in range(time):
@@ -122,13 +122,14 @@ T_ds = numpy.zeros((time,DIM), dtype='float64') #area sottostante la curva che m
 s = 0
 es = 0.05
 
-r_s = numpy.sum(p_s, axis=0) #escort distribution
+#r_s = numpy.sum(p_s, axis=0) #escort distribution
       	    
 for s in range(0,DIM):
 
     for i in range(rating):
         for t in range(time):        
             p_s[i,t] = s_i[i,t]**es
+	    r_s = numpy.sum(p_s, axis=0) #escort distribution
 
     for i in range(rating):
         for t in range(time):
@@ -136,12 +137,12 @@ for s in range(0,DIM):
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
 
-    for t in range(time):
-        if math.fabs(T[t,s] - Te[t]) <= 0.12:
-            print t, s, es
-        else:
-            print math.fabs(T[t,s] - Te[t]) 
-            print T[t,s], Te[t]
+ #   for t in range(time):
+ #       if math.fabs(T[t,s] - Te[t]) <= 0.12:
+ #           print t, s, es
+ #       else:
+ #           print math.fabs(T[t,s] - Te[t]) 
+ #           print T[t,s], Te[t]
    
     for i in range(rating):
         for t in range(time):
@@ -149,11 +150,13 @@ for s in range(0,DIM):
 		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
 	d_s[t,s] = d_t[t,s] - sh[t,s ]**2
-        T_ds[t,s] = Te[t] + d_s[t,s]/2
+        T_ds[t,s] = Te[t] + 1/2*(d_s[t,s])
 
     es += 0.05
 
 
-print R
-basicutils.mat_to_file(rc, "rcmtx.txt")
-#basicutils.mat_to_file(R_i, "Rimtx.txt")
+print Te
+basicutils.mat_to_file(d_t, "dtmtx.txt")
+basicutils.mat_to_file(T, "Tmtx.txt")
+basicutils.mat_to_file(T_ds, "Tdsmtx.txt")
+
