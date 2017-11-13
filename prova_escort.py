@@ -48,8 +48,8 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 rm = msd[namems]
 ir = bpd[namebp]
 
-rm = rm[:,0:-6]
-ir = ir[:,0:-6]
+#rm = rm[:,0:-6]
+#ir = ir[:,0:-6]
 
 countries = rm.shape[0]
 rating = numpy.max(rm)
@@ -137,26 +137,33 @@ for s in range(0,DIM):
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
 
- #   for t in range(time):
- #       if math.fabs(T[t,s] - Te[t]) <= 0.12:
- #           print t, s, es
- #       else:
- #           print math.fabs(T[t,s] - Te[t]) 
- #           print T[t,s], Te[t]
+    for t in range(time):
+        if math.fabs(T[t,s] - Te[t]) <= 0.12:
+            print t, es
+      #  else:
+      #      print math.fabs(T[t,s] - Te[t]) 
+      #      print T[t,s], Te[t]
    
     for i in range(rating):
         for t in range(time):
 	    if E_r[i,t] != 0.0:
 		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
-	d_s[t,s] = d_t[t,s] - sh[t,s ]**2
-        T_ds[t,s] = Te[t] + 1/2*(d_s[t,s])
+            d_s[t,s] = d_t[t,s] - sh[t,s ]**2
+            T_ds[t,s] = Te[t] + 1/2*(d_s[t,s])
 
     es += 0.05
 
 
 print Te
-basicutils.mat_to_file(d_t, "dtmtx.txt")
+basicutils.mat_to_file(d_s, "dsmtx.txt")
+basicutils.mat_to_file(T_ds, "tdsmtx.txt")
 basicutils.mat_to_file(T, "Tmtx.txt")
-basicutils.mat_to_file(T_ds, "Tdsmtx.txt")
+#plt.plot(T[-1,:])
+#plt.show()
+#plt.plot(Te)
+plt.plot(T[:,39])
+plt.plot(T_ds[:,39])
+plt.show()
+#print(numpy.seterr)
 
