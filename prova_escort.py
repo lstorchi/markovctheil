@@ -136,14 +136,7 @@ for s in range(0,DIM):
 	    E_r[i,t] = p_s[i,t]/r_s[t]
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
-
-    #for t in range(time):
-    #    if math.fabs(T[t,s] - Te[t]) <= 0.12:
-    #        print t, es
-    #    else:
-    #        print math.fabs(T[t,s] - Te[t]) 
-    #        print T[t,s], Te[t]
-   
+  
     for i in range(rating):
         for t in range(time):
 	    if E_r[i,t] != 0.0:
@@ -158,6 +151,20 @@ for s in range(0,DIM):
     basicutils.progress_bar (s, DIM)
 
 print ""
+
+fp = open("results_es.txt", "w")
+
+fp.write("    T         ES          T         Te\n")
+es = 0.0
+for s in range(0,DIM):
+    for t in range(time):
+        if math.fabs(T[t,s] - Te[t]) <= 0.05:
+            fp.write("%5d %10.5f %10.5f %10.5f %10.5f\n"%
+                    (t, es, T[t,s], Te[t], math.fabs(T[t,s] - Te[t])))
+
+    es += 0.05
+
+fp.close()
 
 basicutils.vct_to_file(Te, "Te.txt")
 basicutils.mat_to_file(ir, "irmtx.txt")
