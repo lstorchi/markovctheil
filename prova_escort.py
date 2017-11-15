@@ -137,29 +137,33 @@ for s in range(0,DIM):
             if E_r[i,t] != 0.0:
                 T[t,s] += E_r[i,t] * math.log(float(rating) * E_r[i,t])    
 
-#    for t in range(time):
-#        if math.fabs(T[t,s] - Te[t]) <= 0.12:
-#            print t, es
-      #  else:
-      #      print math.fabs(T[t,s] - Te[t]) 
-      #      print T[t,s], Te[t]
+    #for t in range(time):
+    #    if math.fabs(T[t,s] - Te[t]) <= 0.12:
+    #        print t, es
+    #    else:
+    #        print math.fabs(T[t,s] - Te[t]) 
+    #        print T[t,s], Te[t]
    
     for i in range(rating):
         for t in range(time):
 	    if E_r[i,t] != 0.0:
 		d_t[t,s] += E_r[i,t] *(math.log(E_r[i,t]))**2
 		sh[t,s] -= E_r[i,t] *(math.log(E_r[i,t]))
+
             d_s[t,s] = d_t[t,s] - sh[t,s ]**2
             T_ds[t,s] = Te[t] + 1/2*(d_s[t,s])
 
     es += 0.05
 
-print(ir.shape)
-print Te
-print T[:,38]
+    basicutils.progress_bar (s, DIM)
+
+print ""
+
+basicutils.vct_to_file(Te, "Te.txt")
 basicutils.mat_to_file(ir, "irmtx.txt")
 basicutils.mat_to_file(T_ds, "tdsmtx.txt")
 basicutils.mat_to_file(T, "Tmtx.txt")
+
 #plt.plot(T[-1,:])
 #plt.show()
 #plt.plot(Te)
@@ -167,4 +171,3 @@ basicutils.mat_to_file(T, "Tmtx.txt")
 #plt.plot(T_ds[:,38])
 #plt.show()
 #print(numpy.seterr)
-
