@@ -155,7 +155,7 @@ print ""
 fp = open("results_es.txt", "w")
 
 fp.write(" Time         ES          T         Te\n")
-es = 0.0
+es = 0.05
 for s in range(0,DIM):
     for t in range(time):
         if math.fabs(T[t,s] - Te[t]) <= 0.05:
