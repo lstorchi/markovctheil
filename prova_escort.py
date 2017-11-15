@@ -154,7 +154,7 @@ print ""
 
 fp = open("results_es.txt", "w")
 
-fp.write("    T         ES          T         Te\n")
+fp.write(" Time         ES          T         Te\n")
 es = 0.0
 for s in range(0,DIM):
     for t in range(time):
