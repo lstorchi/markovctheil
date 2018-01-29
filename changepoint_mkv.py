@@ -48,13 +48,14 @@ L = 0.0
 
 for i in range(rating):
     for j in range(rating):
+
         for c  in range(countries):
             for t in range(time-1):
                 if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
                     nk[i, j, c] = nk[i, j, c] + 1
                 
-                num[i, j] = sum(nk[i, j])
-
+        num[i, j] = sum(nk[i, j])
+    
     den[i] = sum(num[i])
 
     if (den[i] > 0.0):
@@ -69,7 +70,7 @@ for i in range(rating):
            pr[i, j] = float(num[i, j])/float(den[i])
         else: 
            pr[i, j] = 0
-           pr[i,i] = 1
+           pr[i, i] = 1
    
 nk1 = numpy.zeros((rating,rating,countries), dtype='int64')
 num1 = numpy.zeros((rating,rating), dtype='int64')
@@ -80,12 +81,13 @@ L1 = 0.0
 
 for i in range(rating):
      for j in range(rating):
+
         for c in range(countries):
              for t in range(c_p-1):
- 
                 if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
                     nk1[i, j, c] = nk1[i, j, c] + 1
-                num1[i, j] = sum(nk1[i, j])
+        
+        num1[i, j] = sum(nk1[i, j])
 
      den1[i] = sum(num1[i])
 
@@ -114,12 +116,13 @@ L2 = 0.0
 
 for i in range(rating):
      for j in range(rating):
+         
          for c in range(countries):
               for t in range(c_p,time-1) :
-
                   if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
                       nk2[i, j, c] = nk2[i, j, c] + 1
-                  num2[i, j] = sum(nk2[i, j])
+         
+         num2[i, j] = sum(nk2[i, j])
 
      den2[i] = sum(num2[i])
 
