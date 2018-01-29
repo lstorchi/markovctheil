@@ -15,6 +15,7 @@ filename = ""
 
 if len(sys.argv) == 2:
     filename = sys.argv[1]
+else:
     print "usage: ", sys.argv[0], " ratingmtx "
     exit()
  
@@ -23,7 +24,7 @@ msd = scipy.io.loadmat(filename)
 namems = "ratings"
 
 if not(namems in msd.keys()):
-    print ("Cannot find " + namems + " in " + filename1)
+    print ("Cannot find " + namems + " in " + filename)
     print (msd.keys())
     exit(1)
 
