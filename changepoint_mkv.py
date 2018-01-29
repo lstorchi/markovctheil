@@ -44,17 +44,22 @@ num = numpy.zeros((rating,rating), dtype='int64')
 den = numpy.zeros(rating, dtype='int64')
 pr = numpy.zeros((rating,rating), dtype='float64')
 
+L = 0.0
+
 for c  in range(countries):
     for t in range(time-1):
         for i in range(rating):
             for j in range(rating):
                 if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                    nk[i, j, k] = nk[i, j, k] + 1
+                    nk[i, j, c] = nk[i, j, c] + 1
 
                 num[i, j] = sum(nk[i, j])
 
             den[i] = sum(num[i])
-            L += num[i,j]*math.log(num[i,j]/den[i]) 
+
+            if (den[i] > 0.0):
+                if (num[i,j]/den[i] > 0.0):
+                    L += num[i,j]*math.log(num[i,j]/den[i]) 
 
 for i in range(rating):
     for j in range(rating):
@@ -69,15 +74,19 @@ num1 = numpy.zeros((rating,rating), dtype='int64')
 den1 = numpy.zeros(rating, dtype='int64')
 pr1 = numpy.zeros((rating,rating),dtype='float64')
 
+L1 = 0.0 
+
 for c in range(countries):
     for t in range(c_p-1):
         for i in range(rating):
              for j in range(rating):
                 if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                    nk1[i, j, k] = nk1[i, j, k] + 1
+                    nk1[i, j, c] = nk1[i, j, c] + 1
                 num1[i, j] = sum(nk1[i, j])
              den1[i] = sum(num1[i])
-             L1 += num1[i,j]*math.log(num1[i,j]/den1[i]) 
+             if (den1[i] > 0.0):
+                if (num1[i,j]/den1[i] > 0.0):
+                   L1 += num1[i,j]*math.log(num1[i,j]/den1[i]) 
 
 for i in range(rating):
     for j in range(rating):
@@ -94,15 +103,19 @@ num2 = numpy.zeros((rating,rating), dtype='int64')
 den2 = numpy.zeros(rating, dtype='int64')
 pr2 = numpy.zeros((rating,rating),dtype='float64')
  
+L2 = 0.0 
+
 for c in range(countries):
     for t in range(c_p,time-1) :
          for i in range(rating):
               for j in range(rating):
                   if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                      nk2[i, j, k] = nk2[i, j, k] + 1
+                      nk2[i, j, c] = nk2[i, j, c] + 1
                   num2[i, j] = sum(nk2[i, j])
               den2[i] = sum(num2[i])
-              L2 += num2[i,j]*math.log(num2[i,j]/den2[i]) 
+              if (den2[i] > 0.0):
+                  if (num2[i,j]/den2[i] > 0.0):
+                      L2 += num2[i,j]*math.log(num2[i,j]/den2[i]) 
  
 for i in range(rating):
     for j in range(rating):
@@ -111,4 +124,6 @@ for i in range(rating):
         else: 
            pr2[i, j] = 0
            pr2[i,i] = 1
-lamda = -2*((L1+l2)/L)
+
+print L, L1, L2
+lamda = -2*((L1+L2)/L)
