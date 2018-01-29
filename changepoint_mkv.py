@@ -128,4 +128,5 @@ for i in range(rating):
            pr2[i,i] = 1
 
 print L, L1, L2
-lamda = -2*((L1+L2)/L)
+lamda = -2*((L1+L2)-L)
+print pr, pr1, pr2 
