@@ -28,8 +28,8 @@ else:
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
 
-namems = "data_ms"
-namebp = "nmat"
+namems = "ratings"
+namebp = "interest_rates"
 
 if not(namems in msd.keys()):
     print ("Cannot find " + namems + " in " + filename1)
@@ -158,7 +158,7 @@ fp.write(" Time         ES          T         Te\n")
 es = 0.05
 for s in range(0,DIM):
     for t in range(time):
-        if math.fabs(T[t,s] - Te[t]) <= 0.05:
+        if math.fabs(T[t,s] - Te[t]) <= 0.01:
             fp.write("%5d %10.5f %10.5f %10.5f %10.5f\n"%
                     (t, es, T[t,s], Te[t], math.fabs(T[t,s] - Te[t])))
 
