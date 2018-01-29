@@ -1,6 +1,11 @@
 import scipy
 import numpy
 import math
+import sys
+
+import scipy.stats
+import scipy.io
+
 import matplotlib.pyplot as plt
 
 sys.path.append("./module")
@@ -31,7 +36,8 @@ c_p=time/2
 
 if (rating <= 0) or (rating > 8):
     errmsg.append("rating " + rating + " is not a valid value")
-    return False
+    exit(1)
+
 nk = numpy.zeros((rating,rating,countries), dtype='int64')
 num = numpy.zeros((rating,rating), dtype='int64')
 den = numpy.zeros(rating, dtype='int64')
@@ -88,7 +94,7 @@ den2 = numpy.zeros(rating, dtype='int64')
 pr2 = numpy.zeros((rating,rating),dtype='float64')
  
 for c in range(countries):
-    for t in c_p:time-1
+    for t in range(c_p,time-1) :
          for i in range(rating):
               for j in range(rating):
                   if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
