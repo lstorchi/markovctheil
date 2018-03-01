@@ -53,8 +53,6 @@ if (L == None):
 
 #print L, L1, L2
 lamda = -2*((L1+L2)-L)
-print "Lamda: ", lamda
-
 
 maxrat = -1.0 * float("inf")
 minrat = float("inf")
@@ -67,4 +65,8 @@ for t in range(time):
 ndof = (maxrat - minrat + 1) * (maxrat - minrat)
 
 chi2 = scipy.stats.chi2.isf(0.05, ndof)
-print "Chi2", chi2
+pvalue = 1.0 - scipy.stats.chi2.cdf(lamda, ndof)
+
+print "Lamda   : ", lamda
+print "Chi2    : ", chi2
+print "P-Value : ", pvalue

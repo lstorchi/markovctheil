@@ -44,6 +44,9 @@ time=rm.shape[1]
 
 errmsg = ""
 
+
+fp = open("change.txt", "w")
+
 maxval = -1.0 * float("inf")
 cp = 0
 for c_p in range(1, time):
@@ -57,6 +60,7 @@ for c_p in range(1, time):
         maxval = L1 + L2
         cp = c_p
     
-    print c_p , L1+L2
+    fp.write(str(c_p) + " " + str(L1+L2) + "\n")
 
+fp.close()
 print cp, maxval
