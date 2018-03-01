@@ -14,12 +14,14 @@ import changemod
 
 filename = ""
 rownum = 0
+c_p = 0 
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 4:
     filename = sys.argv[1]
     rownum = int(sys.argv[2])
+    c_p = int(sys.argv[3])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx row_number"
+    print "usage: ", sys.argv[0], " ratingmtx row_number changepoint"
     exit()
  
 msd = scipy.io.loadmat(filename)
@@ -41,7 +43,6 @@ if (rownum >= countries):
 
 rating=numpy.max(rm)
 time=rm.shape[1]
-c_p=time/2
 
 errmsg = ""
 L, L1, L2 = changemod.compute_ls(rm, c_p, rownum, errmsg)

@@ -44,6 +44,8 @@ time=rm.shape[1]
 
 errmsg = ""
 
+maxval = -1.0 * float("inf")
+cp = 0
 for c_p in range(1, time):
     L, L1, L2 = changemod.compute_ls(rm, c_p, rownum, errmsg)
     
@@ -51,4 +53,10 @@ for c_p in range(1, time):
         print errmsg
         exit(1)
 
+    if (maxval < L1+L2):
+        maxval = L1 + L2
+        cp = c_p
+    
     print c_p , L1+L2
+
+print cp, maxval
