@@ -13,13 +13,11 @@ import basicutils
 import changemod
 
 filename = ""
-rownum = 0
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 2:
     filename = sys.argv[1]
-    rownum = int(sys.argv[2])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx row_number"
+    print "usage: ", sys.argv[0], " ratingmtx"
     exit()
  
 msd = scipy.io.loadmat(filename)
@@ -32,25 +30,36 @@ if not(namems in msd.keys()):
     exit(1)
 
 rm = msd[namems]
+countries = rm.shape[0]
 
-countries=rm.shape[0]
+"""
+rmi = msd[namems]
+countries = rmi.shape[0]
+countries = countries - 1
 
-if (rownum >= countries):
-    print "Max rownum value should be ", countries-1 
-    exit(1)
+rm = numpy.zeros((countries, rmi.shape[1]), dtype='int64')
+
+idx = 0
+for i in range(countries + 1):
+    if i != 6:
+        for j in range(rmi.shape[1]):
+           rm[idx, j] = rmi[i, j]
+
+        idx = idx + 1
+"""
 
 rating=numpy.max(rm)
 time=rm.shape[1]
 
 errmsg = ""
 
-
 fp = open("change.txt", "w")
 
 maxval = -1.0 * float("inf")
 cp = 0
 for c_p in range(1, time):
-    L, L1, L2 = changemod.compute_ls(rm, c_p, rownum, errmsg)
+    print c_p , " of ", time-1
+    L, L1, L2 = changemod.compute_ls(rm, c_p, errmsg)
     
     if (L == None):
         print errmsg

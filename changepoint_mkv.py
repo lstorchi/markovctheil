@@ -13,15 +13,13 @@ import basicutils
 import changemod
 
 filename = ""
-rownum = 0
 c_p = 0 
 
-if len(sys.argv) == 4:
+if len(sys.argv) == 3:
     filename = sys.argv[1]
-    rownum = int(sys.argv[2])
-    c_p = int(sys.argv[3])
+    c_p = int(sys.argv[2])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx row_number changepoint"
+    print "usage: ", sys.argv[0], " ratingmtx changepoint"
     exit()
  
 msd = scipy.io.loadmat(filename)
@@ -36,16 +34,11 @@ if not(namems in msd.keys()):
 rm = msd[namems]
 
 countries=rm.shape[0]
-
-if (rownum >= countries):
-    print "Max rownum value should be ", countries-1 
-    exit(1)
-
 rating=numpy.max(rm)
 time=rm.shape[1]
 
 errmsg = ""
-L, L1, L2 = changemod.compute_ls(rm, c_p, rownum, errmsg)
+L, L1, L2 = changemod.compute_ls(rm, c_p, errmsg)
 
 if (L == None):
     print errmsg
@@ -56,11 +49,12 @@ lamda = -2*((L1+L2)-L)
 
 maxrat = -1.0 * float("inf")
 minrat = float("inf")
-for t in range(time):
-    if (maxrat < rm[rownum, t]):
-        maxrat = rm[rownum, t]
-    if (minrat > rm[rownum, t]):
-        minrat = rm[rownum, t]
+for c in range(countries):
+    for t in range(time):
+        if (maxrat < rm[c, t]):
+            maxrat = rm[c, t]
+        if (minrat > rm[c, t]):
+            minrat = rm[c, t]
 
 ndof = (maxrat - minrat + 1) * (maxrat - minrat)
 
