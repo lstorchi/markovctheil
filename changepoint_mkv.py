@@ -45,7 +45,7 @@ if (L == None):
     exit(1)
 
 #print L, L1, L2
-lamda = -2*((L1+L2)-L)
+lamda = 2.0*((L1+L2)-L)
 
 maxrat = -1.0 * float("inf")
 minrat = float("inf")
