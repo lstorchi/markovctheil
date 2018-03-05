@@ -122,3 +122,92 @@ def compute_ls (rm, c_p, errmsg):
     basicutils.mat_to_file(pr1, "pr1.txt")
     basicutils.mat_to_file(pr2, "pr2.txt")
     return L, L1, L2
+
+###############################################################################
+
+def compute_double_cp (rm, c_p1, c_p2, errmsg):
+
+    countries=rm.shape[0]
+    rating=numpy.max(rm)
+    time=rm.shape[1]
+
+    if (rating <= 0) or (rating > 8):
+        errmsg.append("rating " + rating + " is not a valid value")
+        return None
+    
+    nk1 = numpy.zeros((rating,rating,countries), dtype='int64')
+    num1 = numpy.zeros((rating,rating), dtype='int64')
+    den1 = numpy.zeros(rating, dtype='int64')
+    pr1 = numpy.zeros((rating,rating),dtype='float64')
+    
+    L1 = 0.0 
+    
+    for i in range(rating):
+         for j in range(rating):
+    
+            for c in range(countries):
+                 for t in range(c_p1-1):
+                    if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                        nk1[i, j, c] = nk1[i, j, c] + 1
+            
+            num1[i, j] = sum(nk1[i, j])
+    
+         den1[i] = sum(num1[i])
+    
+         if (den1[i] > 0.0):
+            for j in range(rating):
+               val = numpy.float64(num1[i,j])/numpy.float64(den1[i])
+               if (val > 0.0):
+                  L1 += num1[i,j]*math.log(val) 
+    
+    nk2 = numpy.zeros((rating,rating,countries), dtype='int64')
+    num2 = numpy.zeros((rating,rating), dtype='int64')
+    den2 = numpy.zeros(rating, dtype='int64')
+    pr2 = numpy.zeros((rating,rating),dtype='float64')
+     
+    L2 = 0.0 
+    
+    for i in range(rating):
+         for j in range(rating):
+             
+             for c in range(countries):
+                  for t in range(c_p1,c_p2-1) :
+                      if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                          nk2[i, j, c] = nk2[i, j, c] + 1
+             
+             num2[i, j] = sum(nk2[i, j])
+    
+         den2[i] = sum(num2[i])
+    
+         if (den2[i] > 0.0):
+             for j in range(rating):
+                val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
+                if (val > 0.0):
+                    L2 += num2[i,j]*math.log(val) 
+     
+    nk3 = numpy.zeros((rating,rating,countries), dtype='int64')
+    num3 = numpy.zeros((rating,rating), dtype='int64')
+    den3 = numpy.zeros(rating, dtype='int64')
+    pr3 = numpy.zeros((rating,rating),dtype='float64')
+     
+    L3 = 0.0 
+    
+    for i in range(rating):
+         for j in range(rating):
+             
+             for c in range(countries):
+                  for t in range(c_p2,time-1) :
+                      if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                          nk3[i, j, c] = nk2[i, j, c] + 1
+             
+             num3[i, j] = sum(nk3[i, j])
+    
+         den3[i] = sum(num3[i])
+    
+         if (den3[i] > 0.0):
+             for j in range(rating):
+                val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
+                if (val > 0.0):
+                    L3 += num3[i,j]*math.log(val) 
+     
+    return L1, L2, L3
