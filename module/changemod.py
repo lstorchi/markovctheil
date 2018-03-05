@@ -198,7 +198,7 @@ def compute_double_cp (rm, c_p1, c_p2, errmsg):
              for c in range(countries):
                   for t in range(c_p2,time-1) :
                       if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                          nk3[i, j, c] = nk2[i, j, c] + 1
+                          nk3[i, j, c] = nk3[i, j, c] + 1
              
              num3[i, j] = sum(nk3[i, j])
     

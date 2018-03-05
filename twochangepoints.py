@@ -42,19 +42,18 @@ fp = open("change.txt", "w")
 maxval = -1.0 * float("inf")
 cp1 = 0
 cp2 = 0
-for c_p1 in range(1, time):
-    print c_p1 , " of ", time-1
-    for c_p2 in range(1, time):
+for c_p1 in range(1, time-1):
+    print c_p1 , " of ", time-2
+    for c_p2 in range(c_p1+1, time):
         print "   ", c_p2 , " of ", time-1 
-        if (c_p1 != c_p2):
-            L1, L2, L3 = changemod.compute_double_cp(rm, c_p1, c_p2, errmsg)
-            
-            if (maxval < L1+L2+L3):
-                maxval = L1 + L2 + L3
-                cp1 = c_p1
-                cp2 = c_p2
-            
-            fp.write(str(c_p1) + " " + str(c_p2) + " " + str(L1+L2+L3) + "\n")
+        L1, L2, L3 = changemod.compute_double_cp(rm, c_p1, c_p2, errmsg)
+        
+        if (maxval < L1+L2+L3):
+            maxval = L1 + L2 + L3
+            cp1 = c_p1
+            cp2 = c_p2
+        
+        fp.write(str(c_p1) + " " + str(c_p2) + " " + str(L1+L2+L3) + "\n")
 
 fp.close()
 print cp1, cp2, maxval
