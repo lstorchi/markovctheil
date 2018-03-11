@@ -196,7 +196,7 @@ order = [\
     'Malta', \
     'Netherlands', \
     'Austria', \
-    'poland', \
+    'Poland', \
     'Portugal', \
     'Romania', \
     'Slovenia', \
