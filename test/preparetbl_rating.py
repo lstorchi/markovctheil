@@ -51,7 +51,7 @@ def basic_repter (values):
             "Baa1":4, "Baa2":4, "Baa3":4, "BB+":5, "BB":5, "BB-":5, \
             "Ba1":5, "Ba2":5, "Ba3":5, "B+":6, "B":6, "B-":6, "B1":6, \
             "B2":6, "B3":6, "CCC+":7, "CCC":7, "CCC-":7, "CC":7, "C":7, \
-            "Caa1":7, "Caa2":7, "Caa3":7, "Ca":7,"C-":7, "SD":8, "D":8, "RD":8}
+            "Caa1":7, "Caa2":7, "Caa3":7, "Ca":7,"C-":8, "SD":8, "D":8, "RD":8}
 
     nametonum = dict((v,k) for k,v in enumerate(calendar.month_abbr))
 
@@ -283,3 +283,4 @@ for i in range(len(filenames)):
          os.remove(filenames[i])
  
     scipy.io.savemat(filenames[i], datadicts[i])
+
