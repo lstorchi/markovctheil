@@ -311,7 +311,7 @@ def compute_three_cp (rm, c_p1, c_p2, c_p3, errmsg):
          for j in range(rating):
              
              for c in range(countries):
-                  for t in range(c_p2,time-1) :
+                  for t in range(c_p3,time-1) :
                       if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
                           nk4[i, j, c] = nk4[i, j, c] + 1
              
