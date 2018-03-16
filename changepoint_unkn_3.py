@@ -17,7 +17,7 @@ cp1start = 0
 cp1end = 0
 delta = 0
 
-if len(sys.argv) == 4:
+if len(sys.argv) == 5:
     filename = sys.argv[1]
     cp1start = int(sys.argv[2])
     cp1end = int(sys.argv[3])
@@ -49,6 +49,14 @@ maxval = -1.0 * float("inf")
 cp1 = 0
 cp2 = 0
 cp3 = 0
+
+if cp1end >= time:
+    cp1end = time-1
+if cp1start >= time-1:
+    cp1start = time-2
+if delta >= time-1:
+    delta = time-2
+
 for c_p1 in range(cp1start, cp1end):
     for c_p2 in range(c_p1+delta, time):
         for c_p3 in range(c_p2+delta, time):
