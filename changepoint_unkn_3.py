@@ -13,11 +13,15 @@ import basicutils
 import changemod
 
 filename = ""
+cp1start = 0
+cp1end = 0
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 4:
     filename = sys.argv[1]
+    cp1start = int(sys.argv[2])
+    cp1end = int(sys.argv[2])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx"
+    print "usage: ", sys.argv[0], " ratingmtx cp1start cp1end"
     exit()
  
 msd = scipy.io.loadmat(filename)
@@ -37,13 +41,13 @@ time=rm.shape[1]
 
 errmsg = ""
 
-fp = open("change.txt", "w")
+fp = open(str(cp1start)+"_"+str(cp1end)+"_change.txt", "w")
 
 maxval = -1.0 * float("inf")
 cp1 = 0
 cp2 = 0
 cp3 = 0
-for c_p1 in range(1, time-1):
+for c_p1 in range(cp1start, cp1end):
     print c_p1 , " of ", time-2
     for c_p2 in range(c_p1+1, time):
         print "   ", c_p2 , " of ", time-1 
