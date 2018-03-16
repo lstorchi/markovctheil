@@ -15,13 +15,15 @@ import changemod
 filename = ""
 cp1start = 0
 cp1end = 0
+delta = 0
 
 if len(sys.argv) == 4:
     filename = sys.argv[1]
     cp1start = int(sys.argv[2])
-    cp1end = int(sys.argv[2])
+    cp1end = int(sys.argv[3])
+    delta = int(sys.argv[4])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx cp1start cp1end"
+    print "usage: ", sys.argv[0], " ratingmtx cp1start cp1end deltabtwcps"
     exit()
  
 msd = scipy.io.loadmat(filename)
@@ -48,10 +50,8 @@ cp1 = 0
 cp2 = 0
 cp3 = 0
 for c_p1 in range(cp1start, cp1end):
-    print c_p1 , " of ", time-2
-    for c_p2 in range(c_p1+1, time):
-        print "   ", c_p2 , " of ", time-1 
-        for c_p3 in range(c_p2+1, time):
+    for c_p2 in range(c_p1+delta, time):
+        for c_p3 in range(c_p2+delta, time):
             L1, L2, L3, L4 = changemod.compute_three_cp(rm, c_p1, c_p2, c_p3, errmsg)
             
             summa = L1+L2+L3+L4
