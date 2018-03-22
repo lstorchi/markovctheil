@@ -13,13 +13,20 @@ import basicutils
 import changemod
 
 filename = ""
+cp1start = 0
+cp1end = 0
+delta = 0
 
-if len(sys.argv) == 2:
+if len(sys.argv) == 5:
     filename = sys.argv[1]
+    cp1start = int(sys.argv[2])
+    cp1end = int(sys.argv[3])
+    delta = int(sys.argv[4])
 else:
-    print "usage: ", sys.argv[0], " ratingmtx"
+    print "usage: ", sys.argv[0], " ratingmtx cp1start cp1end deltabtwcps"
     exit()
  
+
 msd = scipy.io.loadmat(filename)
 
 namems = "ratings"
@@ -42,9 +49,17 @@ fp = open("change.txt", "w")
 maxval = -1.0 * float("inf")
 cp1 = 0
 cp2 = 0
-for c_p1 in range(1, time-1):
+
+if cp1end >= time:
+    cp1end = time-1
+if cp1start >= time-1:
+    cp1start = time-2
+if delta >= time-1:
+    delta = time/2
+
+for c_p1 in range(cp1start, cp1end):
     print c_p1 , " of ", time-2
-    for c_p2 in range(c_p1+1, time):
+    for c_p2 in range(c_p1+delta, time):
         print "   ", c_p2 , " of ", time-1 
         L1, L2, L3 = changemod.compute_double_cp(rm, c_p1, c_p2, errmsg)
         
