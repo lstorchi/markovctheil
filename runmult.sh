@@ -1,0 +1,9 @@
+python changepoint_unkn_3.py ./files/data_sp.mat 1 217 50 > changepoint_unkn_3.out 2> changepoint_unkn_3.err
+python changepoint_unkn_3.py ./files/data_sp.mat 1 5 50 > changepoint_unkn_3_1_5.out 2> changepoint_unkn_3_1_5.err
+python changepoint_unkn_3.py ./files/data_sp.mat 5 10 50 > changepoint_unkn_3_5_10.out 2> changepoint_unkn_3_5_10.err
+python changepoint_unkn_3.py ./files/data_sp.mat 10 15 50 > changepoint_unkn_3_10_15.out 2> changepoint_unkn_3_10_15.err
+python changepoint_unkn_3.py ./files/data_sp.mat 15 20 50 > changepoint_unkn_3_15_20.out 2> changepoint_unkn_3_15_20.err
+python changepoint_unkn_3.py ./files/data_sp.mat 20 30 50 > changepoint_unkn_3_20_30.out 2> changepoint_unkn_3_20_30.err
+python changepoint_unkn_3.py ./files/data_sp.mat 30 50 50 > changepoint_unkn_3_30_50.out 2> changepoint_unkn_3_30_50.err
+python changepoint_unkn_3.py ./files/data_sp.mat 50 100 50 > changepoint_unkn_3_50_100.out 2> changepoint_unkn_3_50_100.err
+python changepoint_unkn_3.py ./files/data_sp.mat 100 150 50 > changepoint_unkn_3_100_150.out 2> changepoint_unkn_3_100_150.err
