@@ -44,7 +44,7 @@ time=rm.shape[1]
 
 errmsg = ""
 
-fp = open("change.txt", "w")
+fp = open(str(cp1start)+"_"+str(cp1end)+"_change.txt", "w")
 
 maxval = -1.0 * float("inf")
 cp1 = 0
