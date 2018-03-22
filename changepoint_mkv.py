@@ -64,3 +64,5 @@ pvalue = 1.0 - scipy.stats.chi2.cdf(lamda, ndof)
 print "Lamda   : ", lamda
 print "Chi2    : ", chi2
 print "P-Value : ", pvalue
+plt.plot(rm[6,:])
+plt.show()
