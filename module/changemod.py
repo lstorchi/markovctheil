@@ -1,10 +1,6 @@
-import scipy
 import numpy
 import math
 import sys
-
-import scipy.stats
-import scipy.io
 
 import basicutils
 

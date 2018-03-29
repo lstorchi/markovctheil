@@ -3,7 +3,6 @@ import numpy
 import math
 import sys
 
-import scipy.stats
 import scipy.io
 
 import matplotlib.pyplot as plt
