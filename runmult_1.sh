@@ -5,7 +5,7 @@ do
   echo $num
   export end=$(($start + 50))
   echo $start, $end
-  python changepoint_unkn_3.py ./files/sep.mat $start $end 1095 > changepoint_unkn_"$num".out 2> changepoint_unkn_"$num".err
+  python changepoint_unkn_3.py ./files/sep.mat $start $end 1095 > changepoint_unkn_"$num".out 2> changepoint_unkn_"$num".err &
   start=$(($end + 1))
 done
 
