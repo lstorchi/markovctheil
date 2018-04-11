@@ -57,21 +57,24 @@ if cp1start >= time-1:
 if delta >= time-1:
     delta = time-2
 
+counter = 0
 for c_p1 in range(cp1start, cp1end):
-    for c_p2 in range(c_p1+delta, time):
+    for c_p2 in range(c_p1+delta, time-delta):
         for c_p3 in range(c_p2+delta, time):
-            L1, L2, L3, L4 = changemod.compute_three_cp(rm, c_p1, c_p2, c_p3, errmsg)
-            
+            L1, L2, L3, L4 = changemod.compute_three_cp_fake(rm, c_p1, c_p2, c_p3, errmsg)
+
             summa = L1+L2+L3+L4
             if (maxval < summa):
                 maxval = summa
                 cp1 = c_p1
                 cp2 = c_p2
                 cp3 = c_p3
-            
-            fp.write(str(c_p1) + " " + str(c_p2) + " " + str(c_p3) + " " + \
-                    str(summa)+ "\n")
+
+            counter = counter + 1
+            #fp.write(str(c_p1) + " " + str(c_p2) + " " + str(c_p3) + " " + \
+            #        str(summa)+ "\n")
             #print str(c_p1) + " " + str(c_p2) + " " + str(c_p3) + " " + str(summa)
 
+print counter
 fp.close()
 print cp1, cp2, cp3, maxval
