@@ -1,0 +1,10 @@
+time python test.py  ./files/sep.mat 1 10 1000 
+
+
+112747665
+1 1001 2001 0.0
+
+real    289m28,361s
+user    287m15,486s
+sys     0m3,947s
+
