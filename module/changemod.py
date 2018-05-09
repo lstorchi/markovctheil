@@ -117,7 +117,7 @@ def compute_ls (rm, c_p, errmsg):
     
     basicutils.mat_to_file(pr1, "pr1.txt")
     basicutils.mat_to_file(pr2, "pr2.txt")
-    return L, L1, L2
+    return L, L1, L2, pr1
 
 ###############################################################################
 

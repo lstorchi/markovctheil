@@ -59,7 +59,7 @@ maxval = -1.0 * float("inf")
 cp = 0
 for c_p in range(1, time):
     print c_p , " of ", time-1
-    L, L1, L2 = changemod.compute_ls(rm, c_p, errmsg)
+    L, L1, L2, pr1 = changemod.compute_ls(rm, c_p, errmsg)
     
     if (L == None):
         print errmsg

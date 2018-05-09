@@ -38,7 +38,7 @@ rating=numpy.max(rm)
 time=rm.shape[1]
 
 errmsg = ""
-L, L1, L2 = changemod.compute_ls(rm, c_p, errmsg)
+L, L1, L2, pr1 = changemod.compute_ls(rm, c_p, errmsg)
 
 if (L == None):
     print errmsg
