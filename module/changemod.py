@@ -131,6 +131,40 @@ def compute_double_cp (rm, c_p1, c_p2, errmsg):
         errmsg.append("rating " + rating + " is not a valid value")
         return None
     
+    nk = numpy.zeros((rating,rating,countries), dtype='int64')
+    num = numpy.zeros((rating,rating), dtype='int64')
+    den = numpy.zeros(rating, dtype='int64')
+    pr = numpy.zeros((rating,rating), dtype='float64')
+ 
+ 
+    L = 0.0
+ 
+    for i in range(rating):
+         for j in range(rating):
+
+             for c  in range(countries):
+                 for t in range(time-1):
+                     if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                         nk[i, j, c] = nk[i, j, c] + 1
+ 
+             num[i, j] = sum(nk[i, j])
+ 
+         den[i] = sum(num[i])
+ 
+         if (den[i] > 0.0):
+             for j in range(rating):
+                 val = numpy.float64(num[i,j])/numpy.float64(den[i])
+                 if (val > 0.0):
+                      L += num[i,j]*math.log(val)
+ 
+    for i in range(rating):
+        for j in range(rating):
+            if den[i] != 0:
+               pr[i, j] = float(num[i, j])/float(den[i])
+            else:
+               pr[i, j] = 0
+               pr[i, i] = 1
+
     nk1 = numpy.zeros((rating,rating,countries), dtype='int64')
     num1 = numpy.zeros((rating,rating), dtype='int64')
     den1 = numpy.zeros(rating, dtype='int64')
@@ -205,8 +239,11 @@ def compute_double_cp (rm, c_p1, c_p2, errmsg):
                 val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
                 if (val > 0.0):
                     L3 += num3[i,j]*math.log(val) 
-     
-    return L1, L2, L3
+
+    basicutils.mat_to_file(pr1, "pr1.txt")
+    basicutils.mat_to_file(pr2, "pr2.txt")
+    basicutils.mat_to_file(pr3, "pr3.txt")
+    return L,  L1, L2, L3, pr1, pr2, pr3
 
 
 ###############################################################################
@@ -298,14 +335,16 @@ def compute_three_cp (rm, c_p1, c_p2, c_p3, errmsg):
                           num4[i, j] = num4[i, j] + 1
              
          den4[i] = sum(num4[i])
-    
          if (den4[i] > 0.0):
              for j in range(rating):
                 val = numpy.float64(num4[i,j])/numpy.float64(den4[i])
                 if (val > 0.0):
                     L4 += num4[i,j]*math.log(val) 
  
-     
+    basicutils.mat_to_file(pr1, "pr1.txt")
+    basicutils.mat_to_file(pr2, "pr2.txt")
+    basicutils.mat_to_file(pr3, "pr3.txt")
+    basicutils.mat_to_file(pr4, "pr4.txt")
     return L1, L2, L3, L4
 
 ###############################################################################
