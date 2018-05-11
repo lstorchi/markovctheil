@@ -42,6 +42,10 @@ parser.add_argument("-i", "--time-inf", help="Simulation using stationary distri
         default=False, action="store_true", dest="timeinf")
 parser.add_argument("-S", "--seed", help="Using a seed for the random generator", \
         default=False, action="store_true", dest="seed")
+parser.add_argument("-p", "--changepoint", help="start from time cp, default=0, " + \
+        "used only when continuos is off", \
+        default=0, dest="changepoint")
+
 
 if len(sys.argv) == 1:
     parser.print_help()
@@ -49,6 +53,7 @@ if len(sys.argv) == 1:
 
 args = parser.parse_args()
 
+cp = int(args.changepoint)
 namebp = args.nameofbpmatrix
 timeinf = args.timeinf
 verbose = args.verbose
@@ -90,6 +95,25 @@ if msd[namems].shape[0] != bpd[namebp].shape[0]:
 ms = msd[namems]
 i_r = bpd[namebp]
 
+countries = ms.shape[0]
+time = ms.shape[1]
+ 
+i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
+msn = numpy.zeros((countries, time-cp) , dtype='float64')
+
+for i in range(countries):
+    k = 0
+    for j in range(cp, time):
+        i_rn[i, k] = i_r[i, j]
+        k = k + 1
+
+for i in range(countries):
+    k = 0
+    for j in range(cp, time):
+        msn[i, k] = ms[i, j]
+        k = k + 1
+ 
+
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
 
@@ -106,9 +130,9 @@ allratingsnins = []
 if continuous:
     time = ms.shape[1]
     pr = numpy.zeros((rating,rating,time), dtype='float64')
-    if not mainmkvcmp.main_mkc_comp_cont (ms, i_r, timeinf, step, tprev, \
+    if not mainmkvcmp.main_mkc_comp_cont (msn, i_rn, timeinf, step, tprev, \
             numofrun, verbose, True, args.seed, errmsg, entropia, \
-            var, allratings, allratingsnins, pr, meanval, stdeval):
+            var, allratings, allratingsnins, pr, meanval, stdevali, None):
         for m in errmsg:
             print (m)
         exit(1)
