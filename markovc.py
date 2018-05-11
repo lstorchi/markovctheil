@@ -137,7 +137,7 @@ if continuous:
             print (m)
         exit(1)
 else:
-    if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
+    if not mainmkvcmp.main_mkc_comp (msn, i_rn, timeinf, step, tprev, \
             numofrun, verbose, True, args.seed, errmsg, entropia, \
             var, allratings, allratingsnins, pr, meanval, stdeval):
         for m in errmsg:
