@@ -99,7 +99,7 @@ countries = ms.shape[0]
 time = ms.shape[1]
  
 i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
-msn = numpy.zeros((countries, time-cp) , dtype='float64')
+msn = numpy.zeros((countries, time-cp) , dtype='int64')
 
 for i in range(countries):
     k = 0
