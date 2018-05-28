@@ -669,14 +669,40 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for j in range(rating):
            if i != j:
                amtx[i,j] = num[i,j]/v[i]
-           
+
+   for i in range(rating):
+       min = float("+inf")
+       max = float("-inf")
+       for j in range(rating):
+           if (amtx[i,j] > max):
+               max = amtx[i,j]
+           if (amtx[i,j] < min):
+               min = amtx[i,j]
+
+       sigma = 0.5
+
+       ranval = 0.0
+       while (True):
+           ranval = random.gauss(0.0, sigma)
+           if (ranval >= -max) and (ranval <= max):
+               break
+
+       print ranval
+
+       j = i + 1
+       if (j < rating):
+            amtx[i,j] = amtx[i,j] + ranval
+       j = i - 1
+       if (j >= 0):
+           amtx[i,j] = amtx[i,j] + ranval
+  
    q = numpy.sum(amtx, axis=1)
    for i in range(rating):
        amtx[i, i] = -1.0e0 * q[i] 
 
    testrow = numpy.sum(amtx, axis=1)
    for t in testrow:
-       if math.fabs(t) > 1e-18 :
+       if math.fabs(t) > 1e-15 :
            print "Error in A matrix ", math.fabs(t)
            exit(1)
 

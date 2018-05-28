@@ -132,7 +132,7 @@ if continuous:
     pr = numpy.zeros((rating,rating,time), dtype='float64')
     if not mainmkvcmp.main_mkc_comp_cont (msn, i_rn, timeinf, step, tprev, \
             numofrun, verbose, True, args.seed, errmsg, entropia, \
-            var, allratings, allratingsnins, pr, meanval, stdevali, None):
+            var, allratings, allratingsnins, pr, meanval, stdeval, None):
         for m in errmsg:
             print (m)
         exit(1)
