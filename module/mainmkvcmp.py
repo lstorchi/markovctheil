@@ -684,7 +684,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        ranval = 0.0
        while (True):
            ranval = random.gauss(0.0, sigma)
-           if (ranval >= -max) and (ranval <= max):
+           if (ranval >= -min) and (ranval <= max):
                break
 
        print ranval
