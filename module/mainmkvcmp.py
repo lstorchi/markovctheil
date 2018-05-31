@@ -541,7 +541,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
         pr, meanval, stdeval, \
-        setval=None):
+        setval=None, indextoadd=0):
 
    if seed:
        random.seed(9001)
@@ -551,7 +551,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    rating = numpy.max(rm)
 
    if outfiles:
-       oufilename = "average_rat_class_hist_"+str(numofrun)+".txt"
+       oufilename = "average_rat_class_hist_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
          os.remove(oufilename)
  
@@ -606,7 +606,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            return False
 
    if outfiles:
-       oufilename = "change_"+str(numofrun)+".txt"
+       oufilename = "change_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
          os.remove(oufilename)
  
@@ -652,7 +652,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            num[i,j] = val
 
    if outfiles:
-       oufilename = "num_"+str(numofrun)+".txt"
+       oufilename = "num_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
          os.remove(oufilename)
 
@@ -711,7 +711,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #print amtx
 
    if outfiles:
-       oufilename = "amtx_"+str(numofrun)+".txt"
+       oufilename = "amtx_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
          os.remove(oufilename)
 
@@ -908,7 +908,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    fval, pval = scipy.stats.f_oneway (*args)
 
-   oufilename = "1wayanova_"+str(numofrun)+".txt"
+   oufilename = "1wayanova_"+str(numofrun)+"_"+str(indextoadd)+".txt"
    
    if outfiles:
      if os.path.exists(oufilename):
@@ -942,7 +942,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    
    
    if outfiles:
-     oufilename = "entropy_histi_"+str(numofrun)+".txt"
+     oufilename = "entropy_histi_"+str(numofrun)+"_"+str(indextoadd)+".txt"
      if os.path.exists(oufilename):
         os.remove(oufilename)
 
@@ -968,7 +968,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                pmtx[x,y] = 0.0
 
    if outfiles:
-       oufilename = "pmtx_"+str(numofrun)+".txt"
+       oufilename = "pmtx_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
            os.remove(oufilename)
 
@@ -998,13 +998,13 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    #            cdf[i, j] = 1.0e0
 
    if outfiles:
-       oufilename = "cdf_"+str(numofrun)+".txt"
+       oufilename = "cdf_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
            os.remove(oufilename)
 
        basicutils.mat_to_file (cdf, oufilename)
 
-       oufilename = "q_"+str(numofrun)+".txt"
+       oufilename = "q_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
            os.remove(oufilename)
 
@@ -1038,7 +1038,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            counter = 0
            if outfiles:
                mcount += 1
-               oufilename = "mc_"+str(numofrun)+"_"+str(mcount)+".txt"
+               oufilename = "mc_"+str(numofrun)+"_"+str(mcount)+"_"+str(indextoadd)+".txt"
                if os.path.exists(oufilename):
                    os.remove(oufilename)
 
@@ -1099,7 +1099,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    if outfiles:
 
-       oufilename = "average_rat_class_"+str(numofrun)+".txt"
+       oufilename = "average_rat_class_"+str(numofrun)+"_"+str(indextoadd)+".txt"
        if os.path.exists(oufilename):
            os.remove(oufilename)
 
@@ -1112,7 +1112,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            i += 1
        outfp.close()
  
-   oufilename = "entropy_"+str(numofrun)+".txt"
+   oufilename = "entropy_"+str(numofrun)+"_"+str(indextoadd)+".txt"
 
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
@@ -1135,7 +1135,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for j in range(acm.shape[1]):
            acm[i, j] = numpy.mean(ac[i, j, :])
    
-   oufilename = "acm_"+str(numofrun)+".txt"
+   oufilename = "acm_"+str(numofrun)+"_"+str(indextoadd)+".txt"
    
    if outfiles:
      if os.path.exists(oufilename):
@@ -1148,7 +1148,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        for j in range(bpm.shape[1]):
            bpm[i, j] = numpy.mean(bp[i, j])
    
-   oufilename = "bpm_"+str(numofrun)+".txt"
+   oufilename = "bpm_"+str(numofrun)+"_"+str(indextoadd)+".txt"
   
    if outfiles:
      if os.path.exists(oufilename):

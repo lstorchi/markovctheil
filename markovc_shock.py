@@ -49,8 +49,6 @@ parser.add_argument("-p", "--changepoint", help="start from time cp, default=0, 
 parser.add_argument("-N", "--numofshock", help="Number of shock to be used (in parallel) " , \
         type=int, required=True, default=1, dest="numofshock")
 
-exit(1)
-
 if len(sys.argv) == 1:
     parser.print_help()
     exit(1)
@@ -68,6 +66,7 @@ step = args.step
 tprev = args.tprev
 numofrun = args.maxrun
 namems = args.nameofmatrix
+numofshock = args.numofshock
 
 errmsg = []
 
@@ -134,16 +133,19 @@ allratingsnins = []
 if continuous:
     time = ms.shape[1]
     pr = numpy.zeros((rating,rating,time), dtype='float64')
-    if not mainmkvcmp.main_mkc_comp_cont (msn, i_rn, timeinf, step, tprev, \
-            numofrun, verbose, True, args.seed, errmsg, entropia, \
-            var, allratings, allratingsnins, pr, meanval, stdeval, None):
-        for m in errmsg:
-            print (m)
-        exit(1)
+
+    tojoin = []
+    for index in range(numofshock):
+        p = Process(target=mainmkvcmp.main_mkc_comp_cont, \
+              args=(msn, i_rn, timeinf, step, tprev, \
+              numofrun, verbose, True, args.seed, errmsg, entropia, \
+              var, allratings, allratingsnins, pr, meanval, stdeval, None, \
+              index))
+        p.start() 
+        tojoin.append(p)
+
+    for p in tojoin:
+        p.join()
 else:
-    if not mainmkvcmp.main_mkc_comp (msn, i_rn, timeinf, step, tprev, \
-            numofrun, verbose, True, args.seed, errmsg, entropia, \
-            var, allratings, allratingsnins, pr, meanval, stdeval):
-        for m in errmsg:
-            print (m)
-        exit(1)
+    print "Not yet implemented"
+    exit(1)
