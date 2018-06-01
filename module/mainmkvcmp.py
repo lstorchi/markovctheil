@@ -541,7 +541,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
         pr, meanval, stdeval, \
-        setval=None, indextoadd=0):
+        setval=None, indextoadd=0, addshock=False):
 
    if seed:
        random.seed(9001)
@@ -670,31 +670,52 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
            if i != j:
                amtx[i,j] = num[i,j]/v[i]
 
-   for i in range(rating):
-       min = float("+inf")
-       max = float("-inf")
-       for j in range(rating):
-           if (amtx[i,j] > max):
-               max = amtx[i,j]
-           if (amtx[i,j] < min):
-               min = amtx[i,j]
+   if addshock:
+      numpy.random.seed(indextoadd)
 
-       sigma = 0.5
+      for i in range(rating):
+          min = float("+inf")
+          max = float("-inf")
+          for j in range(rating):
+              if (amtx[i,j] > max):
+                  max = amtx[i,j]
+              if (amtx[i,j] < min):
+                  min = amtx[i,j]
+                  
+      mean = []
+      cov = []
+      for i in range(rating):
+          mean.append(0.0)
+          covrow = []
+          for j in range(rating):
+              covrow.append(0.000025*(j+1)*(1+1))
+          cov.append(covrow)
 
-       ranval = 0.0
-       while (True):
-           ranval = random.gauss(0.0, sigma)
-           if (ranval >= -min) and (ranval <= max):
-               break
+      for i in range(rating):
+          for j in range(i):
+              cov[j][i] = cov[i][j]
 
-       print ranval
+      #print cov
 
-       j = i + 1
-       if (j < rating):
-            amtx[i,j] = amtx[i,j] + ranval
-       j = i - 1
-       if (j >= 0):
-           amtx[i,j] = amtx[i,j] + ranval
+      ranval = []
+      while (True):
+          outval = numpy.random.multivariate_normal(mean, cov)
+          #print outval
+          
+          if (all(((i >= -min) and (i <= max)) for i in outval)):
+              ranval = outval
+              break
+      
+      print "Shock added: ", ranval
+
+      for i in range(rating):
+      
+          j = i + 1
+          if (j < rating):
+               amtx[i,j] = amtx[i,j] + ranval[i]
+          j = i - 1
+          if (j >= 0):
+              amtx[i,j] = amtx[i,j] + ranval[i]
   
    q = numpy.sum(amtx, axis=1)
    for i in range(rating):

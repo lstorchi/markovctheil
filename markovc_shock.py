@@ -140,7 +140,7 @@ if continuous:
               args=(msn, i_rn, timeinf, step, tprev, \
               numofrun, verbose, True, args.seed, errmsg, entropia, \
               var, allratings, allratingsnins, pr, meanval, stdeval, None, \
-              index))
+              index, True))
         p.start() 
         tojoin.append(p)
 
