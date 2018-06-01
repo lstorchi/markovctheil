@@ -673,6 +673,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
    if addshock:
       numpy.random.seed(indextoadd)
 
+      mean = []
       for i in range(rating):
           min = float("+inf")
           max = float("-inf")
@@ -681,11 +682,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                   max = amtx[i,j]
               if (amtx[i,j] < min):
                   min = amtx[i,j]
+
+          mean.append((max+min)/2.0)
                   
-      mean = []
       cov = []
       for i in range(rating):
-          mean.append(0.0)
           covrow = []
           for j in range(rating):
               covrow.append(0.000025*(j+1)*(1+1))
