@@ -13,6 +13,7 @@ import os.path
 
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
+import time as timeclass
 
 import basicutils
 
@@ -671,25 +672,36 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                amtx[i,j] = num[i,j]/v[i]
 
    if addshock:
-      numpy.random.seed(indextoadd)
+
+      numpy.random.seed((indextoadd+1))
 
       mean = []
+      minrow = []
+      maxrow = []
       for i in range(rating):
           min = float("+inf")
           max = float("-inf")
           for j in range(rating):
-              if (amtx[i,j] > max):
+              if (math.fabs(amtx[i,j]) > 1.0e-15):
+                if (amtx[i,j] > max):
                   max = amtx[i,j]
-              if (amtx[i,j] < min):
+                if (amtx[i,j] < min):
                   min = amtx[i,j]
 
-          mean.append((max+min)/2.0)
+          minrow.append(min)
+          maxrow.append(max)
+
+          #print -min, max
+          mean.append((max-min)/2.0)
+          #mean.append(0.0)
+
+      #print mean
                   
       cov = []
       for i in range(rating):
           covrow = []
           for j in range(rating):
-              covrow.append(0.000025*(j+1)*(1+1))
+              covrow.append(0.25)
           cov.append(covrow)
 
       for i in range(rating):
@@ -702,21 +714,25 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
       while (True):
           outval = numpy.random.multivariate_normal(mean, cov)
           #print outval
+
+          counter = 0
+          for i in range(rating):
+              min = minrow[i]
+              max = maxrow[i]
+              if (outval[i] >= -min) and (outval[i] <= max):
+                  counter = counter + 1
           
-          if (all(((i >= -min) and (i <= max)) for i in outval)):
+          if counter == rating:
               ranval = outval
               break
       
       print "Shock added: ", ranval
 
       for i in range(rating):
-      
-          j = i + 1
-          if (j < rating):
-               amtx[i,j] = amtx[i,j] + ranval[i]
-          j = i - 1
-          if (j >= 0):
-              amtx[i,j] = amtx[i,j] + ranval[i]
+          for j in range(i+1, rating):
+              if math.fabs(amtx[i,j]) > 1.0e-13:
+                  amtx[i,j] = amtx[i,j] + ranval[i]
+                  amtx[j,i] = amtx[j,i] + ranval[i]
   
    q = numpy.sum(amtx, axis=1)
    for i in range(rating):
