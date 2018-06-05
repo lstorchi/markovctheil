@@ -117,9 +117,6 @@ for i in range(countries):
         k = k + 1
  
 
-entropia = numpy.zeros(tprev, dtype='float64')
-var = numpy.zeros((tprev), dtype='float64')
-
 rating = numpy.max(ms)
 
 pr = numpy.zeros((rating,rating), dtype='float64')
@@ -130,12 +127,16 @@ stdeval = []
 allratings = []
 allratingsnins = []
 
+entropia = numpy.zeros(tprev, dtype='float64')
+var = numpy.zeros((tprev), dtype='float64')
+
 if continuous:
     time = ms.shape[1]
     pr = numpy.zeros((rating,rating,time), dtype='float64')
 
     tojoin = []
-    for index in range(numofshock):
+
+    for index in range(1,numofshock):
         p = Process(target=mainmkvcmp.main_mkc_comp_cont, \
               args=(msn, i_rn, timeinf, step, tprev, \
               numofrun, verbose, True, args.seed, errmsg, entropia, \
@@ -144,8 +145,38 @@ if continuous:
         p.start() 
         tojoin.append(p)
 
+    index = 0
+    p = Process(target=mainmkvcmp.main_mkc_comp_cont, \
+          args=(msn, i_rn, timeinf, step, tprev, \
+          numofrun, verbose, True, args.seed, errmsg, entropia, \
+          var, allratings, allratingsnins, pr, meanval, stdeval, None, \
+          index, False))
+    p.start() 
+    tojoin.append(p)
+
     for p in tojoin:
         p.join()
+
+    entropia_vct = []
+    var_vct = []
+    for index in range(0,numofshock):
+        infilename = "entropy_"+str(numofrun)+"_"+str(index)+".txt"
+        fp = open(infilename, "r")
+        ent = []
+        for l in fp:
+            if len(l.split()) == 3:
+                ent.append(float(l.split()[1]))
+        fp.close()
+        entropia_vct.append(ent)
+
+
+    for j in range(len(entropia_vct[0])):
+        for i in range(len(entropia_vct)):
+            if (i == len(entropia_vct)-1):
+                sys.stdout.write( str(entropia_vct[i][j]))
+            else:
+                sys.stdout.write( str(entropia_vct[i][j]) + ", ")
+        sys.stdout.write( "\n")
 else:
     print "Not yet implemented"
     exit(1)

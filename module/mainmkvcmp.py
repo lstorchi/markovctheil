@@ -705,8 +705,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
           cov.append(covrow)
 
       for i in range(rating):
-          for j in range(i):
-              cov[j][i] = cov[i][j]
+          for j in range(i+1):
+              if i == j:
+                  cov[j][i] = 0.25
+              else:
+                  cov[j][i] = cov[i][j]
 
       #print cov
 
