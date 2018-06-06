@@ -672,8 +672,9 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
                amtx[i,j] = num[i,j]/v[i]
 
    if addshock:
-
-      numpy.random.seed((indextoadd+1))
+      seedv = int((int(timeclass.time()) * (indextoadd+1)) / 10000000)
+      print seedv 
+      numpy.random.seed(seedv)
 
       mean = []
       minrow = []
