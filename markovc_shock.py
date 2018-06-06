@@ -190,7 +190,7 @@ if continuous:
             elif (entropia_vct[i][j] < entropia_vct[0][j]):
                 neg = neg + 1
 
-            diff = pos - neg
+        diff = pos - neg
 
         fp.write(str(j+1) + " " + str(diff) + "\n")
     fp.close()
