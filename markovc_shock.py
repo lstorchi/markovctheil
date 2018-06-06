@@ -170,13 +170,31 @@ if continuous:
         entropia_vct.append(ent)
 
 
+    fp = open("markovtheil_entropy.txt", "w")
     for j in range(len(entropia_vct[0])):
         for i in range(len(entropia_vct)):
             if (i == len(entropia_vct)-1):
-                sys.stdout.write( str(entropia_vct[i][j]))
+                fp.write( str(entropia_vct[i][j]))
             else:
-                sys.stdout.write( str(entropia_vct[i][j]) + ", ")
-        sys.stdout.write( "\n")
+                fp.write( str(entropia_vct[i][j]) + " , ")
+        fp.write( "\n")
+    fp.close()
+
+    fp = open("markovtheil_diff_entropy.txt", "w")
+    for j in range(len(entropia_vct[0])):
+        pos = 0
+        neg = 0
+        for i in range(1,len(entropia_vct)):
+            if (entropia_vct[i][j] > entropia_vct[0][j]):
+                pos = pos + 1
+            elif (entropia_vct[i][j] < entropia_vct[0][j]):
+                neg = neg + 1
+
+            diff = pos - neg
+
+        fp.write(str(j+1) + " " + str(diff) + "\n")
+    fp.close()
+
 else:
     print "Not yet implemented"
     exit(1)
