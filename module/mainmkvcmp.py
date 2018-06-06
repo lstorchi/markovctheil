@@ -733,10 +733,10 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
       print "Shock added: ", ranval
 
       for i in range(rating):
-          for j in range(i+1, rating):
-              if math.fabs(amtx[i,j]) > 1.0e-13:
-                  amtx[i,j] = amtx[i,j] + ranval[i]
-                  amtx[j,i] = amtx[j,i] + ranval[i]
+          for j in range(rating):
+              if (i != j):
+                  if math.fabs(amtx[i,j]) > 1.0e-13:
+                     amtx[i,j] = amtx[i,j] + ranval[i]
   
    q = numpy.sum(amtx, axis=1)
    for i in range(rating):
