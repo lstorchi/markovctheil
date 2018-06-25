@@ -512,6 +512,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      for t in range(tprev):
          outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
     
+     outf.flush()
      outf.close()
    
    acm = numpy.zeros((rating,tprev), dtype='float64')
