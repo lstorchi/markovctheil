@@ -702,19 +702,30 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
       cov = numpy.zeros((rating, rating), dtype='float64')
                   
       #cov = []
-      for i in range(rating):
+      for i in range(0,4): #investment
           #covrow = []
-          for j in range(rating):
+          for j in range(0,4):
              # covrow.append(-2.5e-10)
           #cov.append(covrow)
-               cov[i][j] = 2.5e-10
+               cov[i][j] = 0.25
+
+      for i in range(4,8):
+          for j in range(4,8):
+              cov[i][j] = 0.4
+      
+      for i in range(rating):
+          for j in range(rating):
+              if cov[i][j] == 0.00:
+                  cov[i][j] = 0.1
 
       for i in range(rating):
           for j in range(i+1):
               if i == j:
-                  cov[j][i] = 5e-9 
-              else:
-                  cov[j][i] = cov[i][j]
+                  cov[j][i] = 0.5
+              #elif cov[i][j] == 0.00:
+              #    cov[i][j] = 0.1
+              #else:
+              #    cov[j][i] = cov[i][j]
 
       print cov
 
