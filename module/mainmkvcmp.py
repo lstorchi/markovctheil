@@ -679,37 +679,37 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
       mean = []
       minrow = []
-      maxrow = []
+      #maxrow = []
       for i in range(rating):
           min = float("+inf")
-          max = float("-inf")
+          #max = float("-inf")
           for j in range(rating):
               if (math.fabs(amtx[i,j]) > 1.0e-15):
-                if (amtx[i,j] > max):
-                  max = amtx[i,j]
+               # if (amtx[i,j] > max):
+               #   max = amtx[i,j]
                 if (amtx[i,j] < min):
                   min = amtx[i,j]
 
           minrow.append(min)
-          maxrow.append(max)
+         # maxrow.append(max)
 
           #print -min, max
-          mean.append((max-min)/2.0)
+          mean.append((min-min)/2.0)
           #mean.append(0.0)
 
-      #print mean
+      print mean
                   
       cov = []
       for i in range(rating):
           covrow = []
           for j in range(rating):
-              covrow.append(0.25)
+              covrow.append(-2.5e-10)
           cov.append(covrow)
 
       for i in range(rating):
           for j in range(i+1):
               if i == j:
-                  cov[j][i] = 0.25
+                  cov[j][i] = 5e-9 
               else:
                   cov[j][i] = cov[i][j]
 
@@ -723,8 +723,8 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
           counter = 0
           for i in range(rating):
               min = minrow[i]
-              max = maxrow[i]
-              if (outval[i] >= -min) and (outval[i] <= max):
+              #max = maxrow[i]
+              if (outval[i] >= -min) and (outval[i] <= min):
                   counter = counter + 1
           
           if counter == rating:
@@ -735,7 +735,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
       for i in range(rating):
           for j in range(rating):
-              if (i != j):
+              if (i > j):
                   if math.fabs(amtx[i,j]) > 1.0e-13:
                      amtx[i,j] = amtx[i,j] + ranval[i]
   
