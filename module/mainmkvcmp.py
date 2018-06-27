@@ -698,13 +698,16 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
           #mean.append(0.0)
 
       print mean
+
+      cov = numpy.zeros((rating, rating), dtype='float64')
                   
-      cov = []
+      #cov = []
       for i in range(rating):
-          covrow = []
+          #covrow = []
           for j in range(rating):
-              covrow.append(-2.5e-10)
-          cov.append(covrow)
+             # covrow.append(-2.5e-10)
+          #cov.append(covrow)
+               cov[i][j] = 2.5e-10
 
       for i in range(rating):
           for j in range(i+1):
@@ -713,8 +716,11 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
               else:
                   cov[j][i] = cov[i][j]
 
-      #print cov
+      print cov
 
+      basicutils.mat_to_file (cov, "cov.txt")
+
+    
       ranval = []
       while (True):
           outval = numpy.random.multivariate_normal(mean, cov)
