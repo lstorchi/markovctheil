@@ -118,20 +118,20 @@ for i in range(countries):
         k = k + 1
 """
 
-i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
-msn = numpy.zeros((countries, time-cp) , dtype='int64')
+timet = time - 2927
 
-for i in range(countries):
-    k = 0
-    for j in range(0, time):
-        i_rn[i, k] = i_r[i, j]
-        k = k + 1
+msn = numpy.zeros((countries, timet) , dtype='int64')
+
+i_rn = i_r
 
 for i in range(countries):
     k = 0
     for j in range(2927, time):
         msn[i, k] = ms[i, j]
         k = k + 1
+
+print msn.shape
+print i_rn.shape
 
 rating = numpy.max(ms)
 
