@@ -97,7 +97,8 @@ i_r = bpd[namebp]
 
 countries = ms.shape[0]
 time = ms.shape[1]
- 
+
+"""
 i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
 msn = numpy.zeros((countries, time-cp) , dtype='int64')
 
@@ -112,6 +113,23 @@ for i in range(countries):
     for j in range(cp, time):
         msn[i, k] = ms[i, j]
         k = k + 1
+"""
+
+timet = time - 2927
+
+msn = numpy.zeros((countries, timet) , dtype='int64')
+
+i_rn = i_r
+
+for i in range(countries):
+    k = 0
+    for j in range(2927, time):
+        msn[i, k] = ms[i, j]
+        k = k + 1
+
+print msn.shape
+print i_rn.shape
+
  
 entr=numpy((numofrun, tprev) , dtype='float64')
 entropia = numpy.zeros(tprev, dtype='float64')
