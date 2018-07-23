@@ -100,7 +100,8 @@ i_r = bpd[namebp]
 
 countries = ms.shape[0]
 time = ms.shape[1]
- 
+
+"""
 i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
 msn = numpy.zeros((countries, time-cp) , dtype='int64')
 
@@ -115,7 +116,22 @@ for i in range(countries):
     for j in range(cp, time):
         msn[i, k] = ms[i, j]
         k = k + 1
- 
+"""
+
+i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
+msn = numpy.zeros((countries, time-cp) , dtype='int64')
+
+for i in range(countries):
+    k = 0
+    for j in range(0, time):
+        i_rn[i, k] = i_r[i, j]
+        k = k + 1
+
+for i in range(countries):
+    k = 0
+    for j in range(2927, time):
+        msn[i, k] = ms[i, j]
+        k = k + 1
 
 rating = numpy.max(ms)
 
