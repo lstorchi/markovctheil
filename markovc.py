@@ -113,10 +113,11 @@ for i in range(countries):
         msn[i, k] = ms[i, j]
         k = k + 1
  
-
+entr=numpy((numofrun, tprev) , dtype='float64')
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
-
+skew = numpy.zeros((tprev), dtype='float64')
+kurt = numpy.zeros((tprev), dtype='float64')
 rating = numpy.max(ms)
 
 pr = numpy.zeros((rating,rating), dtype='float64')

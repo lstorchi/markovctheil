@@ -483,7 +483,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
                                math.log(float(countries)/(float(rating)*cont[i, t, run]))
     
            entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
-   
+ 
        if verbose:
            basicutils.progress_bar(run+1, numofrun)
 
@@ -493,6 +493,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
              errmsg.append("Cancelled!")
              return False
    
+       basicutils.mat_to_file(entr, 'markov_entr.txt')
    if verbose:
      print (" ")
    
@@ -501,6 +502,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
        var[t] = numpy.std(entr[t])
+       skew[t] = scipy.stats.skew(entr[t], axis=0, bias =True)
+       kurt[t] = scipy.stats.kurtosis(entr[t], axis=0, fisher=True, bias=False)
 
    if outfiles:
    
@@ -510,7 +513,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      outf = open(oufilename, "w")
   
      for t in range(tprev):
-         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]), skew[t], kurt[t])
     
      outf.flush()
      outf.close()
@@ -707,16 +710,16 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
           for j in range(0,4):
              # covrow.append(-2.5e-10)
           #cov.append(covrow)
-               cov[i][j] = 0.25
+               cov[i][j] = -2.5e-10
 
       for i in range(4,8):
           for j in range(4,8):
-              cov[i][j] = 0.4
+              cov[i][j] = 4e-10
       
       for i in range(rating):
           for j in range(rating):
               if cov[i][j] == 0.00:
-                  cov[i][j] = 0.1
+                  cov[i][j] = 1e-10
 
       for i in range(rating):
           for j in range(i+1):
