@@ -131,7 +131,6 @@ print msn.shape
 print i_rn.shape
 
  
-entr=numpy((numofrun, tprev) , dtype='float64')
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
 skew = numpy.zeros((tprev), dtype='float64')
