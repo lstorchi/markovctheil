@@ -25,6 +25,8 @@ parser.add_argument("-m","--rmat-filename", help="Transition probability matrix 
         type=str, required=True, dest="rmatfilename")
 parser.add_argument("-b", "--imat-filename", help="Rewards matrix filename", \
         type=str, required=True, dest="imatfilename")
+parser.add_argument("-r", "--rmat1-filename", help="rating trajectories matrix to compute spread distribution",\
+        type= str, required=True, dest="rmat1filename")
 parser.add_argument("-s", "--step", help="Bin width ", \
         type=float, required=False, default=0.25, dest="step")
 parser.add_argument("-t", "--time-prev", help="Forecasted period ", \
@@ -35,6 +37,8 @@ parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matr
         type=str, required=False, default="ms", dest="nameofmatrix")
 parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix ", \
         type=str, required=False, default="i_r", dest="nameofbpmatrix")
+parser.add_argument("-R", "--name-of-rm1matrix", help="Name of rating matrix for spread distr",\
+        type=str, required=False, default="rat_spread", dest='nameofmatrix' )
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 parser.add_argument("-c", "--continuous", help="continuous time simulation", \

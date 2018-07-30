@@ -542,7 +542,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
 #####################################################################
 
-def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
+def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
         pr, meanval, stdeval, \
@@ -805,11 +805,13 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    if verbose:
        print "Compute reward matrix"
+   
+   timerw = len(ir(1))
 
-   r = numpy.zeros((countries,time), dtype='float64') 
+   r = numpy.zeros((countries,timerw), dtype='float64') 
    
    for i in range(countries):
-       for j in range(time):
+       for j in range(timerw):
            r[i, j] = ir[i, j] - benchmark[j]
    
    for i in range(len(r)):
@@ -831,8 +833,8 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
 
    for i in range(rating):
        for j in range(countries):
-           for k in range(time):
-               if rm[j, k] == i+1: 
+           for k in range(timerw):
+               if rs[j, k] == i+1: 
                    nn[i] = nn[i] + 1 
                    ist[i, nn[i]-1] = r[j, k]
    
@@ -1176,10 +1178,18 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
        outfp.close()
  
    oufilename = "entropy_"+str(numofrun)+"_"+str(indextoadd)+".txt"
+   
+   entr_tot = []
+   for t in range(tprev):
+       entr_tot.append(entr[t])
+
+   basicutils.mat_to_file(entr_tot, entr_tot.txt)  
 
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
        var[t] = numpy.std(entr[t])
+       skew[t] = scipy.stats.skew(entr[t])
+       kurt[t] = scipy.stats.kurtosis(entr[t], fisher = False)
 
    if outfiles:
    
@@ -1189,7 +1199,7 @@ def main_mkc_comp_cont (rm, ir, timeinf, step, tprev, \
      outf = open(oufilename, "w")
   
      for t in range(tprev):
-         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t], skew[t], kurt[t]))
     
      outf.close()
    
