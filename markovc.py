@@ -95,12 +95,12 @@ if not(namebp in bpd.keys()):
     print (bpd.keys())
     exit(1)
 
-if not(namers in bpd.keys()):
+if not(namers in rsd.keys()):
     print("Cannot find " + namers + "in" + filename3)
-    print (bpd.keys())
+    print (rsd.keys())
     exit(1)
 
-if rsd[namems].shape[0] != bpd[namebp].shape[0]:
+if rsd[namers].shape[0] != bpd[namebp].shape[0]:
     print ("wrong dim of the input matrix rs and bp")
     exit(1)
 
@@ -111,41 +111,24 @@ rs =rsd[namers]
 countries = ms.shape[0]
 time = ms.shape[1]
 
-"""
-i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
-msn = numpy.zeros((countries, time-cp) , dtype='int64')
-
-for i in range(countries):
-    k = 0
-    for j in range(cp, time):
-        i_rn[i, k] = i_r[i, j]
-        k = k + 1
-
-for i in range(countries):
-    k = 0
-    for j in range(cp, time):
-        msn[i, k] = ms[i, j]
-        k = k + 1
-"""
-
-msn = numpy.zeros((countries, time) , dtype='int64')
-
 i_rn = i_r
+#i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
+#for i in range(countries):
+#    k = 0
+#    for j in range(cp, time):
+#        i_rn[i, k] = i_r[i, j]
+#        k = k + 1
 
+
+msn = numpy.zeros((countries, time-cp) , dtype='int64')
 for i in range(countries):
     k = 0
     for j in range(cp, time):
         msn[i, k] = ms[i, j]
         k = k + 1
 
-#print msn.shape
-#print i_rn.shape
-
- 
 entropia = numpy.zeros(tprev, dtype='float64')
 var = numpy.zeros((tprev), dtype='float64')
-skew = numpy.zeros((tprev), dtype='float64')
-kurt = numpy.zeros((tprev), dtype='float64')
 rating = numpy.max(ms)
 
 pr = numpy.zeros((rating,rating), dtype='float64')
@@ -159,7 +142,7 @@ allratingsnins = []
 if continuous:
     time = ms.shape[1]
     pr = numpy.zeros((rating,rating,time), dtype='float64')
-    if not mainmkvcmp.main_mkc_comp_cont (msn, i_rn, timeinf, step, tprev, \
+    if not mainmkvcmp.main_mkc_comp_cont (msn, i_rn, rs, timeinf, step, tprev, \
             numofrun, verbose, True, args.seed, errmsg, entropia, \
             var, allratings, allratingsnins, pr, meanval, stdeval, None):
         for m in errmsg:

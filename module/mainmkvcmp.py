@@ -542,7 +542,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
 #####################################################################
 
-def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
+def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
         pr, meanval, stdeval, \
@@ -554,6 +554,9 @@ def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
    countries = rm.shape[0]
    time = rm.shape[1]
    rating = numpy.max(rm)
+   
+   skew = numpy.zeros((tprev), dtype='float64')
+   kurt = numpy.zeros((tprev), dtype='float64')
 
    if outfiles:
        oufilename = "average_rat_class_hist_"+str(numofrun)+"_"+str(indextoadd)+".txt"
@@ -806,7 +809,7 @@ def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
    if verbose:
        print "Compute reward matrix"
    
-   timerw = len(ir(1))
+   timerw = ir.shape[1]
 
    r = numpy.zeros((countries,timerw), dtype='float64') 
    
@@ -999,7 +1002,7 @@ def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
    if verbose:
        print "Compute historical entropy" 
    
-   for t in range(time):
+   for t in range(timerw):
        for k in range(countries):
            s_t[k, t] = r[k, t] / R_t[t]
            if s_t[k, t] != 0:
@@ -1177,19 +1180,15 @@ def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
            i += 1
        outfp.close()
  
-   oufilename = "entropy_"+str(numofrun)+"_"+str(indextoadd)+".txt"
-   
-   entr_tot = []
-   for t in range(tprev):
-       entr_tot.append(entr[t])
-
-   basicutils.mat_to_file(entr_tot, entr_tot.txt)  
+   basicutils.mat_to_file(entr, "entr_tot.txt")  
 
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
        var[t] = numpy.std(entr[t])
        skew[t] = scipy.stats.skew(entr[t])
        kurt[t] = scipy.stats.kurtosis(entr[t], fisher = False)
+
+   oufilename = "entropy_"+str(numofrun)+"_"+str(indextoadd)+".txt"
 
    if outfiles:
    
@@ -1199,7 +1198,7 @@ def main_mkc_comp_cont (rm, ir,rs, timeinf, step, tprev, \
      outf = open(oufilename, "w")
   
      for t in range(tprev):
-         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t], skew[t], kurt[t]))
+         outf.write("%d %.10e %.10e %.10e %.10e\n"%(t+1, entropia[t], var[t], skew[t], kurt[t]))
     
      outf.close()
    
