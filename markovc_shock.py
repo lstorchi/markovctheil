@@ -84,6 +84,10 @@ if not (os.path.isfile(filename2)):
     print("File " + filename2 + " does not exist ")
     exit(1)
 
+if not (os.path.isfile(filename3)):
+    print("File " + filename3 + " does not exist ")
+    exit(1)
+
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
 rsd = scipy.io.loadmat(filename3)
@@ -103,14 +107,13 @@ if not(namers in rsd.keys()):
     print (rsd.keys())
     exit(1)
 
-
 if rsd[namers].shape[0] != bpd[namebp].shape[0]:
     print ("wrong dim of the input matrix")
     exit(1)
 
 ms = msd[namems]
 i_r = bpd[namebp]
-rs =rsd[namers]
+rs = rsd[namers]
 
 countries = ms.shape[0]
 time = ms.shape[1]
@@ -176,13 +179,16 @@ if continuous:
     var_vct = []
     for index in range(0,numofshock):
         infilename = "entropy_"+str(numofrun)+"_"+str(index)+".txt"
-        fp = open(infilename, "r")
-        ent = []
-        for l in fp:
-            if len(l.split()) == 3:
-                ent.append(float(l.split()[1]))
-        fp.close()
-        entropia_vct.append(ent)
+        if (os.path.isfile(infilename)):
+            fp = open(infilename, "r")
+            ent = []
+            for l in fp:
+                if len(l.split()) == 3:
+                    ent.append(float(l.split()[1]))
+            fp.close()
+            entropia_vct.append(ent)
+        else:
+            print "Missed file ", infilename
 
 
     fp = open("markovtheil_entropy.txt", "w")

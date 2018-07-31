@@ -81,6 +81,10 @@ if not (os.path.isfile(filename2)):
     print("File " + filename2 + " does not exist ")
     exit(1)
 
+if not (os.path.isfile(filename3)):
+    print("File " + filename3 + " does not exist ")
+    exit(1)
+
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
 rsd = scipy.io.loadmat(filename3)
