@@ -114,9 +114,9 @@ def generate_mc (mc, tprev, countries, cdf, rating, q):
        
 #####################################################################
 
-def main_mkc_comp (rm, ir, timeinf, step, tprev, \
+def main_mkc_comp (rm, ir, rs, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
-        entropia, var, allratings, allratingsbins, \
+        entropia, var,  allratings, allratingsbins, \
         pr, meanval, stdeval, \
         setval=None):
 
@@ -126,7 +126,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    countries = rm.shape[0]
    rating = numpy.max(rm)
    time = rm.shape[1]
-   
+  
+   skew = numpy.zeros((tprev), dtype='float64')
+   kurt = numpy.zeros((tprev), dtype='float64')
+
    if (rating <= 0) or (rating > 8):
        errmsg.append("rating " + rating + " is not a valid value")
        return False
@@ -204,6 +207,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
        print (" ")
        print ("mean value: ", numpy.mean(v))
    
+   timerw = ir.shape[1]
+
    for i in range(len(ir)):
        for j in range(len(ir[0])):
            if math.isnan(ir[i, j]):
@@ -211,10 +216,10 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    benchmark = numpy.amin(ir, 0)
    
-   r = numpy.zeros((countries,time), dtype='float64') 
+   r = numpy.zeros((countries,timerw), dtype='float64') 
    
    for i in range(countries):
-       for j in range(time):
+       for j in range(timerw):
            r[i, j] = ir[i, j] - benchmark[j]
    
    for i in range(len(r)):
@@ -222,7 +227,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
            if (r[i, j] == float('Inf')):
               r[i, j] = float('nan')
    
-   ist = numpy.zeros((rating,time*countries), dtype='float64')
+   ist = numpy.zeros((rating,timerw*countries), dtype='float64')
    nn = numpy.zeros((rating), dtype='int')
 
    if setval != None:
@@ -233,8 +238,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    for i in range(rating):
        for j in range(countries):
-           for k in range(time):
-               if rm[j, k] == i+1: 
+           for k in range(timerw):
+               if rs[j, k] == i+1: 
                    nn[i] = nn[i] + 1 
                    ist[i, nn[i]-1] = r[j, k]
    
@@ -382,7 +387,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
      outf.close()
    
-   s_t = numpy.zeros((countries,time), dtype='float64')
+   s_t = numpy.zeros((countries,timerw), dtype='float64')
    
    for i in range(r.shape[0]):
        for j in range(r.shape[1]):
@@ -390,9 +395,9 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
                r[i, j] = 0.0
    
    R_t = numpy.sum(r, axis=0)
-   T_t = numpy.zeros(time, dtype='float64')
+   T_t = numpy.zeros(timerw, dtype='float64')
    
-   for t in range(time):
+   for t in range(timerw):
        for k in range(countries):
            s_t[k, t] = r[k, t] / R_t[t]
            if s_t[k, t] != 0:
@@ -513,8 +518,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      outf = open(oufilename, "w")
   
      for t in range(tprev):
-         outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]), skew[t], kurt[t])
-    
+         outf.write("%d %.10e %.10e %.10e %.10e\n"%(t+1, entropia[t], var[t], skew[t], kurt[t]))    
      outf.flush()
      outf.close()
    
@@ -544,7 +548,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
 def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
-        entropia, var, allratings, allratingsbins, \
+        entropia, var,  allratings, allratingsbins, \
         pr, meanval, stdeval, \
         setval=None, indextoadd=0, addshock=False):
 
@@ -735,7 +739,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
 
       basicutils.mat_to_file (cov, "cov.txt")
 
-    
+      print cov  
       ranval = []
       while (True):
           outval = numpy.random.multivariate_normal(mean, cov)
@@ -820,7 +824,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
            if (r[i, j] == float('Inf')):
               r[i, j] = float('nan')
    
-   ist = numpy.zeros((rating,time*countries), dtype='float64')
+   ist = numpy.zeros((rating,timerw*countries), dtype='float64')
    nn = numpy.zeros((rating), dtype='int')
 
    if setval != None:
@@ -987,7 +991,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
    
      outf.close()
    
-   s_t = numpy.zeros((countries,time), dtype='float64')
+   s_t = numpy.zeros((countries,timerw), dtype='float64')
    
    for i in range(r.shape[0]):
        for j in range(r.shape[1]):
@@ -995,7 +999,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
                r[i, j] = 0.0
    
    R_t = numpy.sum(r, axis=0)
-   T_t = numpy.zeros(time, dtype='float64')
+   T_t = numpy.zeros(timerw, dtype='float64')
 
    if verbose:
        print "Compute historical entropy" 
@@ -1178,7 +1182,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
            i += 1
        outfp.close()
  
-   #basicutils.mat_to_file(entr, "entr_tot.txt")  
+   basicutils.mat_to_file(entr, "entr_tot.txt")  
 
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])

@@ -162,7 +162,7 @@ if continuous:
 
     index = 0
     p = Process(target=mainmkvcmp.main_mkc_comp_cont, \
-          args=(msn, i_rn, timeinf, step, tprev, \
+          args=(msn, i_rn, rs, timeinf, step, tprev, \
           numofrun, verbose, True, args.seed, errmsg, entropia, \
           var, allratings, allratingsnins, pr, meanval, stdeval, None, \
           index, False))

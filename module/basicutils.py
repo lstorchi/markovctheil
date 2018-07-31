@@ -56,7 +56,7 @@ def mat_to_file (bpm, oufilename):
 
     for i in range(bpm.shape[0]):
         for j in range(bpm.shape[1]):
-            outf.write(" %10.5f "%(bpm[i, j]))
+            outf.write(" %10.7f "%(bpm[i, j]))
         outf.write("\n")
         
     outf.close()
