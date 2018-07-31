@@ -25,8 +25,8 @@ parser.add_argument("-m","--rmat-filename", help="Transition probability matrix 
         type=str, required=True, dest="rmatfilename")
 parser.add_argument("-b", "--imat-filename", help="Rewards matrix filename", \
         type=str, required=True, dest="imatfilename")
-parser.add_argument("-r", "--rmat1-filename", help="rating trajectories matrix to compute spread distribution",\
-        type= str, required=True, dest="rmat1filename")
+parser.add_argument("-r", "--rsmat-filename", help="rating trajectories matrix to compute spread distribution",\
+        type= str, required=True, dest="rsmatfilename")
 parser.add_argument("-s", "--step", help="Bin width ", \
         type=float, required=False, default=0.25, dest="step")
 parser.add_argument("-t", "--time-prev", help="Forecasted period ", \
@@ -37,8 +37,8 @@ parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matr
         type=str, required=False, default="ms", dest="nameofmatrix")
 parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix ", \
         type=str, required=False, default="i_r", dest="nameofbpmatrix")
-parser.add_argument("-R", "--name-of-rm1matrix", help="Name of rating matrix for spread distr",\
-        type=str, required=False, default="rat_spread", dest='nameofmatrix' )
+parser.add_argument("-R", "--name-of-rsmatrix", help="Name of rating matrix for spread distr",\
+        type=str, required=False, default="rs", dest='nameofrsmatrix' )
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 parser.add_argument("-c", "--continuous", help="continuous time simulation", \
@@ -66,11 +66,13 @@ verbose = args.verbose
 continuous = args.continuous 
 filename1 = args.rmatfilename
 filename2 = args.imatfilename
+filename3 = args.rsmatfilename
 step = args.step
 tprev = args.tprev
 numofrun = args.maxrun
 namems = args.nameofmatrix
 numofshock = args.numofshock
+namers = args.nameofrsmatrix
 
 errmsg = []
 
@@ -84,6 +86,7 @@ if not (os.path.isfile(filename2)):
 
 msd = scipy.io.loadmat(filename1)
 bpd = scipy.io.loadmat(filename2)
+rsd = scipy.io.loadmat(filename3)
 
 if not(namems in msd.keys()):
     print ("Cannot find " + namems + " in " + filename1)
@@ -95,60 +98,52 @@ if not(namebp in bpd.keys()):
     print (bpd.keys())
     exit(1)
 
-if msd[namems].shape[0] != bpd[namebp].shape[0]:
+if not(namers in rsd.keys()):
+    print("Cannot find " + namers + "in" + filename3)
+    print (rsd.keys())
+    exit(1)
+
+
+if rsd[namers].shape[0] != bpd[namebp].shape[0]:
     print ("wrong dim of the input matrix")
     exit(1)
 
 ms = msd[namems]
 i_r = bpd[namebp]
+rs =rsd[namers]
 
 countries = ms.shape[0]
 time = ms.shape[1]
 
-"""
-i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
+
+i_rn = i_r
+#i_rn = numpy.zeros((countries, time-cp) , dtype='float64')
+#for i in range(countries):
+#    k = 0
+#    for j in range(cp, time):
+#        i_rn[i, k] = i_r[i, j]
+#        k = k + 1
+
 msn = numpy.zeros((countries, time-cp) , dtype='int64')
 
 for i in range(countries):
     k = 0
     for j in range(cp, time):
-        i_rn[i, k] = i_r[i, j]
-        k = k + 1
-
-for i in range(countries):
-    k = 0
-    for j in range(cp, time):
-        msn[i, k] = ms[i, j]
-        k = k + 1
-"""
-
-timet = time - 2927
-
-msn = numpy.zeros((countries, timet) , dtype='int64')
-
-i_rn = i_r
-
-for i in range(countries):
-    k = 0
-    for j in range(2927, time):
         msn[i, k] = ms[i, j]
         k = k + 1
 
-print msn.shape
-print i_rn.shape
 
+entropia = numpy.zeros(tprev, dtype='float64')
+var = numpy.zeros((tprev), dtype='float64')
 rating = numpy.max(ms)
 
 pr = numpy.zeros((rating,rating), dtype='float64')
- 
+  
 meanval = []
 stdeval = []
  
 allratings = []
 allratingsnins = []
-
-entropia = numpy.zeros(tprev, dtype='float64')
-var = numpy.zeros((tprev), dtype='float64')
 
 if continuous:
     time = ms.shape[1]
@@ -158,7 +153,7 @@ if continuous:
 
     for index in range(1,numofshock):
         p = Process(target=mainmkvcmp.main_mkc_comp_cont, \
-              args=(msn, i_rn, timeinf, step, tprev, \
+              args=(msn, i_rn, rs, timeinf, step, tprev, \
               numofrun, verbose, True, args.seed, errmsg, entropia, \
               var, allratings, allratingsnins, pr, meanval, stdeval, None, \
               index, True))

@@ -708,32 +708,30 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
       cov = numpy.zeros((rating, rating), dtype='float64')
                   
       #cov = []
-      for i in range(0,4): #investment
+      #for i in range(0,4): #investment
           #covrow = []
-          for j in range(0,4):
+      #    for j in range(0,4):
              # covrow.append(-2.5e-10)
           #cov.append(covrow)
-               cov[i][j] = -2.5e-10
+     #          cov[i][j] = 2.5e-10
 
-      for i in range(4,8):
-          for j in range(4,8):
-              cov[i][j] = 4e-10
+     # for i in range(4,8):
+     #     for j in range(4,8):
+     #         cov[i][j] = 2.5e-10
       
-      for i in range(rating):
-          for j in range(rating):
-              if cov[i][j] == 0.00:
-                  cov[i][j] = 1e-10
+     # for i in range(rating):
+     #     for j in range(rating):
+     #         if cov[i][j] == 0.00:
+     #             cov[i][j] = 1e-10
 
       for i in range(rating):
           for j in range(i+1):
               if i == j:
-                  cov[j][i] = 0.5
+                  cov[j][i] = 2.5e-10
               #elif cov[i][j] == 0.00:
               #    cov[i][j] = 0.1
               #else:
               #    cov[j][i] = cov[i][j]
-
-      print cov
 
       basicutils.mat_to_file (cov, "cov.txt")
 
@@ -1180,7 +1178,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
            i += 1
        outfp.close()
  
-   basicutils.mat_to_file(entr, "entr_tot.txt")  
+   #basicutils.mat_to_file(entr, "entr_tot.txt")  
 
    for t in range(tprev):
        entropia[t] =numpy.mean(entr[t])
