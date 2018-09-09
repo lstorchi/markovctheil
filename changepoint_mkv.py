@@ -43,8 +43,9 @@ L, L1, L2, pr1 = changemod.compute_ls(rm, c_p, errmsg)
 if (L == None):
     print errmsg
     exit(1)
+summa = L1 + L2
 
-#print L, L1, L2
+print L, L1, L2, summa 
 lamda = 2.0*((L1+L2)-L)
 
 maxrat = -1.0 * float("inf")
