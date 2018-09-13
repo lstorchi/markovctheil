@@ -288,7 +288,7 @@ class main_window(QtGui.QMainWindow):
         
         if self.__entropiadone__ :
             self.__ax__  = self.__figure__.add_subplot(111)
-            self.__ax__.hold(False)
+            #self.__ax__.hold(False)
             self.__ax__.plot(x, y, '*-')
             #self.__ax__.scatter(x, y)
             self.__ax__.set_xlabel('Time')
