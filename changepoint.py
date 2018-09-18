@@ -50,7 +50,7 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 
 if not (os.path.isfile(args.rmatfilename)):
-    errmsg.append("File " + args.rmatfilename + " does not exist ")
+    print "File " + args.rmatfilename + " does not exist "
     exit(1)
 
 msd = scipy.io.loadmat(args.rmatfilename)
@@ -64,8 +64,6 @@ ms = msd[args.nameofmatrix]
 
 rating = numpy.max(ms)
 time = ms.shape[1]
-
-errmsg = ""
 
 fp = open(args.outf, "w")
 
@@ -94,10 +92,10 @@ if (args.numofcp == 1):
         start = tempo.time()
         cstart = tempo.clock()
 
-        L1, L2 = changemod.compute_cps(ms, errmsg, c_p)
-                
-        if (L1 == None):
-            print errmsg
+        try:
+            L1, L2 = changemod.compute_cps(ms, c_p)
+        except changemod.Error:
+            print "Oops! error in the main function" 
             exit(1)
 
         if (maxval < L1+L2):
@@ -153,12 +151,12 @@ elif (args.numofcp == 2):
                start = tempo.time()
                cstart = tempo.clock()
 
-               L1, L2, L3 = changemod.compute_cps(ms, errmsg, c_p1, c_p2)
-                   
-               if (L1 == None):
-                   print errmsg
+               try:
+                   L1, L2, L3 = changemod.compute_cps(ms, c_p1, c_p2)
+               except changemod.Error:
+                   print "Oops! error in the main function" 
                    exit(1)
-       
+ 
                if (maxval < L1+L2+L3):
                    maxval = L1 + L2 + L3
                    cp1 = c_p1
@@ -230,10 +228,10 @@ elif (args.numofcp == 2):
                start = tempo.time()
                cstart = tempo.clock()
 
-               L1, L2, L3 = changemod.compute_cps(ms, errmsg, c_p1, c_p2)
-                   
-               if (L1 == None):
-                   print errmsg
+               try:
+                   L1, L2, L3 = changemod.compute_cps(ms, c_p1, c_p2)
+               except changemod.Error:
+                   print "Oops! error in the main function" 
                    exit(1)
        
                if (maxval < L1+L2+L3):
@@ -295,10 +293,10 @@ elif (args.numofcp == 3):
                    start = tempo.time()
                    cstart = tempo.clock()
 
-                   L1, L2, L3, L4 = changemod.compute_cps(ms, errmsg, c_p1, c_p2, c_p3)
-                       
-                   if (L1 == None):
-                       print errmsg
+                   try:
+                       L1, L2, L3, L4 = changemod.compute_cps(ms, c_p1, c_p2, c_p3)
+                   except changemod.Error:
+                       print "Oops! error in the main function" 
                        exit(1)
                    
                    if (maxval < L1+L2+L3+L4):
@@ -396,13 +394,13 @@ elif (args.numofcp == 3):
                    start = tempo.time()
                    cstart = tempo.clock()
 
-                   L1, L2, L3, L4 = changemod.compute_cps(ms, errmsg, 
+                   try:
+                       L1, L2, L3, L4 = changemod.compute_cps(ms,  
                            c_p1, c_p2, c_p3)
-                       
-                   if (L1 == None):
-                       print errmsg
+                   except changemod.Error:
+                       print "Oops! error in the main function" 
                        exit(1)
-                   
+ 
                    if (maxval < L1+L2+L3+L4):
                        maxval = L1 + L2 + L3 + L4
                        cp1 = c_p1

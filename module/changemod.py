@@ -6,15 +6,18 @@ import basicutils
 
 ###############################################################################
 
-def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
+class Error(Exception):
+    """Base class for exceptions in this module."""
+    pass
+
+def compute_cps (rm, c_p1, c_p2 = -1, c_p3 = -1):
 
     countries=rm.shape[0]
     rating=numpy.max(rm)
     time=rm.shape[1]
 
     if (rating <= 0) or (rating > 8):
-        errmsg.append("rating " + rating + " is not a valid value")
-        return None, 
+        raise Error ("rating " + rating + " is not a valid value")
 
     if c_p1 > 0:
         num1 = numpy.zeros((rating,rating), dtype='int64')
@@ -140,7 +143,7 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
  
             return L1, L2
 
-    return None, 
+    raise "at least cp1 should be > 0"
 
 ###############################################################################
 
