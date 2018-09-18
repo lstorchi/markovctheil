@@ -19,7 +19,6 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
     if c_p1 > 0:
         num1 = numpy.zeros((rating,rating), dtype='int64')
         den1 = numpy.zeros(rating, dtype='int64')
-        pr1 = numpy.zeros((rating,rating),dtype='float64')
         
         L1 = 0.0 
         
@@ -40,7 +39,6 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
 
         num2 = numpy.zeros((rating,rating), dtype='int64')
         den2 = numpy.zeros(rating, dtype='int64')
-        pr2 = numpy.zeros((rating,rating),dtype='float64')
          
         L2 = 0.0 
         
@@ -63,7 +61,6 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
             
             num3 = numpy.zeros((rating,rating), dtype='int64')
             den3 = numpy.zeros(rating, dtype='int64')
-            pr3 = numpy.zeros((rating,rating),dtype='float64')
              
             L3 = 0.0 
 
@@ -87,7 +84,6 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
                 
                 num4 = numpy.zeros((rating,rating), dtype='int64')
                 den4 = numpy.zeros(rating, dtype='int64')
-                pr4 = numpy.zeros((rating,rating),dtype='float64')
                  
                 L4 = 0.0 
                 
@@ -105,7 +101,7 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
                             if (val > 0.0):
                                 L4 += num4[i,j]*math.log(val) 
                 
-                return L1, pr1, L2, pr2, L3, pr3, L4, pr4
+                return L1, L2, L3, L4
 
             else:
                 for i in range(rating):
@@ -123,7 +119,7 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
                             if (val > 0.0):
                                 L3 += num3[i,j]*math.log(val) 
 
-                return L1, pr1, L2, pr2, L3, pr3 
+                return L1, L2, L3 
 
         else:
 
@@ -142,7 +138,7 @@ def compute_cps (rm, errmsg, c_p1, c_p2 = -1, c_p3 = -1):
                         if (val > 0.0):
                             L2 += num2[i,j]*math.log(val) 
  
-            return L1, pr1, L2, pr2
+            return L1, L2
 
     return None, 
 
