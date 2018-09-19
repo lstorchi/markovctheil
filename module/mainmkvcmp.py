@@ -15,6 +15,8 @@ import matplotlib.pyplot as plt
 
 import basicutils
 
+#####################################################################
+
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
@@ -434,3 +436,46 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      basicutils.mat_to_file (bpm, oufilename)
 
    return True
+
+#####################################################################
+
+def main_mkc_prop (rm, pr):
+
+   countries = rm.shape[0]
+   rating = numpy.max(rm)
+   time = rm.shape[1]
+
+   cdf = numpy.zeros((rating,rating), dtype='float64')
+
+   for i in range (rating):
+       cdf[i, 0] = pr[i, 0]
+   
+   for i in range(rating):
+       for j in range(1,rating):
+           cdf[i, j] = pr[i, j] + cdf[i, j-1]
+
+   x = numpy.zeros((countries,time), dtype='int')
+   xi = numpy.random.rand(countries,time)
+   
+   for c in range(countries):
+       x[c, 0] = rm[c, 0]
+   
+   for c in range(countries):
+       if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
+           x[c, 1] = 1
+   
+       for k in range(1,rating):
+           if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
+                   (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
+              x[c, 1] = k + 1
+   
+       for t in range(2,time):
+           if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
+               x[c, t] = 1
+   
+           for k in range(1,rating):
+               if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
+                       and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
+                 x[c, t] = k + 1
+   
+   return x
