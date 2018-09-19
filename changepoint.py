@@ -38,10 +38,9 @@ parser.add_argument("--cp3-start", help="CP 3 start from (default: 1)", \
 parser.add_argument("--cp3-stop", help="CP 3 stop  (default: -1 i.e. will stop at maximum time)", \
         type=int, required=False, default=-1, dest="cp3stop")
 
-parser.add_argument("--delta-cp", help="DElta time between CPs (default: 0) " + 
-        "if delta > 0 cp2 and cp3 start and stop values wont be used ", \
-        type=int, required=False, default=0, dest="deltacp")
-
+parser.add_argument("--delta-cp", help="Delta time between CPs (default: 1 no delta)" + 
+        "if delta <= 0 will use cp2 and cp3 start and stop values", \
+        type=int, required=False, default=1, dest="deltacp")
 
 if len(sys.argv) == 1:
     parser.print_help()
@@ -123,7 +122,7 @@ elif (args.numofcp == 2):
     cp1 = 0
     cp2 = 0
 
-    if args.deltacp  > 0:
+    if args.deltacp > 0:
 
        cp1stop = time-1
 
@@ -262,7 +261,7 @@ elif (args.numofcp == 3):
     cp2 = 0
     cp3 = 0
 
-    if args.deltacp  > 0:
+    if args.deltacp > 0:
 
        cp1stop = time-1
 
