@@ -9,6 +9,7 @@ import os.path
 sys.path.append("./module")
 import changemod
 import basicutils
+import mainmkvcmp
 
 parser = argparse.ArgumentParser()
 
@@ -42,9 +43,9 @@ parser.add_argument("--delta-cp", help="Delta time between CPs (default: 1 no de
         "if delta <= 0 will use cp2 and cp3 start and stop values", \
         type=int, required=False, default=1, dest="deltacp")
 
-parser.add_argument("--perform-test", help="Perfom Lamda test for the specified cp "+
-        "(default: -1 i.e. no test is performed)", 
-        required=False, type=int, default=-1, dest="performtest")
+parser.add_argument("--perform-test", help="Perfom Lamda test for the specified cp;num_of_run "+
+        "(default: \"-1;0\" i.e. no test is performed)", 
+        required=False, type=str, default="-1;0", dest="performtest")
 
 
 if len(sys.argv) == 1:
@@ -71,15 +72,46 @@ time = ms.shape[1]
 
 fp = open(args.outf, "w")
 
-maxval = -1.0 * float("inf")
+cp_fortest = int(args.performtest.split(";")[0])
+num_of_run = int(args.performtest.split(";")[1])
 
-if args.performtest >= 0:
+if cp_fortest >= 0 and num_of_run >= 0:
 
-    L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, 
-            args.performtest, True)
+    L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, cp_fortest, True)
 
+    lambdas = []
+
+    for i in range(num_of_run):
+        x = mainmkvcmp.main_mkc_prop (ms, pr1)
+
+        L, L1, L2, pr1_o, pr2_o = changemod.compute_cps(x, cp_fortest, True)
+
+        lamda = 2.0*((L1+L2)-L)
+
+        lambdas.append(lamda) 
+
+        fp.write(str(i+1) + " " + str(lamda) + "\n") 
+
+    idx95 = int(num_of_run*0.95+0.5)
+
+    lamda95 = lambdas[idx95]
+
+    minrat = numpy.min(ms)
+    maxrat = numpy.max(ms)
+
+    ndof = (maxrat - minrat + 1) * (maxrat - minrat)
+
+    chi2 = scipy.stats.chi2.isf(0.05, ndof)
+    pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
+
+    print "Ndof       : ", ndof
+    print "Lamda(95%) : ", lamda95
+    print "Chi2       : ", chi2
+    print "P-Value    : ", pvalue
 
 else:
+
+    maxval = -1.0 * float("inf")
 
     if (args.numofcp == 1):
     
@@ -438,4 +470,4 @@ else:
            print ""
            print "Change Point: ", cp1, " , ", cp2 , " ", cp3, " (",maxval, ")"
     
-    fp.close()
+fp.close()
