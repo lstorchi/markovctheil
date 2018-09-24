@@ -79,6 +79,22 @@ if cp_fortest >= 0 and num_of_run >= 0:
 
     L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, cp_fortest, True)
 
+    lambdastart = 2.0*((L1+L2)-L)
+
+    positive1 = 0
+    for i in range(pr1.shape[0]):
+        for j in range(pr1.shape[1]):
+            if i != j:
+                if pr1[i, j] > 0.0:
+                    positive1 += 1
+
+    positive2 = 0
+    for i in range(pr2.shape[0]):
+        for j in range(pr2.shape[1]):
+            if i != j:
+                if pr2[i, j] > 0.0:
+                    positive2 += 1
+
     lambdas = []
 
     for i in range(num_of_run):
@@ -99,10 +115,14 @@ if cp_fortest >= 0 and num_of_run >= 0:
     minrat = numpy.min(ms)
     maxrat = numpy.max(ms)
 
-    ndof = (maxrat - minrat + 1) * (maxrat - minrat)
+    #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
+    ndof = max (positive1, positive2)
 
     chi2 = scipy.stats.chi2.isf(0.05, ndof)
-    pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
+    #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
+
+    pvalue = (1.0 / numpy.float64(num_of_run + 1)) * \
+            (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
 
     print "Ndof       : ", ndof
     print "Lamda(95%) : ", lamda95
