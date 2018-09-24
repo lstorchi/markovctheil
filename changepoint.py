@@ -77,6 +77,8 @@ num_of_run = int(args.performtest.split(";")[1])
 
 if cp_fortest >= 0 and num_of_run >= 0:
 
+    print "Startint CP test..."
+
     L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, cp_fortest, True)
 
     lambdastart = 2.0*((L1+L2)-L)
@@ -97,7 +99,13 @@ if cp_fortest >= 0 and num_of_run >= 0:
 
     lambdas = []
 
+    print "Starting iterations..."
+
     for i in range(num_of_run):
+
+        start = tempo.time()
+        cstart = tempo.clock()
+ 
         x = mainmkvcmp.main_mkc_prop (ms, pr1)
 
         L, L1, L2, pr1_o, pr2_o = changemod.compute_cps(x, cp_fortest, True)
@@ -108,7 +116,17 @@ if cp_fortest >= 0 and num_of_run >= 0:
 
         fp.write(str(i+1) + " " + str(lamda) + "\n") 
 
+        end = tempo.time()
+        cend = tempo.clock()
+    
+        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(i+1 , num_of_run, 
+                 end - start, cend - cstart)
+ 
+
     idx95 = int(num_of_run*0.95+0.5)
+
+    if idx95 >= num_of_run:
+        idx95 = num_of_run - 1
 
     lamda95 = lambdas[idx95]
 
