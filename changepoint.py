@@ -43,8 +43,8 @@ parser.add_argument("--delta-cp", help="Delta time between CPs (default: 1 no de
         "if delta <= 0 will use cp2 and cp3 start and stop values", \
         type=int, required=False, default=1, dest="deltacp")
 
-parser.add_argument("--perform-test", help="Perfom Lamda test for the specified cp;num_of_run "+
-        "(default: \"-1;0\" i.e. no test is performed)", 
+parser.add_argument("--perform-test", help="Perfom Lambda test for the specified cp1:cp2;cp3;num_of_run "+
+        "(default: \"-1;0\" i.e. no test is performed) will use also cp2 and cp3 if --numof-cp is equal to 2 or 3", 
         required=False, type=str, default="-1;0", dest="performtest")
 
 
@@ -72,30 +72,61 @@ time = ms.shape[1]
 
 fp = open(args.outf, "w")
 
-cp_fortest = int(args.performtest.split(";")[0])
-num_of_run = int(args.performtest.split(";")[1])
+cp_fortest = -1
+num_of_run = 0
+cp_fortest_2 = -1
+cp_fortest_3 = -1
+
+if args.numofcp == 1:
+    if len(args.performtest.split(";")) != 2:
+        print "Error in --perform-test option"
+        exit(1)
+
+    cp_fortest = int(args.performtest.split(";")[0])
+    num_of_run = int(args.performtest.split(";")[1])
+elif args.numofcp == 2:
+    if len(args.performtest.split(";")) != 3:
+        print "Error in --perform-test option"
+        exit(1)
+ 
+    cp_fortest = int(args.performtest.split(";")[0])
+    cp_fortest_2 = int(args.performtest.split(";")[1])
+    num_of_run = int(args.performtest.split(";")[2])
+elif args.numofcp == 3:
+    if len(args.performtest.split(";")) != 4:
+        print "Error in --perform-test option"
+        exit(1)
+ 
+    cp_fortest = int(args.performtest.split(";")[0])
+    cp_fortest_2 = int(args.performtest.split(";")[1])
+    cp_fortest_3 = int(args.performtest.split(";")[2])
+    num_of_run = int(args.performtest.split(";")[3])
 
 if cp_fortest >= 0 and num_of_run >= 0:
 
     print "Startint CP test..."
 
-    L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, cp_fortest, True)
+    L = 0.0
+    L1 = 0.0
+    L2 = 0.0
+    L3 = 0.0
+    L4 = 0.0
 
-    lambdastart = 2.0*((L1+L2)-L)
+    pr1 = 0.0
+    lambdastart = 0.0
 
-    positive1 = 0
-    for i in range(pr1.shape[0]):
-        for j in range(pr1.shape[1]):
-            if i != j:
-                if pr1[i, j] > 0.0:
-                    positive1 += 1
-
-    positive2 = 0
-    for i in range(pr2.shape[0]):
-        for j in range(pr2.shape[1]):
-            if i != j:
-                if pr2[i, j] > 0.0:
-                    positive2 += 1
+    if args.numofcp == 1:
+        L, L1, L2, pr1, pr2 = changemod.compute_cps(ms, cp_fortest, True)
+        lambdastart = 2.0*((L1+L2)-L)
+    elif args.numofcp == 2:
+        L, L1, L2, L3, pr1, pr2, pr3 = \
+        changemod.compute_cps(ms, cp_fortest, True, cp_fortest_2)
+        lambdastart = 2.0*((L1+L2+L3)-L)
+    elif args.numofcp == 3:
+        L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
+                changemod.compute_cps(ms, cp_fortest, True, \
+                cp_fortest_2, cp_fortest_3)
+        lambdastart = 2.0*((L1+L2+L3+L4)-L)
 
     lambdas = []
 
@@ -108,13 +139,26 @@ if cp_fortest >= 0 and num_of_run >= 0:
  
         x = mainmkvcmp.main_mkc_prop (ms, pr1)
 
+        lambdav = 0.0
+
         L, L1, L2, pr1_o, pr2_o = changemod.compute_cps(x, cp_fortest, True)
 
-        lamda = 2.0*((L1+L2)-L)
+        if args.numofcp == 1:
+            L, L1, L2, pr1_o, pr2_o = changemod.compute_cps(x, cp_fortest, True)
+            lambdav = 2.0*((L1+L2)-L)
+        elif args.numofcp == 2:
+            L, L1, L2, L3, pr1_o, pr2_o, pr3_o = \
+            changemod.compute_cps(x, cp_fortest, True, cp_fortest_2)
+            lambdav = 2.0*((L1+L2+L3)-L)
+        elif args.numofcp == 3:
+            L, L1, L2, L3, L4, pr1_o, pr2_o, pr3_o, pr4_o = \
+                    changemod.compute_cps(x, cp_fortest, True, \
+                    cp_fortest_2, cp_fortest_3)
+            lambdav = 2.0*((L1+L2+L3+L4)-L)
 
-        lambdas.append(lamda) 
+        lambdas.append(lambdav) 
 
-        fp.write(str(i+1) + " " + str(lamda) + "\n") 
+        fp.write(str(i+1) + " " + str(lambdav) + "\n") 
 
         end = tempo.time()
         cend = tempo.clock()
@@ -134,18 +178,18 @@ if cp_fortest >= 0 and num_of_run >= 0:
     maxrat = numpy.max(ms)
 
     #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
-    ndof = max (positive1, positive2)
+    #ndof = max (positive1, positive2)
 
-    chi2 = scipy.stats.chi2.isf(0.05, ndof)
+    #chi2 = scipy.stats.chi2.isf(0.05, ndof)
     #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
 
     pvalue = (1.0 / numpy.float64(num_of_run + 1)) * \
             (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
 
-    print "Ndof       : ", ndof
-    print "Lamda(95%) : ", lamda95
-    print "Chi2       : ", chi2
-    print "P-Value    : ", pvalue
+    #print "Ndof        : ", ndof
+    print "Lambda(95%) : ", lamda95
+    print "Lambda      : ", lambdastart
+    print "P-Value     : ", pvalue
 
 else:
 

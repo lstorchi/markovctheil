@@ -24,15 +24,10 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
         pr = 0
         pr1 = 0
         pr2 = 0
+        pr3 = 0
+        pr4 = 0
 
         if performtest:
-
-            if c_p2 > 0:
-                raise Error ("if performtest is True c_p2 must be < 0")
-
-            if c_p3 > 0:
-                raise Error ("if performtest is True c_p3 must be < 0")
-
             pr = numpy.zeros((rating,rating),dtype='float64')
             pr1 = numpy.zeros((rating,rating),dtype='float64')
             pr2 = numpy.zeros((rating,rating),dtype='float64')
@@ -103,8 +98,11 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
         den2 = numpy.zeros(rating, dtype='int64')
          
         L2 = 0.0 
-        
+       
         if c_p2 > 0:
+
+            if performtest:
+                pr3 = numpy.zeros((rating,rating),dtype='float64')
            
             for i in range(rating):
                  for j in range(rating):
@@ -120,15 +118,27 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
                         val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
                         if (val > 0.0):
                             L2 += num2[i,j]*math.log(val) 
-            
+
+            if performtest:
+
+                 for i in range(rating):
+                     for j in range(rating):
+                         if den2[i] != 0:
+                            pr2[i, j] = float(num2[i, j])/float(den2[i])
+                         else: 
+                            pr2[i, j] = 0        
+                            pr2[i,i] = 1  
+
             num3 = numpy.zeros((rating,rating), dtype='int64')
             den3 = numpy.zeros(rating, dtype='int64')
              
             L3 = 0.0 
 
-
             if c_p3 > 0:
-            
+
+                if performtest:
+                    pr4 = numpy.zeros((rating,rating),dtype='float64')
+           
                 for i in range(rating):
                      for j in range(rating):
                          for c in range(countries):
@@ -143,6 +153,16 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
                             val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
                             if (val > 0.0):
                                 L3 += num3[i,j]*math.log(val) 
+
+                if performtest:
+
+                    for i in range(rating):
+                        for j in range(rating):
+                            if den3[i] != 0:
+                               pr3[i, j] = float(num3[i, j])/float(den3[i])
+                            else: 
+                               pr3[i, j] = 0
+                               pr3[i,i] = 1
                 
                 num4 = numpy.zeros((rating,rating), dtype='int64')
                 den4 = numpy.zeros(rating, dtype='int64')
@@ -162,6 +182,19 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
                             val = numpy.float64(num4[i,j])/numpy.float64(den4[i])
                             if (val > 0.0):
                                 L4 += num4[i,j]*math.log(val) 
+
+                if performtest:
+
+                     for i in range(rating):
+                         for j in range(rating):
+                             if den4[i] != 0:
+                                pr4[i, j] = float(num4[i, j])/float(den4[i])
+                             else: 
+                                pr4[i, j] = 0        
+                                pr4[i,i] = 1  
+
+                     return L, L1, L2, L3, L4, pr1, pr2, pr3, pr4
+
                 
                 return L1, L2, L3, L4
 
@@ -181,6 +214,18 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
                             if (val > 0.0):
                                 L3 += num3[i,j]*math.log(val) 
 
+                if performtest:
+
+                    for i in range(rating):
+                        for j in range(rating):
+                            if den3[i] != 0:
+                               pr3[i, j] = float(num3[i, j])/float(den3[i])
+                            else: 
+                               pr3[i, j] = 0
+                               pr3[i,i] = 1
+
+                    return L, L1, L2, L3, pr1, pr2, pr3
+ 
                 return L1, L2, L3 
 
         else:
