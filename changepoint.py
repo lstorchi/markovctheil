@@ -122,11 +122,13 @@ if cp_fortest >= 0 and num_of_run >= 0:
         L, L1, L2, L3, pr1, pr2, pr3 = \
         changemod.compute_cps(ms, cp_fortest, True, cp_fortest_2)
         lambdastart = 2.0*((L1+L2+L3)-L)
+        print L, L1, L2, L3
     elif args.numofcp == 3:
         L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
                 changemod.compute_cps(ms, cp_fortest, True, \
                 cp_fortest_2, cp_fortest_3)
         lambdastart = 2.0*((L1+L2+L3+L4)-L)
+        print L, L1, L2, L3, L4
 
     lambdas = []
 
