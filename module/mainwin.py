@@ -51,6 +51,10 @@ class main_window(QtGui.QMainWindow):
         run.setStatusTip("Run")
         self.connect(run, QtCore.SIGNAL('triggered()'), self.mainrun)
 
+        runchangepoint = QtGui.QAction(QtGui.QIcon("icons/run.png"), "RunChangePoint", self)
+        runchangepoint.setStatusTip("Run ChangePoint")
+        self.connect(runchangepoint, QtCore.SIGNAL('triggered()'), self.runchangepoint)
+
         self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot CS distributions", self)
         self.__plots__.setShortcut("Ctrl+S")
         self.__plots__.setStatusTip("Credit spread distributions")
@@ -77,6 +81,7 @@ class main_window(QtGui.QMainWindow):
 
         edit = menubar.addMenu('&Edit')
         edit.addAction(run)
+        edit.addAction(runchangepoint)
         edit.addAction(self.__plots__ )
         edit.addAction(self.__mats__ )
 
@@ -194,6 +199,10 @@ class main_window(QtGui.QMainWindow):
           self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
           self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
           self.__fileio__ = True
+
+    def runchangepoint(self):
+
+        return
 
     def mainrun(self):
 
