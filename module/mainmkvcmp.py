@@ -731,7 +731,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
       for i in range(rating):
           for j in range(i+1):
               if i == j:
-                  cov[j][i] = 2.5e-10
+                  cov[j][i] = 5e-9
               #elif cov[i][j] == 0.00:
               #    cov[i][j] = 0.1
               #else:
@@ -760,7 +760,7 @@ def main_mkc_comp_cont (rm, ir, rs, timeinf, step, tprev, \
 
       for i in range(rating):
           for j in range(rating):
-              if (i > j):
+              if (i != j):
                   if math.fabs(amtx[i,j]) > 1.0e-13:
                      amtx[i,j] = amtx[i,j] + ranval[i]
   
