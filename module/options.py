@@ -3,6 +3,140 @@ import sys
 
 import basicutils
 
+class optiondialog_cp(QtGui.QDialog):
+
+    def __init__(self, parent=None):
+        self.__numofcp__ = 1
+        self.__cp1start__ = 1
+        self.__cp1stop__ = -1
+        self.__cp2start__ = 1
+        self.__cp2stop__ = -1
+        self.__cp3start__ = 1
+        self.__cp3stop__ = -1
+        self.__deltacp__ = 1
+        self.__performtest__ = "-1;0"
+
+        super(optiondialog_cp, self).__init__(parent)
+
+        self.okbutton = QtGui.QPushButton('Ok');
+        self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
+        self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
+
+        labelnumofcp = QtGui.QLabel("Number of CPs: ", self)
+        self.numofcp_line = QtGui.QLineEdit(str(self.__numofcp__), self)
+        self.numofcp_line.move(20, 20)
+        self.numofcp_line.resize(280,40)
+
+        labelcp1start = QtGui.QLabel("CP1 start: ", self)
+        self.cp1start_line = QtGui.QLineEdit(str(self.__cp1start__), self)
+        self.cp1start_line.move(20, 20)
+        self.cp1start_line.resize(280,40)
+
+        labelcp1stop = QtGui.QLabel("CP1 stop: ", self)
+        self.cp1stop_line = QtGui.QLineEdit(str(self.__cp1stop__), self)
+        self.cp1stop_line.move(20, 20)
+        self.cp1stop_line.resize(280,40)
+
+        labelcp2start = QtGui.QLabel("CP2 start: ", self)
+        self.cp2start_line = QtGui.QLineEdit(str(self.__cp2start__), self)
+        self.cp2start_line.move(20, 20)
+        self.cp2start_line.resize(280,40)
+
+        labelcp2stop = QtGui.QLabel("CP2 stop: ", self)
+        self.cp2stop_line = QtGui.QLineEdit(str(self.__cp2stop__), self)
+        self.cp2stop_line.move(20, 20)
+        self.cp2stop_line.resize(280,40)
+
+        labelcp3start = QtGui.QLabel("CP3 start: ", self)
+        self.cp3start_line = QtGui.QLineEdit(str(self.__cp3start__), self)
+        self.cp3start_line.move(20, 20)
+        self.cp3start_line.resize(280,40)
+
+        labelcp3stop = QtGui.QLabel("CP3 stop: ", self)
+        self.cp3stop_line = QtGui.QLineEdit(str(self.__cp3stop__), self)
+        self.cp3stop_line.move(20, 20)
+        self.cp3stop_line.resize(280,40)
+
+        labeldeltacp = QtGui.QLabel("Delta CP: ", self)
+        self.deltacp_line = QtGui.QLineEdit(str(self.__deltacp__), self)
+        self.deltacp_line.move(20, 20)
+        self.deltacp_line.resize(280,40)
+
+        labelperformtest = QtGui.QLabel("Perfom Lambda test for the specified number of CPs: ", self)
+        self.performtest_line = QtGui.QLineEdit(str(self.__performtest__), self)
+        self.performtest_line.move(20, 20)
+        self.performtest_line.resize(280,40)
+
+
+        self.grid = QtGui.QGridLayout(self)
+
+        self.grid.addWidget(labelnumofcp)
+        self.grid.addWidget(self.numofcp_line)
+
+        self.grid.addWidget(labelcp1start)
+        self.grid.addWidget(self.cp1start_line)
+
+        self.grid.addWidget(labelcp1stop)
+        self.grid.addWidget(self.cp1stop_line)
+
+        self.grid.addWidget(labelcp2start)
+        self.grid.addWidget(self.cp2start_line)
+
+        self.grid.addWidget(labelcp2stop)
+        self.grid.addWidget(self.cp2stop_line)
+
+        self.grid.addWidget(labelcp3start)
+        self.grid.addWidget(self.cp3start_line)
+
+        self.grid.addWidget(labelcp3stop)
+        self.grid.addWidget(self.cp3stop_line)
+
+        self.grid.addWidget(labeldeltacp)
+        self.grid.addWidget(self.deltacp_line)
+
+        self.grid.addWidget(labelperformtest)
+        self.grid.addWidget(self.performtest_line)
+
+        self.grid.addWidget(self.okbutton)
+
+    def closedialog(self):
+        if (basicutils.is_integer(str(self.numofcp_line.displayText()))):
+           self.__numofcp__ = int(str(self.numofcp_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "numofcp unexpected value reset to default")
+
+        self.close()
+
+    def get_numofcp (self):
+        return self.__numofcp__ 
+
+    def get_cp1start(self):
+        return self.__cp1start__ 
+
+    def get_cp1stop(self):
+        return self.__cp1stop__
+
+    def get_cp2start(self):
+        return self.__cp2start__ 
+
+    def get_cp2stop(self):
+        return self.__cp2stop__ 
+
+    def get_cp3start(self):
+        return self.__cp3start__ 
+
+    def get_cp3stop(self):
+        return self.__cp3stop__ 
+
+    def get_deltacp(self):
+        return self.__deltacp__
+
+    def get_performtest(self):
+        return self.__performtest__.split(";")
+
+
 class optiondialog(QtGui.QDialog):
 
     def __init__(self, parent=None):
@@ -56,21 +190,21 @@ class optiondialog(QtGui.QDialog):
         else:
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
-            "STEP unexpected value reset to defaul")
+            "STEP unexpected value reset to default")
 
         if (basicutils.is_integer(str(self.tprevtb.displayText()))):
            self.__tprev__ = int(str(self.tprevtb.displayText()))
         else:
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
-            "TPREV unexpected value reset to defaul")
+            "TPREV unexpected value reset to default")
 
         if (basicutils.is_integer(str(self.nofruntb.displayText()))):
            self.__nofrun__ = int(str(self.nofruntb.displayText()))
         else:
            QtGui.QMessageBox.critical( self, \
             "ERROR", \
-            "Max. num of iterations unexpected value reset to defaul")
+            "Max. num of iterations unexpected value reset to default")
 
         self.__inftime__ = self.inftcb.isChecked()
 

@@ -102,6 +102,8 @@ class main_window(QtGui.QMainWindow):
 
         self.__options_dialog__ = options.optiondialog(self)
 
+        self.__options_dialog_cp__ = options.optiondialog_cp(self)
+
         self.__options_name_dialog__ = options.optionnamedialog(self)
 
     def savefile(self):
@@ -202,15 +204,18 @@ class main_window(QtGui.QMainWindow):
 
     def runchangepoint(self):
 
+        if (self.__fileio__):
+            self.__options_dialog_cp__.setWindowTitle("Options")
+
+            self.__options_dialog_cp__.exec_()
+
         return
 
     def mainrun(self):
 
         self.__entropiadone__ = False
         self.__savefile__.setEnabled(False)
-
         self.__mats__.setEnabled(False)
-
         self.__plots__.setEnabled(False)
 
         if (self.__fileio__):
