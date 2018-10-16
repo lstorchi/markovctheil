@@ -107,6 +107,62 @@ class optiondialog_cp(QtGui.QDialog):
             "ERROR", \
             "numofcp unexpected value reset to default")
 
+        if (basicutils.is_integer(str(self.cp1start_line.displayText()))):
+           self.__cp1start__ = int(str(self.cp1start_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp1start unexpected value reset to default")
+
+
+        if (basicutils.is_integer(str(self.cp1stop_line.displayText()))):
+           self.__cp1stop__ = int(str(self.cp1stop_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp1stop unexpected value reset to default")
+
+
+        if (basicutils.is_integer(str(self.cp2start_line.displayText()))):
+           self.__cp2start__ = int(str(self.cp2start_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp2start unexpected value reset to default")
+
+
+        if (basicutils.is_integer(str(self.cp2stop_line.displayText()))):
+           self.__cp2stop__ = int(str(self.cp2stop_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp2stop unexpected value reset to default")
+
+        if (basicutils.is_integer(str(self.cp3start_line.displayText()))):
+           self.__cp3start__ = int(str(self.cp3start_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp3start unexpected value reset to default")
+
+
+        if (basicutils.is_integer(str(self.cp3stop_line.displayText()))):
+           self.__cp3stop__ = int(str(self.cp3stop_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "cp3stop unexpected value reset to default")
+
+
+        if (basicutils.is_integer(str(self.deltacp_line.displayText()))):
+           self.__deltacp__ = int(str(self.deltacp_line.displayText()))
+        else:
+           QtGui.QMessageBox.critical( self, \
+            "ERROR", \
+            "deltacp unexpected value reset to default")
+
+        self.__performtest__ = str(self.performtest_line.displayText())
+
         self.close()
 
     def get_numofcp (self):
