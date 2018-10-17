@@ -208,16 +208,14 @@ class main_window(QtGui.QMainWindow):
             self.__options_dialog_cp__.setWindowTitle("Options")
             self.__options_dialog_cp__.exec_()
 
-            rating = numpy.max(self.__rm__)
-            time = self.__rm__.shape[1]
-            
+           
             cp_fortest = -1
             num_of_run = 0
             cp_fortest_2 = -1
             cp_fortest_3 = -1
 
-            print self.__options_dialog_cp__.get_numofcp()
-            print self.__options_dialog_cp__.get_performtest()
+            #print self.__options_dialog_cp__.get_numofcp()
+            #print self.__options_dialog_cp__.get_performtest()
             
             if self.__options_dialog_cp__.get_numofcp() == 1:
                 if len(self.__options_dialog_cp__.get_performtest()) != 2:
@@ -225,6 +223,33 @@ class main_window(QtGui.QMainWindow):
                             "ERROR", \
                             "Error in perform-test values")
                     return
+                
+                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
+                if cp_fortest > 0:
+                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[1])
+            elif self.__options_dialog_cp__.get_numofcp() == 2:
+                if len(self.__options_dialog_cp__.get_performtest()) != 3:
+                    QtGui.QMessageBox.critical( self, \
+                            ERROR", \
+                            "Error in perform-test values")
+                    return
+                
+                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
+                if cp_fortest > 0:
+                    cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
+                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[2])
+            elif self.__options_dialog_cp__.get_numofcp() == 3:
+                if len(self.__options_dialog_cp__.get_performtest()) != 4:
+                    QtGui.QMessageBox.critical( self, \
+                            ERROR", \
+                            "Error in perform-test values")
+                    return
+                
+                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
+                if cp_fortest > 0:
+                    cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
+                    cp_fortest_3 = int(self.__options_dialog_cp__.get_performtest()[2])
+                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[3])
 
             progdialog = QtGui.QProgressDialog(
                     "", "Cancel", 0, 100.0, self)
@@ -233,6 +258,9 @@ class main_window(QtGui.QMainWindow):
             progdialog.setWindowModality(QtCore.Qt.WindowModal)
             progdialog.setMinimumDuration(0)
             progdialog.show()
+
+            rating = numpy.max(self.__rm__)
+            time = self.__rm__.shape[1]
  
 
             progdialog.setValue(100.0)
