@@ -1,6 +1,7 @@
 from PyQt4 import QtGui, QtCore 
 
 import mainmkvcmp
+import changemod
 import plothist
 import scipy.io
 import options
@@ -230,8 +231,7 @@ class main_window(QtGui.QMainWindow):
             elif self.__options_dialog_cp__.get_numofcp() == 2:
                 if len(self.__options_dialog_cp__.get_performtest()) != 3:
                     QtGui.QMessageBox.critical( self, \
-                            ERROR", \
-                            "Error in perform-test values")
+                            "ERROR", "Error in perform-test values")
                     return
                 
                 cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
@@ -241,7 +241,7 @@ class main_window(QtGui.QMainWindow):
             elif self.__options_dialog_cp__.get_numofcp() == 3:
                 if len(self.__options_dialog_cp__.get_performtest()) != 4:
                     QtGui.QMessageBox.critical( self, \
-                            ERROR", \
+                            "ERROR", \
                             "Error in perform-test values")
                     return
                 
@@ -259,9 +259,21 @@ class main_window(QtGui.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
 
-            rating = numpy.max(self.__rm__)
-            time = self.__rm__.shape[1]
- 
+            try:
+                changemod.main_compute_cps (self.__rm__, \
+                        num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, \
+                        self.__options_dialog_cp__.get_numofcp(), \
+                        self.__options_dialog_cp__.get_cp1start(), \
+                        self.__options_dialog_cp__.get_cp2start(), \
+                        self.__options_dialog_cp__.get_cp3start(), \
+                        self.__options_dialog_cp__.get_cp1stop(), \
+                        self.__options_dialog_cp__.get_cp2stop(), \
+                        self.__options_dialog_cp__.get_cp3stop(), \
+                        self.__options_dialog_cp__.get_deltacp(), \
+                        False, None, False, progdialog)
+            except changemod.Error:
+                print "Oops! error in the main function" 
+                exit(1)
 
             progdialog.setValue(100.0)
             progdialog.close()

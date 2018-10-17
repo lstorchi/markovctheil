@@ -268,7 +268,12 @@ def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
 
 def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, 
         anumofcp, acp1start, acp2start, acp3start, acp1stop, acp2stop, 
-        acp3stop, adeltacp, aiterations, fp = None, verbose = False):
+        acp3stop, adeltacp, aiterations, fp = None, verbose = False,
+        setval=None):
+
+    if setval != None:
+        setval.setValue(0)
+        setval.setLabelText("ChangePoint analysis")
     
     rating = numpy.max(ms)
     time = ms.shape[1]
@@ -417,7 +422,12 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                             end - start, cend - cstart)
                     else:
                         basicutils.progress_bar(idx+1, cp1stop-acp1start)
-        
+
+                if not(setval is None):
+                    setval.setValue(100.0*(float(idx+1)/float(cp1stop-acp1start)))
+                    if setval.wasCanceled():
+                        raise Error("Cancelled")
+
                 idx = idx + 1 
         
             if (verbose):
@@ -444,6 +454,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                if cp1stop <= acp1start or cp1stop > time-1:
                    raise Error ("CP1 stop invalid value")
         
+               # I am lazy 
                tot = 0
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(c_p1 + adeltacp, time-1):
@@ -474,7 +485,12 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                                     end - start, cend - cstart)
                             else:
                                 basicutils.progress_bar(idx+1, tot)
-        
+
+                       if not(setval is None):
+                           setval.setValue(100.0*(float(idx+1)/float(tot)))
+                           if setval.wasCanceled():
+                               raise Error("Cancelled")
+
                        idx = idx + 1 
          
                        if not (fp is None):
@@ -518,6 +534,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                if acp2start <= acp1start:
                    raise Error ("CP2 start invalid value")
          
+               # I am lazy
                tot = 0
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(acp2start, cp2stop):
@@ -549,6 +566,11 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                                     end - start, cend - cstart)
                             else:
                                 basicutils.progress_bar(idx+1, tot)
+
+                       if not(setval is None):
+                           setval.setValue(100.0*(float(idx+1)/float(tot)))
+                           if setval.wasCanceled():
+                               raise Error("Cancelled")
         
                        idx = idx + 1 
          
@@ -581,6 +603,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                if cp1stop <= acp1start or cp1stop > time-1:
                    raise Error ("CP1 stop invalid value")
         
+               # I am lazy
                tot = 0
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(c_p1 + adeltacp, time-1):
@@ -615,7 +638,12 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                                             end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
-                           
+
+                           if not(setval is None):
+                               setval.setValue(100.0*(float(idx+1)/float(tot)))
+                               if setval.wasCanceled():
+                                  raise Error("Cancelled")
+                            
                            idx = idx + 1 
                           
                            if not (fp is None):
@@ -711,6 +739,12 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                                             end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
+
+                           if not(setval is None):
+                               setval.setValue(100.0*(float(idx+1)/float(tot)))
+                               if setval.wasCanceled():
+                                  raise Error("Cancelled")
+ 
                            
                            idx = idx + 1 
                            if not (fp is None):
