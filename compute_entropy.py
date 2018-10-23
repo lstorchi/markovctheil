@@ -9,7 +9,11 @@ import matplotlib.pyplot as plt
 sys.path.append("./module")
 import basicutils 
 
-filename=""
+if len(sys.argv) != 2:
+    print "need to specify a filename"
+    exit(1)
+
+filename=sys.argv[1]
 
 msd = scipy.io.loadmat(filename)
 
