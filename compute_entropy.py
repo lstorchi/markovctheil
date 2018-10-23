@@ -21,9 +21,9 @@ namems = "mtx"
 
 r = msd[namems] #traiettorie spread simulate
 
-countries = rm.shape[0]
-time = rm.shape[1]
-run = rm.shape[2]
+countries = r.shape[0]
+time = r.shape[1]
+run = r.shape[2]
 print countries, time, run
 
 R = numpy.sum(r, axis=0)
@@ -31,14 +31,15 @@ Rm = numpy.zeros((time), dtype = 'float64')
 pm = numpy.zeros((countries,time), dtype = 'float64')
 entropy = numpy.zeros((time), dtype = 'float64')
 std = numpy.zeros((time), dtype = 'float64')
+T = numpy.zeros((time, run), dtype = 'float64')
 
 for i in range(run):
     for j in range(countries):
         for t in range(time):
-            p[j,t,i] = r[j,t,i] / R[t,i]
-            pm[j,t] = numpy.mean(p[j,t])
-            if p[j,t,i] != 0:
-                T[t,i] += p[j, t, i]*math.log(float(countries) * p[j, t, i])
+            p = r[j,t,i] / R[t,i]
+            #pm[j,t] = numpy.mean(p[j,t])
+            if p != 0:
+                T[t,i] += p*math.log(float(countries) * p)
 
 
 for t in range(time):
