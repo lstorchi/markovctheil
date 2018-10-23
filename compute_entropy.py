@@ -41,7 +41,6 @@ meanp = numpy.zeros((countries,time), dtype = 'float64')
 for j in range(countries):
 
     for t in range(time):
-
         pm = numpy.float64(0.0)
 
         for i in range(run):
