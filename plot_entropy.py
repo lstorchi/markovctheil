@@ -18,17 +18,17 @@ ri = int(sys.argv[2])
 
 msd = scipy.io.loadmat(filename)
 
-namems = "mtx"
+namems = "spread_synth"
 
 rin = msd[namems] #traiettorie spread simulate
 
-countries = rin.shape[0]
+countries = rin.shape[2]
 time = rin.shape[1]
-run = rin.shape[2]
+run = rin.shape[0]
 print "countries: ", countries, "time: ", time, "run: ", run
 
 r = numpy.zeros((countries, time), dtype = 'float64')
-r = rin[:, :, ri] 
+r = rin[ri, :, :] 
 
 print r
 
@@ -38,12 +38,12 @@ T = numpy.zeros((time), dtype = 'float64')
 
 p = numpy.zeros((countries, time), dtype = 'float64')
 
-R = numpy.sum(r, axis=0)
+R = numpy.sum(r, axis=1)
 
 for c in range(countries):
     print c+1 , " of ", countries
     for t in range(time):
-        p[c, t] = r[c,t] / R[t]
+        p[c, t] = r[t,c] / R[t]
 
 for t in range(time):
     print t+1 , " of ", time

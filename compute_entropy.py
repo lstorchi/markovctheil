@@ -17,16 +17,18 @@ filename=sys.argv[1]
 
 msd = scipy.io.loadmat(filename)
 
-namems = "mtx"
+namems = "spread_synth"
 
 r = msd[namems] #traiettorie spread simulate
 
-countries = r.shape[0]
+run = r.shape[0]
 time = r.shape[1]
-run = r.shape[2]
+countries = r.shape[2]
 print "countries: ", countries, "time: ", time, "run: ", run
 
-R = numpy.sum(r, axis=0)
+#exit(1)
+
+R = numpy.sum(r, axis=2)
 
 #print r[0,1,:]
 #print r[1,1,:]
@@ -44,7 +46,7 @@ for c in range(countries):
     print c+1 , " of ", countries
     for t in range(time):
         for i in range(run):
-            p[c, t, i] = r[c,t,i] / R[t,i]
+            p[c, t, i] = r[i,t,c] / R[i, t]
 
 for t in range(time):
     print t+1 , " of ", time
@@ -61,4 +63,5 @@ basicutils.vct_to_file(entropy, 'edt.txt')
 basicutils.vct_to_file(std, 'std.txt')
 
 plt.plot(entropy)
+#plt.plot(std)
 plt.show()
