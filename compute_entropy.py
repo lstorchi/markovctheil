@@ -59,9 +59,26 @@ for t in range(time):
     entropy[t] = numpy.mean(T[t, :])
     std[t] = numpy.std(T[t, :])
 
+pm=numpy.zeros((countries, time), dtype = 'float64')
+entropy_pm = numpy.zeros((time), dtype = 'float64')
+
+for c in range(countries):
+    for t in range(time):
+        pm[c,t] = numpy.mean(p[c,t,:])
+
+for t in range(time):
+    for c in range(countries):
+        entropy_pm[t] += pm[c, t] * math.log(float(countries) * pm[c, t])
+
 basicutils.vct_to_file(entropy, 'edt.txt')
 basicutils.vct_to_file(std, 'std.txt')
+basicutils.vct_to_file(entropy_pm, 'meanp_entropy.txt')
 
 plt.plot(entropy)
+plt.plot(entropy_pm)
 #plt.plot(std)
+plt.show()
+
+for c in range(countries):
+    plt.plot(pm[c,:])
 plt.show()
