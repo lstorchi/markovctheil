@@ -260,7 +260,7 @@ class main_window(QtGui.QMainWindow):
             progdialog.show()
 
             try:
-                changemod.main_compute_cps (self.__rm__, \
+                vals = changemod.main_compute_cps (self.__rm__, \
                         num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, \
                         self.__options_dialog_cp__.get_numofcp(), \
                         self.__options_dialog_cp__.get_cp1start(), \
@@ -272,8 +272,12 @@ class main_window(QtGui.QMainWindow):
                         self.__options_dialog_cp__.get_deltacp(), \
                         False, None, False, progdialog)
             except changemod.Error:
-                print "Oops! error in the main function" 
-                exit(1)
+                QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    "Oops! error in the main function")
+                return
+
+            print vals
 
             progdialog.setValue(100.0)
             progdialog.close()

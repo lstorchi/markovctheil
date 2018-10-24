@@ -375,6 +375,9 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
             print "Lambda(95%) : ", lamda95
             print "Lambda      : ", lambdastart
             print "P-Value     : ", pvalue
+
+        vals = [lamda95, lambdastart, pvalue]
+        return vals
     
     else:
     
@@ -397,9 +400,11 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
         
             cp = 0
             idx = 0
+            allvalues = []
             for c_p in range(acp1start, cp1stop):
                 start = tempo.time()
                 cstart = tempo.clock()
+
         
                 try:
                     L1, L2 = compute_cps(ms, c_p)
@@ -412,6 +417,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
             
                 if not (fp is None):
                     fp.write(str(c_p) + " " + str(L1+L2) + "\n")
+                allvalues.append((c_p, L1+L2))
         
                 end = tempo.time()
                 cend = tempo.clock()
@@ -434,7 +440,10 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                 print ""
                 print ""
                 print "Change Point: ", cp, " (",maxval, ")"
-        
+            
+            vals = [cp, maxval, allvalues]
+            return vals
+
         elif (anumofcp == 2):
             cp1 = 0
             cp2 = 0
@@ -461,6 +470,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                        tot = tot + 1
         
                idx = 0
+               allvalues = []
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(c_p1 + adeltacp, time-1):
                        start = tempo.time()
@@ -494,15 +504,19 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                        idx = idx + 1 
          
                        if not (fp is None):
-                        fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                          fp.write(str(c_p1) + " " + str(c_p2) + " " 
                                + str(L1+L2+L3) + "\n")
-                       
+
+                       allvalues.append((c_p1, c_p2, L1+L2+L3))
 
                if (verbose):
                    print ""
                    print ""
                    print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
-        
+               
+               vals = [cp1, cp2, maxval, allvalues]
+               return vals
+
             else:
         
                cp1stop = time-1
@@ -541,6 +555,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                        tot = tot + 1
         
                idx = 0
+               allvalues = []
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(acp2start, cp2stop):
         
@@ -575,14 +590,19 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                        idx = idx + 1 
          
                        if not (fp is None):
-                        fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                          fp.write(str(c_p1) + " " + str(c_p2) + " " 
                                + str(L1+L2+L3) + "\n")
-                       
+
+                       allvalues.append((c_p1, c_p2, L1+L2+L3))
+
                if (verbose):
                     print ""
                     print ""
                     print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
-        
+
+               vals = [cp1, cp2, maxval, allvalues]
+               return vals
+
         elif (anumofcp == 3):
             cp1 = 0
             cp2 = 0
@@ -611,6 +631,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                            tot = tot + 1
         
                idx = 0
+               allvalues = []
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(c_p1 + adeltacp, time-1):
                        for c_p3 in range(c_p2 + adeltacp, time-1):
@@ -647,15 +668,19 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                            idx = idx + 1 
                           
                            if not (fp is None):
-                            fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                              fp.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(c_p3) + " " 
                                    + str(L1+L2+L3+L4) + "\n")
-                           
+                           allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+
                if (verbose):
                     print ""
                     print ""
                     print "Change Point: ", cp1, " , ", cp2, " ", cp3, " (",maxval, ")"
-        
+
+               vals = [cp1, cp2, cp3, maxval, allvalues]
+               return vals
+
             else:
         
                cp1stop = time-1
@@ -710,6 +735,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                            tot = tot + 1
         
                idx = 0
+               allvalues = []
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(acp2start, cp2stop):
                        for c_p3 in range(acp3start, cp3stop):
@@ -750,10 +776,16 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                            if not (fp is None):
                                 fp.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(c_p3) + " " 
-                                   + str(L1+L2) + "\n")
-                           
+                                   + str(L1+L2+L3+L4) + "\n")
+                           allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+
                if (verbose):
                     print ""
                     print ""
                     print "Change Point: ", cp1, " , ", cp2 , " ", cp3, " (",maxval, ")"
-        
+               
+               vals = [cp1, cp2, cp3, maxval, allvalues]
+               return vals
+
+    raise Error ("Nothing todo")
+
