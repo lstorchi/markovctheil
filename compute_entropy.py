@@ -27,33 +27,31 @@ run = r.shape[2]
 print "countries: ", countries, "time: ", time, "run: ", run
 
 R = numpy.sum(r, axis=0)
+
+#print r[0,1,:]
+#print r[1,1,:]
+#print R[1]
+
 print "R.shape: ", R.shape
 
-Rm = numpy.zeros((time), dtype = 'float64')
 entropy = numpy.zeros((time), dtype = 'float64')
 std = numpy.zeros((time), dtype = 'float64')
 T = numpy.zeros((time, run), dtype = 'float64')
 
+p = numpy.zeros((countries, time, run), dtype = 'float64')
 
-meanp = numpy.zeros((countries,time), dtype = 'float64')
-
-
-for j in range(countries):
-
+for c in range(countries):
+    print c+1 , " of ", countries
     for t in range(time):
-        pm = numpy.float64(0.0)
-
         for i in range(run):
-            p = r[j,t,i] / R[t,i]
+            p[c, t, i] = r[c,t,i] / R[t,i]
 
-            pm += p
+for t in range(time):
+    print t+1 , " of ", time
+    for i in range(run):
 
-            if p != 0.0:
-                T[t,i] += p*math.log(float(countries) * p)
-        
-        pm = pm / numpy.float64(run) 
-
-        meanp[j, t] = pm
+        for c in range(countries):
+            T[t,i] += p[c, t, i] * math.log(float(countries) * p[c, t, i])
 
 for t in range(time):
     entropy[t] = numpy.mean(T[t, :])
@@ -61,9 +59,6 @@ for t in range(time):
 
 basicutils.vct_to_file(entropy, 'edt.txt')
 basicutils.vct_to_file(std, 'std.txt')
-basicutils.mat_to_file(meanp, 'meanp.txt')
 
 plt.plot(entropy)
 plt.show()
-
-
