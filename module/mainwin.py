@@ -277,7 +277,55 @@ class main_window(QtGui.QMainWindow):
                     "Oops! error in the main function")
                 return
 
-            print vals
+            if cp_fortest >= 0:
+                assert(len(vals) == 3)
+                QtGui.QMessageBox.information( self, \
+                        "Value", "Lambda(95%) : " +\
+                        str(vals[0]) + " Lambda : " + \
+                        str(vals[1]) + " P-Value : "+
+                        str(vals[2]))
+            else:
+                if self.__options_dialog_cp__.get_numofcp() == 1:
+                    assert(len(vals) == 3)
+                    QtGui.QMessageBox.information( self, \
+                        "Value", "CP : " +\
+                        str(vals[0]) + " Value : " + \
+                        str(vals[1]))
+
+                    x = []
+                    y = []
+                    for v in vals[2]:
+                        x.append(v[0])
+                        y.append(v[1])
+
+                    if self.__plot_done__ :
+                      self.__ax__.cla()
+                      self.__canvas__.draw()
+                      self.__plot_done__ = False
+                    
+                    self.__ax__  = self.__figure__.add_subplot(111)
+                    self.__ax__.plot(x, y, '*-')
+                    #self.__ax__.scatter(x, y)
+                    self.__ax__.set_xlabel('Time')
+                    self.__ax__.set_ylabel('Value')
+                    self.__ax__.set_xlim([2, self.__options_dialog__.gettprev()])
+                    self.__canvas__.draw()
+                    self.__plot_done__ = True
+
+                elif self.__options_dialog_cp__.get_numofcp() == 2:
+                    assert(len(vals) == 4)
+                    QtGui.QMessageBox.information( self, \
+                        "Value", "CP1 : " + str(vals[0]) + \
+                        "CP2 : " + str(vals[1]) + \
+                        " Value : " + str(vals[2]))
+                elif self.__options_dialog_cp__.get_numofcp() == 3:
+                    assert(len(vals) == 5)
+                    QtGui.QMessageBox.information( self, \
+                        "Value", "CP1 : " + str(vals[0]) + \
+                        "CP2 : " + str(vals[1]) + \
+                        "CP3 : " + str(vals[2]) + \
+                        " Value : " + str(vals[3]))
+ 
 
             progdialog.setValue(100.0)
             progdialog.close()
