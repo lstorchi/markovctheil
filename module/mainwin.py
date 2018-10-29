@@ -217,39 +217,42 @@ class main_window(QtGui.QMainWindow):
 
             #print self.__options_dialog_cp__.get_numofcp()
             #print self.__options_dialog_cp__.get_performtest()
+
+            if len(self.__options_dialog_cp__.get_performtest()) < 1:
+                QtGui.QMessageBox.critical( self, \
+                        "ERROR", \
+                        "Error in perform-test values")
+                return
+
+            cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
+            if cp_fortest > 0:
             
-            if self.__options_dialog_cp__.get_numofcp() == 1:
-                if len(self.__options_dialog_cp__.get_performtest()) != 2:
-                    QtGui.QMessageBox.critical( self, \
-                            "ERROR", \
-                            "Error in perform-test values")
-                    return
-                
-                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
-                if cp_fortest > 0:
-                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[1])
-            elif self.__options_dialog_cp__.get_numofcp() == 2:
-                if len(self.__options_dialog_cp__.get_performtest()) != 3:
-                    QtGui.QMessageBox.critical( self, \
-                            "ERROR", "Error in perform-test values")
-                    return
-                
-                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
-                if cp_fortest > 0:
-                    cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
-                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[2])
-            elif self.__options_dialog_cp__.get_numofcp() == 3:
-                if len(self.__options_dialog_cp__.get_performtest()) != 4:
-                    QtGui.QMessageBox.critical( self, \
-                            "ERROR", \
-                            "Error in perform-test values")
-                    return
-                
-                cp_fortest = int(self.__options_dialog_cp__.get_performtest()[0])
-                if cp_fortest > 0:
-                    cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
-                    cp_fortest_3 = int(self.__options_dialog_cp__.get_performtest()[2])
-                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[3])
+               if self.__options_dialog_cp__.get_numofcp() == 1:
+                   if len(self.__options_dialog_cp__.get_performtest()) != 2:
+                       QtGui.QMessageBox.critical( self, \
+                               "ERROR", \
+                               "Error in perform-test values")
+                       return
+                   
+                   num_of_run = int(self.__options_dialog_cp__.get_performtest()[1])
+               elif self.__options_dialog_cp__.get_numofcp() == 2:
+                   if len(self.__options_dialog_cp__.get_performtest()) != 3:
+                       QtGui.QMessageBox.critical( self, \
+                               "ERROR", "Error in perform-test values")
+                       return
+                   
+                   cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
+                   num_of_run = int(self.__options_dialog_cp__.get_performtest()[2])
+               elif self.__options_dialog_cp__.get_numofcp() == 3:
+                   if len(self.__options_dialog_cp__.get_performtest()) != 4:
+                       QtGui.QMessageBox.critical( self, \
+                               "ERROR", \
+                               "Error in perform-test values")
+                       return
+                   
+                   cp_fortest_2 = int(self.__options_dialog_cp__.get_performtest()[1])
+                   cp_fortest_3 = int(self.__options_dialog_cp__.get_performtest()[2])
+                   num_of_run = int(self.__options_dialog_cp__.get_performtest()[3])
 
             progdialog = QtGui.QProgressDialog(
                     "", "Cancel", 0, 100.0, self)
@@ -260,6 +263,13 @@ class main_window(QtGui.QMainWindow):
             progdialog.show()
 
             try:
+                #print self.__options_dialog_cp__.get_cp1start(), " ", \
+                #        self.__options_dialog_cp__.get_cp2start()," ", \
+                #        self.__options_dialog_cp__.get_cp3start(), " ", \
+                #        self.__options_dialog_cp__.get_cp1stop(), " ", \
+                #        self.__options_dialog_cp__.get_cp2stop(), " ", \
+                #        self.__options_dialog_cp__.get_deltacp()
+
                 vals = changemod.main_compute_cps (self.__rm__, \
                         num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, \
                         self.__options_dialog_cp__.get_numofcp(), \
@@ -271,6 +281,7 @@ class main_window(QtGui.QMainWindow):
                         self.__options_dialog_cp__.get_cp3stop(), \
                         self.__options_dialog_cp__.get_deltacp(), \
                         False, None, False, progdialog)
+                        #True, None, True, progdialog)
             except changemod.Error:
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
@@ -303,12 +314,17 @@ class main_window(QtGui.QMainWindow):
                       self.__canvas__.draw()
                       self.__plot_done__ = False
                     
-                    self.__ax__  = self.__figure__.add_subplot(111)
+                    self.__ax__ = self.__figure__.add_subplot(111)
                     self.__ax__.plot(x, y, '*-')
                     #self.__ax__.scatter(x, y)
                     self.__ax__.set_xlabel('Time')
                     self.__ax__.set_ylabel('Value')
-                    self.__ax__.set_xlim([2, self.__options_dialog__.gettprev()])
+                    self.__ax__.set_xlim([numpy.min(x), numpy.max(x)])
+                    self.__ax__.annotate("ChangePoint", \
+                            xy=(vals[0], vals[1]), xytext=(-20, 20), \
+                            textcoords='offset points', ha='right', va='bottom', \
+                            bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5), \
+                            arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
                     self.__canvas__.draw()
                     self.__plot_done__ = True
 
@@ -316,15 +332,26 @@ class main_window(QtGui.QMainWindow):
                     assert(len(vals) == 4)
                     QtGui.QMessageBox.information( self, \
                         "Value", "CP1 : " + str(vals[0]) + \
-                        "CP2 : " + str(vals[1]) + \
+                        " CP2 : " + str(vals[1]) + \
                         " Value : " + str(vals[2]))
+
+                    if self.__plot_done__ :
+                      self.__ax__.cla()
+                      self.__canvas__.draw()
+                      self.__plot_done__ = False
+
                 elif self.__options_dialog_cp__.get_numofcp() == 3:
                     assert(len(vals) == 5)
                     QtGui.QMessageBox.information( self, \
                         "Value", "CP1 : " + str(vals[0]) + \
-                        "CP2 : " + str(vals[1]) + \
-                        "CP3 : " + str(vals[2]) + \
+                        " CP2 : " + str(vals[1]) + \
+                        " CP3 : " + str(vals[2]) + \
                         " Value : " + str(vals[3]))
+
+                    if self.__plot_done__ :
+                      self.__ax__.cla()
+                      self.__canvas__.draw()
+                      self.__plot_done__ = False
  
 
             progdialog.setValue(100.0)

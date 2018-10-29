@@ -73,35 +73,34 @@ num_of_run = 0
 cp_fortest_2 = -1
 cp_fortest_3 = -1
 
-if args.numofcp == 1:
-    if len(args.performtest.split(";")) != 2:
-        print "Error in --perform-test option"
-        exit(1)
+if len(args.performtest.split(";")) < 1:
+    print "Error in --perform-test option"
+    exit(1)
 
-    cp_fortest = int(args.performtest.split(";")[0])
-    if (cp_fortest > 0):
+cp_fortest = int(args.performtest.split(";")[0])
+
+if cp_fortest >= 0:
+    if args.numofcp == 1:
+        if len(args.performtest.split(";")) != 2:
+            print "Error in --perform-test option"
+            exit(1)
+    
         num_of_run = int(args.performtest.split(";")[1])
-elif args.numofcp == 2:
-    if len(args.performtest.split(";")) != 3:
-        print "Error in --perform-test option"
-        exit(1)
- 
-    cp_fortest = int(args.performtest.split(";")[0])
-
-    if (cp_fortest > 0):
+    elif args.numofcp == 2:
+        if len(args.performtest.split(";")) != 3:
+            print "Error in --perform-test option"
+            exit(1)
+     
         cp_fortest_2 = int(args.performtest.split(";")[1])
         num_of_run = int(args.performtest.split(";")[2])
-elif args.numofcp == 3:
-    if len(args.performtest.split(";")) != 4:
-        print "Error in --perform-test option"
-        exit(1)
- 
-    cp_fortest = int(args.performtest.split(";")[0])
-    if (cp_fortest > 0):
+    elif args.numofcp == 3:
+        if len(args.performtest.split(";")) != 4:
+            print "Error in --perform-test option"
+            exit(1)
+     
         cp_fortest_2 = int(args.performtest.split(";")[1])
         cp_fortest_3 = int(args.performtest.split(";")[2])
         num_of_run = int(args.performtest.split(";")[3])
-
 try:
     changemod.main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, 
         args.numofcp, args.cp1start, args.cp2start, args.cp3start, args.cp1stop, args.cp2stop, 
@@ -109,6 +108,5 @@ try:
 except changemod.Error:
     print "Oops! error in the main function" 
     exit(1)
- 
  
 fp.close()

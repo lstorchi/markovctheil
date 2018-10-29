@@ -274,7 +274,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
     if setval != None:
         setval.setValue(0)
         setval.setLabelText("ChangePoint analysis")
-    
+
     rating = numpy.max(ms)
     time = ms.shape[1]
 
@@ -448,7 +448,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
             cp1 = 0
             cp2 = 0
         
-            if adeltacp > 0:
+            if adeltacp > 1:
         
                cp1stop = time-1
         
@@ -553,7 +553,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                for c_p1 in range(acp1start, cp1stop):
                    for c_p2 in range(acp2start, cp2stop):
                        tot = tot + 1
-        
+
                idx = 0
                allvalues = []
                for c_p1 in range(acp1start, cp1stop):
@@ -608,7 +608,7 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
             cp2 = 0
             cp3 = 0
         
-            if adeltacp > 0:
+            if adeltacp > 1:
         
                cp1stop = time-1
         
