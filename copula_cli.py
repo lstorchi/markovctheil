@@ -1,5 +1,6 @@
 import scipy.io
 import argparse
+import numpy
 import sys
 import os
 
@@ -12,8 +13,10 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-m","--mat-filename", help="Transition probability matrix filename", \
         type=str, required=True, dest="matfilename")
-parser.add_argument("-M", "--name-of-matrix", help="Name of the probability matrix ", \
-        type=str, required=False, default="ms", dest="nameofmatrix")
+parser.add_argument("-R", "--name-of-rating-matrix", help="Name of the rating matrix ", \
+        type=str, required=False, default="rs", dest="nameofratingmatrix")
+parser.add_argument("-S", "--name-of-spread-matrix", help="Name of the spread matrix ", \
+        type=str, required=False, default="r", dest="nameofspreadmatrix")
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 
@@ -23,17 +26,46 @@ if len(sys.argv) == 1:
 
 args = parser.parse_args()
 
-filename = args.rmatfilename
-namemt = args.nameofmatrix
+name_rtmt = args.nameofratingmatrix
+name_spmt = args.nameofspreadmatrix
+filename = args.matfilename
 verbose = args.verbose
 
 errmsg = []
 
-if not (os.path.isfile(filename1)):
-    print ("File " + filename1 + " does not exist ")
+if not (os.path.isfile(filename)):
+    print ("File " + filename + " does not exist ")
     exit(1)
 
 matf = scipy.io.loadmat(filename)
+
+if not(name_rtmt in matf.keys()):
+    print "Cannot find " + name_rtmt + " in " + filename
+    print matf.keys()
+    exit(1)
+
+if not(name_spmt in matf.keys()):
+    print "Cannot find " + name_spmt + " in " + filename
+    print matf.keys()
+    exit(1)
+
+rtmt = matf[name_rtmt]
+spmt = matf[name_spmt]
+
+#print rtmt.shape
+#print spmt.shape
+
+if rtmt.shape != spmt.shape:
+    print "Error  in matrix dimension"
+    exit(1)
+
+N = numpy.max(rtmt)
+Nnaz = spmt.shape[0]
+Dst = max(spmt.shape)
+
+print "N: ", N, "Nnaz: " , Nnaz, "Dst: ", Dst
+
+inc_spread = numpy.zeros((Nnaz,Dst-1))
 
 
 """
