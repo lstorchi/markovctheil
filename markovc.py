@@ -60,11 +60,11 @@ namems = args.nameofmatrix
 errmsg = []
 
 if not (os.path.isfile(filename1)):
-    errmsg.append("File " + filename1 + " does not exist ")
+    print "File " + filename1 + " does not exist"
     exit(1)
 
 if not (os.path.isfile(filename2)):
-    errmsg.append("File ", filename2, " does not exist ")
+    print "File ", filename2, " does not exist"
     exit(1)
 
 msd = scipy.io.loadmat(filename1)
