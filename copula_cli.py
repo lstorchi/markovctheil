@@ -9,14 +9,17 @@ import os.path
 sys.path.append("./module")
 import basicutils
 
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument("-m","--mat-filename", help="Transition probability matrix filename", \
         type=str, required=True, dest="matfilename")
 parser.add_argument("-R", "--name-of-rating-matrix", help="Name of the rating matrix ", \
-        type=str, required=False, default="rs", dest="nameofratingmatrix")
+        type=str, required=False, default="ratings", dest="nameofratingmatrix")
 parser.add_argument("-S", "--name-of-spread-matrix", help="Name of the spread matrix ", \
-        type=str, required=False, default="r", dest="nameofspreadmatrix")
+        type=str, required=False, default="spread", dest="nameofspreadmatrix")
+parser.add_argument("-P", "--name-of-prating-matrix", help="Name of the rating matrix ", \
+        type=str, required=False, default="p_rating", dest="nameofpratingmatrix")
 parser.add_argument("-v", "--verbose", help="increase output verbosity", \
         default=False, action="store_true")
 
@@ -28,6 +31,7 @@ args = parser.parse_args()
 
 name_rtmt = args.nameofratingmatrix
 name_spmt = args.nameofspreadmatrix
+name_prmt = args.nameofpratingmatrix
 filename = args.matfilename
 verbose = args.verbose
 
@@ -49,46 +53,58 @@ if not(name_spmt in matf.keys()):
     print matf.keys()
     exit(1)
 
-rtmt = matf[name_rtmt]
-spmt = matf[name_spmt]
-
+ratings = matf[name_rtmt]
+spread = matf[name_spmt]
+p_rating = matf[name_prmt]
 #print rtmt.shape
 #print spmt.shape
 
-if rtmt.shape != spmt.shape:
+if ratings.shape != spread.shape:
     print "Error  in matrix dimension"
     exit(1)
 
-N = numpy.max(rtmt)
-Nnaz = spmt.shape[0]
-Dst = max(spmt.shape)
+N = numpy.max(ratings)
+Nnaz = spread.shape[0]
+Dst = max(spread.shape)
 
-print "N: ", N, "Nnaz: " , Nnaz, "Dst: ", Dst
+#print "N: ", N, "Nnaz: " , Nnaz, "Dst: ", Dst
 
 inc_spread = numpy.zeros((Nnaz,Dst-1))
 
+end = spread.shape[1]
+for i in range(Nnaz):
+    a = spread[i,1:end] - spread[i,0:end-1]
+    b = spread[i,0:end-1]
+    inc_spread[i,:] = numpy.divide(a, b, out=numpy.zeros_like(a), where=b!=0)
+
+
+#for i in range(inc_spread.shape[0]):
+#    for j in range(inc_spread.shape[1]):
+#        print inc_spread[i, j]
+
+for i in range(N):
+    tmp = numpy.argwhere(ratings[:,1:] == i+1)
+    for j in tmp:
+        print j[0], j[1]
+        #indexes.append(j[0])
+
+    #v = numpy.argwhere(numpy.abs(inc_spread - 0.13831) < 0.00001)
+    #for j in v:
+    #    print j
+    #    print inc_spread[tuple(j)]
+    #print ""
+  
+    #for j in tmp:
+        #print j
+        #print ratings[tuple(j)]
+    #    print "%10.5f"%(inc_spread[j[0]+1, j[1]])
+
+    dist_sp = [inc_spread[tuple(j)] for j in tmp]
+    #for va in dist_sp:
+    #    print "%10.5f"%(va)
+    exit()
 
 """
-clear
-close all
-load Rating_spread
-
-%% carico agenzia di rating
-load p_fitch
-agenzia = 'fitch';
-rating = fitch_rating;%(:,end-1000+1:end);
-%spread(:,1:end-1000)=[];
-P_rating = p_fitch;
-%% distribuzione spread in funzione del rating
-N = max(max(rating));
-Nnaz = length(Nazione);
-Dst = length(spread);
-
-inc_spread = zeros(Nnaz,Dst-1);
-for i=1:Nnaz
-    inc_spread(i,:) = (spread(i,2:end) - spread(i,1:end-1))./spread(i,1:end-1);
-end
-
 
 for i=1:N
     tmp = find(rating(:,2:end) ==i);
