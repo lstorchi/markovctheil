@@ -76,14 +76,11 @@ Dst = max(spread.shape)
 
 inc_spread = numpy.zeros((Nnaz,Dst-1))
 
-Per fermalo devo rimuovere da qui la germania, o meglio gli spread a zero 
-in egenrale altrimenti non tornano i conti a seguire dei quantili
-
 end = spread.shape[1]
 for i in range(Nnaz):
     a = spread[i,1:end] - spread[i,0:end-1]
     b = spread[i,0:end-1]
-    inc_spread[i,:] = numpy.divide(a, b, out=numpy.zeros_like(a), where=b!=0)
+    inc_spread[i,:] = numpy.divide(a, b, out=numpy.full_like(a, float("Inf")), where=b!=0)
 
 rttmp = ratings[:,1:end]
 totdim = rttmp.shape[0]*rttmp.shape[1]
@@ -91,35 +88,18 @@ totdim = rttmp.shape[0]*rttmp.shape[1]
 rttmp = rttmp.reshape(totdim, order='F')
 f_inc_spread = inc_spread.reshape(totdim, order='F')
 
-for i in f_inc_spread:
-    print "%10.5f"%(i)
+#for i in f_inc_spread:
+#    print "%10.5f"%(i)
 
 for i in range(N):
     tmp = numpy.where(rttmp == i+1)[0]
-
-    for j in tmp:
-        print j+1 
-
     dist_sp = [f_inc_spread[j] for j in tmp]
+    dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
 
-    Qui di base dovrebbe bastarmi rimuovere tutti gli zeri 
-    a poi calcolare quantili ed il resto
+    print scipy.stats.mstats.mquantiles(dist_sp, 0.05)
+    print scipy.stats.mstats.mquantiles(dist_sp, 0.95)
 
-    #print scipy.stats.mstats.mquantiles(dist_sp, 0.05)
-    #print scipy.stats.mstats.mquantiles(dist_sp, 0.95)
-
-    #for j in tmp:
-    #    print j[0], j[1]
-    #    print a[tuple(j)]
-    #    print inc_spread[tuple(j)]
-    #dist_sp = [inc_spread[tuple(j)] for j in tmp]
-    #for va in dist_sp:
-    #    print "%10.5f"%(va)
-
-    #print scipy.stats.mstats.mquantiles(dist_sp, 0.05)
-    #print scipy.stats.mstats.mquantiles(dist_sp, 0.95)
-
-    exit()
+exit()
 
 """
 
