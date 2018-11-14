@@ -102,6 +102,9 @@ for i in range(N):
 
     dist_sp = [f_inc_spread[j] for j in tmp]
 
+    Qui di base dovrebbe bastarmi rimuovere tutti gli zeri 
+    a poi calcolare quantili ed il resto
+
     #print scipy.stats.mstats.mquantiles(dist_sp, 0.05)
     #print scipy.stats.mstats.mquantiles(dist_sp, 0.95)
 
