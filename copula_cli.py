@@ -128,15 +128,19 @@ for i in range(N):
     #for j in range(len(G[i])):
     #    print "%10.5f %10.5f"%(X[i][j], G[i][j]) 
 
+d = 365*3
+Nsim = 200
+rho = numpy.corrcoef(spread) # don't need to transpose 
+
+#for i in range(rho.shape[0]):
+#    for j in range(rho.shape[1]):
+#        print "%10.5f "%(rho[i,j])
+
 exit()
 
 """
 
 %% montecarlo rating e spread
-d = 365*3;
-Nsim = 200;
-rho = corrcoef(spread'); % covariance matrix
-%rho = corrcoef(spread','Rows','complete');
 tau = copulastat('gaussian',rho);
 R_in = rating(:,end);
 spread_synth_tmp = zeros(1,Nnaz);
