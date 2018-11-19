@@ -10,6 +10,21 @@ import os.path
 sys.path.append("./module")
 import basicutils
 
+#######################################################################
+# adapted from
+# https://stackoverflow.com/questions/33345780/empirical-cdf-in-python-similiar-to-matlabs-one
+
+def ecdf(raw_data):
+    
+    data = numpy.asarray(raw_data)
+    data = numpy.atleast_1d(data)
+    quantiles, counts = numpy.unique(data, return_counts=True)
+    cumprob = numpy.cumsum(counts).astype(numpy.double) / data.size
+
+    return quantiles, cumprob
+
+#######################################################################
+
 
 parser = argparse.ArgumentParser()
 
@@ -91,31 +106,31 @@ f_inc_spread = inc_spread.reshape(totdim, order='F')
 #for i in f_inc_spread:
 #    print "%10.5f"%(i)
 
+
+X = []
+G = []
+
 for i in range(N):
     tmp = numpy.where(rttmp == i+1)[0]
     dist_sp = [f_inc_spread[j] for j in tmp]
     dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
+    mind = scipy.stats.mstats.mquantiles(dist_sp, 0.05)
+    maxd = scipy.stats.mstats.mquantiles(dist_sp, 0.95)
 
-    print scipy.stats.mstats.mquantiles(dist_sp, 0.05)
-    print scipy.stats.mstats.mquantiles(dist_sp, 0.95)
+    dist_sp = filter(lambda a: a >= mind and a <= maxd, dist_sp)
+
+    x, y = ecdf(dist_sp)
+    X.append(x)
+    G.append(y)
+    #basicutils.vct_to_stdout(numpy.asarray(G[i]))
+    #basicutils.vct_to_stdout(numpy.asarray(dist_sp))
+    #basicutils.vct_to_stdout(numpy.asarray(X[i]))
+    #for j in range(len(G[i])):
+    #    print "%10.5f %10.5f"%(X[i][j], G[i][j]) 
 
 exit()
 
 """
-
-for i=1:N
-    tmp = find(rating(:,2:end) ==i);
-    dist_sp = inc_spread(tmp);
-    dist_sp(dist_sp==inf)=[];
-    dist_sp(dist_sp== -inf)=[];
-    dist_sp(isnan(dist_sp)==1)=[];
-    dist_sp(isnan(dist_sp)==-1)=[];
-    a = quantile(dist_sp,.05);
-    b = quantile(dist_sp,.95);
-    dist_sp(dist_sp<a | dist_sp>b)=[];
-    [G{i},X{i}] = ecdf(dist_sp);
-end
-
 
 %% montecarlo rating e spread
 d = 365*3;

@@ -32,6 +32,13 @@ def mat_to_stdout (mat):
 
 ###############################################################################
 
+def vct_to_stdout (mat):
+
+    for i in range(mat.shape[0]):
+        sys.stdout.write ("%10.5f \n"%mat[i])
+
+###############################################################################
+
 def vct_to_file (bpm, oufilename):
 
     if os.path.exists(oufilename):
