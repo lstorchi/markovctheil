@@ -1,4 +1,5 @@
 import scipy.stats
+import matplotlib.pyplot as plt
 import argparse
 import scipy.io
 import numpy
@@ -105,6 +106,35 @@ f_inc_spread = inc_spread.reshape(totdim, order='F')
 
 #for i in f_inc_spread:
 #    print "%10.5f"%(i)
+
+spread_for_rating = []
+for ratclass in range(1,8+1):
+    spread_for_rating.append([])
+    for i in range(Nnaz):
+        for j in range(ratings.shape[1]):
+            if ratings[i, j] == ratclass:
+                spread_for_rating[ratclass-1].append(spread[i, j])
+
+for ratclass in range(1,8+1):
+    m = numpy.mean(spread_for_rating[ratclass-1])
+
+    for i in range(len(spread_for_rating[ratclass-1])):
+        spread_for_rating[ratclass-1][i] -= m
+
+    s = numpy.std(spread_for_rating[ratclass-1])
+
+    #m = numpy.mean(spread_for_rating[ratclass-1])
+    #print s, m
+
+    #y, x = numpy.histogram(spread_for_rating[ratclass-1], 100, normed=True)
+
+    count, bins, ignored = plt.hist(spread_for_rating[ratclass-1], 100, normed=True, align="mid")
+
+    #for i in range(len(count)):
+    #    print (bins[i]+bins[i+1])/2.0 , " ", count[i]
+
+    params = scipy.stats.lognorm.fit(count)
+    print scipy.stats.kstest(count, "lognorm", params)
 
 
 X = []
