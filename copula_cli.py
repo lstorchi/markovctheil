@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import argparse
 import scipy.io
 import numpy
+import math
 import sys
 import os
 
@@ -107,34 +108,66 @@ f_inc_spread = inc_spread.reshape(totdim, order='F')
 #for i in f_inc_spread:
 #    print "%10.5f"%(i)
 
+start_spread_for_rating = []
+for ratclass in range(1,8+1):
+    start_spread_for_rating.append([])
+    for i in range(Nnaz):
+        if (i != 3):
+          for j in range(ratings.shape[1]):
+              if ratings[i, j] == ratclass:
+                  start_spread_for_rating[ratclass-1].append(spread[i, j])
+
+    s = numpy.std(start_spread_for_rating[ratclass-1])
+    m = numpy.mean(start_spread_for_rating[ratclass-1])
+                
+    #print len(start_spread_for_rating[ratclass-1]), m, s
+
 spread_for_rating = []
 for ratclass in range(1,8+1):
+    s = numpy.std(start_spread_for_rating[ratclass-1])
+    m = numpy.mean(start_spread_for_rating[ratclass-1])
+
     spread_for_rating.append([])
-    for i in range(Nnaz):
-        for j in range(ratings.shape[1]):
-            if ratings[i, j] == ratclass:
-                spread_for_rating[ratclass-1].append(spread[i, j])
 
-for ratclass in range(1,8+1):
-    m = numpy.mean(spread_for_rating[ratclass-1])
-
-    for i in range(len(spread_for_rating[ratclass-1])):
-        spread_for_rating[ratclass-1][i] -= m
+    spread_for_rating[ratclass-1] = \
+            [v for v in start_spread_for_rating[ratclass-1] if \
+            (math.fabs(v-m) <= 3.0*s and v != 0.0) ]
 
     s = numpy.std(spread_for_rating[ratclass-1])
+    m = numpy.mean(spread_for_rating[ratclass-1])
 
+    #print len(spread_for_rating[ratclass-1]), m, s
+
+
+for ratclass in range(1,8+1):
     #m = numpy.mean(spread_for_rating[ratclass-1])
-    #print s, m
+    #for i in range(len(spread_for_rating[ratclass-1])):
+    #    spread_for_rating[ratclass-1][i] -= m
+    s = numpy.std(spread_for_rating[ratclass-1])
+    m = numpy.mean(spread_for_rating[ratclass-1])
+
+    fp1 = open("spread"+str(ratclass)+".txt", "w")
+    fp2 = open("lognorm"+str(ratclass)+".txt", "w")
 
     #y, x = numpy.histogram(spread_for_rating[ratclass-1], 100, normed=True)
+    params = scipy.stats.lognorm.fit(spread_for_rating[ratclass-1])
+    print scipy.stats.kstest(spread_for_rating[ratclass-1], "lognorm", params, 
+            alternative="two-sided", mode="asymp")
 
-    count, bins, ignored = plt.hist(spread_for_rating[ratclass-1], 100, normed=True, align="mid")
+    count, bins, ignored = plt.hist(spread_for_rating[ratclass-1], 100, \
+            normed=True, align="mid")
+    for i in range(len(count)):
+        fp1.write(str((bins[i]+bins[i+1])/2.0)  + " " + str(count[i]) + "\n")
 
-    #for i in range(len(count)):
-    #    print (bins[i]+bins[i+1])/2.0 , " ", count[i]
+    x=numpy.linspace(min(bins),max(bins),1000)
+    pdf = scipy.stats.lognorm.pdf(x, params[0], loc=params[1], scale=params[2])
+    for i in range(len(x)):
+        fp2.write(str( x[i]) + " " + str(pdf[i]) + "\n")
+        
+    fp1.close()
+    fp2.close()
 
-    params = scipy.stats.lognorm.fit(count)
-    print scipy.stats.kstest(count, "lognorm", params)
+exit(1)
 
 
 X = []
