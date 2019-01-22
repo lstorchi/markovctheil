@@ -12,6 +12,8 @@ import os.path
 sys.path.append("./module")
 import basicutils
 
+import matplotlib.pyplot as plt
+
 #######################################################################
 # adapted from
 # https://stackoverflow.com/questions/33345780/empirical-cdf-in-python-similiar-to-matlabs-one
@@ -112,7 +114,7 @@ start_spread_for_rating = []
 for ratclass in range(1,8+1):
     start_spread_for_rating.append([])
     for i in range(Nnaz):
-        if (i != 3):
+#        if (i != 3):
           for j in range(ratings.shape[1]):
               if ratings[i, j] == ratclass:
                   start_spread_for_rating[ratclass-1].append(spread[i, j])
@@ -120,7 +122,7 @@ for ratclass in range(1,8+1):
     s = numpy.std(start_spread_for_rating[ratclass-1])
     m = numpy.mean(start_spread_for_rating[ratclass-1])
                 
-    #print len(start_spread_for_rating[ratclass-1]), m, s
+    print len(start_spread_for_rating[ratclass-1]), m, s
 
 spread_for_rating = []
 for ratclass in range(1,8+1):
@@ -129,9 +131,18 @@ for ratclass in range(1,8+1):
 
     spread_for_rating.append([])
 
+    #spread_for_rating[ratclass-1] = \
+    #        [v for v in start_spread_for_rating[ratclass-1]]
+
+    #spread_for_rating[ratclass-1] = \
+    #        [v for v in start_spread_for_rating[ratclass-1] if \
+    #        (math.fabs(v-m) <= 3.0*s and v != 0.0) ]
+
     spread_for_rating[ratclass-1] = \
-            [v for v in start_spread_for_rating[ratclass-1] if \
-            (math.fabs(v-m) <= 3.0*s and v != 0.0) ]
+        [v for v in start_spread_for_rating[ratclass-1] if \
+        (v > 0.0) ]
+
+
 
     s = numpy.std(spread_for_rating[ratclass-1])
     m = numpy.mean(spread_for_rating[ratclass-1])
@@ -148,11 +159,40 @@ for ratclass in range(1,8+1):
 
     fp1 = open("spread"+str(ratclass)+".txt", "w")
     fp2 = open("lognorm"+str(ratclass)+".txt", "w")
+    fp3 = open("spread_cdf"+str(ratclass)+".txt", "w")
+    fp4 = open("lognorm_cdf"+str(ratclass)+".txt", "w")
 
     #y, x = numpy.histogram(spread_for_rating[ratclass-1], 100, normed=True)
     params = scipy.stats.lognorm.fit(spread_for_rating[ratclass-1])
+    params = scipy.stats.lognorm.fit(spread_for_rating[ratclass-1], params[0], loc=params[1], scale=params[2])
+    params = scipy.stats.lognorm.fit(spread_for_rating[ratclass-1], params[0], loc=params[1], scale=params[2])
+ 
     print scipy.stats.kstest(spread_for_rating[ratclass-1], "lognorm", params, 
             alternative="two-sided", mode="asymp")
+
+    data_sorted = numpy.sort(spread_for_rating[ratclass-1])
+    p = 1. * numpy.arange(len(spread_for_rating[ratclass-1])) / \
+            (len(spread_for_rating[ratclass-1]) - 1)
+
+    for i in range(len(data_sorted)):
+        fp3.write(str(data_sorted[i]) + " " + str(p[i]) + "\n")
+
+
+    """
+    fig = plt.figure()
+
+    ax1 = fig.add_subplot(121)
+    ax1.plot(p, data_sorted)
+    ax1.set_xlabel('$p$')
+    ax1.set_ylabel('$x$')
+
+    ax2 = fig.add_subplot(122)
+    ax2.plot(data_sorted, p)
+    ax2.set_xlabel('$x$')
+    ax2.set_ylabel('$p$')
+
+    plt.show()
+    """
 
     count, bins, ignored = plt.hist(spread_for_rating[ratclass-1], 100, \
             normed=True, align="mid")
@@ -163,9 +203,28 @@ for ratclass in range(1,8+1):
     pdf = scipy.stats.lognorm.pdf(x, params[0], loc=params[1], scale=params[2])
     for i in range(len(x)):
         fp2.write(str( x[i]) + " " + str(pdf[i]) + "\n")
+
+    cdf = scipy.stats.lognorm.cdf(data_sorted, params[0], loc=params[1], scale=params[2])
+    for i in range(len(data_sorted)):
+        fp4.write(str( data_sorted[i]) + " " + str(cdf[i]) + "\n")
         
     fp1.close()
     fp2.close()
+    fp3.close()
+    fp4.close()
+
+for ratclass in range(1,8+1):
+
+    log_spread_for_rating = numpy.log(spread_for_rating[ratclass-1])
+
+    s = numpy.std(log_spread_for_rating)
+    m = numpy.mean(log_spread_for_rating)
+
+    value = [((v-m)/s) for v in log_spread_for_rating]
+
+    print scipy.stats.jarque_bera (value)
+
+ 
 
 exit(1)
 
