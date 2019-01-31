@@ -258,14 +258,18 @@ if __name__ == "__main__" :
         x, y = ecdf(dist_sp)
         X.append(x)
         G.append(y)
+
+        #plt.plot(x, y)
+        #plt.show()
+
         #basicutils.vct_to_stdout(numpy.asarray(G[i]))
         #basicutils.vct_to_stdout(numpy.asarray(dist_sp))
         #basicutils.vct_to_stdout(numpy.asarray(X[i]))
         #for j in range(len(G[i])):
         #    print "%10.5f %10.5f"%(X[i][j], G[i][j]) 
-    
+
     d = 365*3
-    Nsim = 200
+    Nsim = 10
     rho = numpy.corrcoef(spread) # don't need to transpose 
     
     #for i in range(rho.shape[0]):
@@ -283,7 +287,7 @@ if __name__ == "__main__" :
 
     #print R_in
 
-    spread_synth_tmp = numpy.zeros((1,Nnaz))
+    spread_synth_tmp = numpy.zeros(Nnaz)
     spread_synth = numpy.zeros((Nsim,d,Nnaz));
 
     entropy_t = 0.4*numpy.ones((Nsim,d))
@@ -303,46 +307,44 @@ if __name__ == "__main__" :
         for j in range(1,d):
             v = numpy.random.uniform(0.0, 1.0, Nnaz)
             pp = numpy.cumsum(p_rating[R_in-1,:],1)
-            print pp.shape
-            jj = numpy.zeros((1,Nnaz))
+            jj = numpy.zeros(Nnaz, dtype=int)
             for k in range(Nnaz):
-                jj[0,k] = numpy.where(pp[k,:] >= v[k])[0][0]
+                jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                 
-                func = interp1d(G{jj(1,k)}(2:end), X{jj(1,k)}(2:end), kind='linear')
-                func(u[j,k])
+                #plt.plot(G[jj[k]][1:])
 
-                spread_synth_tmp(1,k) = max(interp1(G{jj(1,k)}(2:end),X{jj(1,k)}(2:end),u(j,k),'linear','extrap'),-0.9);
+                func = interp1d(G[jj[k]][1:], X[jj[k]][1:], kind='linear')
 
-            exit(1)
+                xval = u[j,k]
+                xmin = min(G[jj[k]][1:])
+                xmax = max(G[jj[k]][1:])
+                if u[j,k] < xmin:
+                    xval = xmin
+                if u[j,k] > xmax:
+                    xval = xmax 
+
+                spread_synth_tmp[k] = max(func(xval), -0.9)
+
+                #xnew = numpy.linspace(min(G[jj[k]][1:]), max(G[jj[k]][1:]), num=10000, endpoint=True)
+                #ynew = func(xnew)
+                #plt.plot(G[jj[k]][1:], X[jj[k]][1:], 'o', xnew, ynew, '-')
+                #plt.show()
+
+            R_in = jj
+            spread_synth[sim,j,:] = numpy.multiply( \
+                    numpy.squeeze(spread_synth[sim,j-1,:]), \
+                    (1+spread_synth_tmp[:].transpose()))
+
+            summa = numpy.sum(spread_synth[sim,j,:])
+            if summa != 0.0:
+                summa = 1.0e-10
+
+            P_spread = spread_synth[sim,j,:]/numpy.sum(spread_synth[sim,j,:])
+
+            P_spread = P_spread.clip(min=1.0e-15)
+
+            entropy_t[sim,j] =  numpy.sum(numpy.multiply(P_spread, \
+                    numpy.log(float(Nnaz)*P_spread)))
 
 
-    
-    """
-   
-        for j=2:d
-            v = rand(1,Nnaz);
-            pp = cumsum(P_rating(R_in,:),2);
-            jj = zeros(1,Nnaz);
-            for k=1:Nnaz
-                jj(1,k)=find(pp(k,:)>=v(1,k),1,'first');
-                spread_synth_tmp(1,k) = max(interp1(G{jj(1,k)}(2:end),X{jj(1,k)}(2:end),u(j,k),'linear','extrap'),-0.9); %quantile(G{jj(1,k)},u(j,k));
-            end
-            R_in = jj;
-            spread_synth(sim,j,:) = squeeze(spread_synth(sim,j-1,:)).*(1+spread_synth_tmp(1,:)');
-            %% entropia %%
-            P_spread = spread_synth(sim,j,:)./sum(spread_synth(sim,j,:));%+0.00001;
-            entropy_t(sim,j) =  sum(P_spread.*log(Nnaz.*P_spread));   
-        end
-    end
-    
-    
-    %%
-    figure
-    plot(mean(entropy_t(:,2:end),1))
-    title('Entropy')
-    figure
-    plot(squeeze(spread_synth(3,:,:)))
-    save(['Spread_synth_',agenzia],'spread_synth');
-    %%
-    save(['entropy_',agenzia],'entropy_t')
-    """
+    print entropy_t
