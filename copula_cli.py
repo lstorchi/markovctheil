@@ -174,7 +174,11 @@ if __name__ == "__main__" :
             type=str, required=False, default="p_rating", dest="nameofpratingmatrix")
     parser.add_argument("-v", "--verbose", help="increase output verbosity", \
             default=False, action="store_true")
-    
+    parser.add_argument("-d", "--num-of-day", help="Number of dais to simulate ", \
+            type=int, required=False, default=365*3, dest="time")
+    parser.add_argument("-n", "--number-of-MCrun", help="Number of MonteCarlo simulation steps ", \
+            type=int, required=False, default=200, dest="numofsim")
+ 
     if len(sys.argv) == 1:
         parser.print_help()
         exit(1)
@@ -186,6 +190,8 @@ if __name__ == "__main__" :
     name_prmt = args.nameofpratingmatrix
     filename = args.matfilename
     verbose = args.verbose
+    d = args.time
+    Nsim = args.numofsim
     
     errmsg = []
     
@@ -268,8 +274,6 @@ if __name__ == "__main__" :
         #for j in range(len(G[i])):
         #    print "%10.5f %10.5f"%(X[i][j], G[i][j]) 
 
-    d = 365*3
-    Nsim = 10
     rho = numpy.corrcoef(spread) # don't need to transpose 
     
     #for i in range(rho.shape[0]):
@@ -347,4 +351,6 @@ if __name__ == "__main__" :
                     numpy.log(float(Nnaz)*P_spread)))
 
 
-    print entropy_t
+    print numpy.mean(entropy_t[:,1:],0)
+    #plt.plot(numpy.mean(entropy_t[:,1:],0))
+    #plt.show()
