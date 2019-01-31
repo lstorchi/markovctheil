@@ -352,5 +352,5 @@ if __name__ == "__main__" :
 
 
     print numpy.mean(entropy_t[:,1:],0)
-    #plt.plot(numpy.mean(entropy_t[:,1:],0))
-    #plt.show()
+    plt.plot(numpy.mean(entropy_t[:,1:],0))
+    plt.savefig("mean_entropy.png")
