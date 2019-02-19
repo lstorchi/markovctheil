@@ -164,9 +164,9 @@ if __name__ == "__main__" :
 
     parser = argparse.ArgumentParser()
     
-    parser.add_argument("-m","--mat-filename", help="Transition probability matrix filename", \
+    parser.add_argument("-m","--mat-filename", help="Observed transition matrix filename", \
             type=str, required=True, dest="matfilename")
-    parser.add_argument("-R", "--name-of-rating-matrix", help="Name of the rating matrix ", \
+    parser.add_argument("-R", "--name-of-rating-matrix", help="Name of the observed transition matrix ", \
             type=str, required=False, default="ratings", dest="nameofratingmatrix")
     parser.add_argument("-S", "--name-of-spread-matrix", help="Name of the spread matrix ", \
             type=str, required=False, default="spread", dest="nameofspreadmatrix")
@@ -174,7 +174,7 @@ if __name__ == "__main__" :
             type=str, required=False, default="p_rating", dest="nameofpratingmatrix")
     parser.add_argument("-v", "--verbose", help="increase output verbosity", \
             default=False, action="store_true")
-    parser.add_argument("-d", "--num-of-day", help="Number of dais to simulate ", \
+    parser.add_argument("-d", "--num-of-day", help="Number of days to simulate ", \
             type=int, required=False, default=365*3, dest="time")
     parser.add_argument("-n", "--number-of-MCrun", help="Number of MonteCarlo simulation steps ", \
             type=int, required=False, default=200, dest="numofsim")
