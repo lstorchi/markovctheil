@@ -311,6 +311,8 @@ class optionnamedialog(QtGui.QDialog):
         self.grid.addWidget(self.okbutton)
 
     def closedialog(self):
+        self.__namerm__ = str(self.ratingnametb.displayText())
+        self.__nameir__ = str(self.interest_ratestb.displayText())
         self.close()
 
     def getratingname (self):
