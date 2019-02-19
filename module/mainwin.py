@@ -25,7 +25,7 @@ class main_window(QtGui.QMainWindow):
        
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
-        self.setWindowTitle('Forecasted dynamic Theil\'s entropy')
+        self.setWindowTitle('Dynamic Theil entropy')
         self.statusBar().showMessage('Markov started') 
 
         ofile = QtGui.QAction(QtGui.QIcon("icons/open.png"), "Open", self)
