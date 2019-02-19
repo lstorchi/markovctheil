@@ -290,7 +290,7 @@ class optionnamedialog(QtGui.QDialog):
         self.okbutton.setFont(QtGui.QFont("Times", 10, QtGui.QFont.Bold));
         self.connect(self.okbutton, QtCore.SIGNAL("clicked()"), self.closedialog)
 
-        labelratingname = QtGui.QLabel("Name of the transition probability matrix: ", self)
+        labelratingname = QtGui.QLabel("Name of the observed transition matrix: ", self)
         self.ratingnametb = QtGui.QLineEdit(str(self.__namerm__), self)
         self.ratingnametb.move(20, 20)
         self.ratingnametb.resize(280,40)
