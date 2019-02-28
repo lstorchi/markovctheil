@@ -3,6 +3,8 @@ import math
 import sys
 import os
 
+import scipy.stats
+
 ###############################################################################
 
 def is_integer(s):

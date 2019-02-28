@@ -312,13 +312,13 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
      if setval.wasCanceled():
          errmsg.append("Cancelled!")
          return False
-   
+
    bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
    tot = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    xm = numpy.zeros((countries,tprev), dtype='float64')
    cdf = numpy.zeros((rating,rating), dtype='float64')
-   x = numpy.zeros((countries,tprev,numofrun), dtype='int')
+   x = numpy.zeros((countries,tprev), dtype='int')
    cont = numpy.zeros((rating,tprev,numofrun), dtype='int')
    r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
    term = numpy.zeros((tprev,numofrun), dtype='float64')
@@ -348,31 +348,30 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    for run in range(numofrun):
    
-       for c in range(countries):
-           x[c, 0, run] = rm[c, time-1]
+       x[:, 0] = rm[:, time-1]
    
        for c in range(countries):
-           if xi[c, 0, run] <= cdf[x[c, 0, run]-1, 0]:
-               x[c, 1, run] = 1
+           if xi[c, 0, run] <= cdf[x[c, 0]-1, 0]:
+               x[c, 1] = 1
    
            for k in range(1,rating):
-               if (cdf[x[c, 0, run]-1, k-1] < xi[c, 0, run]) and \
-                   (xi[c, 0, run] <= cdf[x[c, 0, run]-1, k] ):
-                  x[c, 1, run] = k + 1
+               if (cdf[x[c, 0]-1, k-1] < xi[c, 0, run]) and \
+                   (xi[c, 0, run] <= cdf[x[c, 0]-1, k] ):
+                  x[c, 1] = k + 1
    
            for t in range(2,tprev):
-               if xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, 0]:
-                   x[c, t, run] = 1
+               if xi[c, t-1, run] <= cdf[x[c, t-1]-1, 0]:
+                   x[c, t] = 1
    
                for k in range(1,rating):
-                   if (cdf[x[c, t-1, run]-1, k-1] < xi[c, t-1, run]) \
-                           and (xi[c, t-1, run] <= cdf[x[c, t-1, run]-1, k]):
-                     x[c, t, run] = k + 1
+                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1, run]) \
+                           and (xi[c, t-1, run] <= cdf[x[c, t-1]-1, k]):
+                     x[c, t] = k + 1
    
        for t in range(tprev):
            for c in range(countries):
                for i in range(rating):
-                   if x[c, t, run] == i+1:
+                   if x[c, t] == i+1:
                        bp[c, t, run] = meanval[i]
                        cont[i, t, run] = cont[i, t, run] + 1
                        tot[i, t, run] = cont[i, t, run] * meanval[i]
@@ -537,3 +536,5 @@ def compute_copula_variables (ratings, spread):
     return G, X, rho
 
 #####################################################################
+
+

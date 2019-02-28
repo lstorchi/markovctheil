@@ -13,37 +13,11 @@ import os.path
 
 sys.path.append("./module")
 
+import mainmkvcmp
 import basicutils
 import kstest
 
 import matplotlib.pyplot as plt
-
-#######################################################################
-# adapted from
-# https://stackoverflow.com/questions/33345780/empirical-cdf-in-python-similiar-to-matlabs-one
-
-def ecdf(raw_data):
-    
-    data = numpy.asarray(raw_data)
-    data = numpy.atleast_1d(data)
-    quantiles, counts = numpy.unique(data, return_counts=True)
-    cumprob = numpy.cumsum(counts).astype(numpy.double) / data.size
-
-    return quantiles, cumprob
-
-#######################################################################
-# adapted from 
-# https://github.com/stochasticresearch/copula-py
-
-def gaussian_copula_rnd (rho, m):
-    
-    n = rho.shape[0]
-    mu = numpy.zeros(n)
-    y = scipy.stats.multivariate_normal(mu,rho)
-    mvndata = y.rvs(size = m)
-    u = scipy.stats.norm.cdf(mvndata)
-
-    return u
 
 #######################################################################
 
@@ -102,15 +76,8 @@ if __name__ == "__main__" :
     spread = matf[name_spmt]
     p_rating = matf[name_prmt]
 
-    kstest.slipshod_kstest (spread, ratings)
+    #kstest.slipshod_kstest (spread, ratings)
 
-    #print ratings.shape
-    #print spmt.shape
-    #for i in range(ratings.shape[0]):
-    #    for j in range(ratings.shape[1]):
-    #        print "%3d"%ratings[i, j]
-    
-    
     if ratings.shape != spread.shape:
         print "Error  in matrix dimension"
         exit(1)
@@ -118,85 +85,32 @@ if __name__ == "__main__" :
     N = numpy.max(ratings)
     Nnaz = spread.shape[0]
     Dst = max(spread.shape)
-    
-    #print "N: ", N, "Nnaz: " , Nnaz, "Dst: ", Dst
-    
-    inc_spread = numpy.zeros((Nnaz,Dst-1))
-    
-    end = spread.shape[1]
-    for i in range(Nnaz):
-        a = spread[i,1:end] - spread[i,0:end-1]
-        b = spread[i,0:end-1]
-        inc_spread[i,:] = numpy.divide(a, b, out=numpy.full_like(a, float("Inf")), where=b!=0)
-    
-    rttmp = ratings[:,1:end]
-    totdim = rttmp.shape[0]*rttmp.shape[1]
-    
-    rttmp = rttmp.reshape(totdim, order='F')
-    f_inc_spread = inc_spread.reshape(totdim, order='F')
-    
-    #for i in f_inc_spread:
-    #    print "%10.5f"%(i)
-    
-    
-    X = []
-    G = []
-    
-    for i in range(N):
-        tmp = numpy.where(rttmp == i+1)[0]
-        dist_sp = [f_inc_spread[j] for j in tmp]
-        dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
-        mind = scipy.stats.mstats.mquantiles(dist_sp, 0.05)
-        maxd = scipy.stats.mstats.mquantiles(dist_sp, 0.95)
-    
-        dist_sp = filter(lambda a: a >= mind and a <= maxd, dist_sp)
-    
-        x, y = ecdf(dist_sp)
-        X.append(x)
-        G.append(y)
 
-        #plt.plot(x, y)
-        #plt.show()
+    if verbose:
+        print "Computing Copula parameters ..."
 
-        #basicutils.vct_to_stdout(numpy.asarray(G[i]))
-        #basicutils.vct_to_stdout(numpy.asarray(dist_sp))
-        #basicutils.vct_to_stdout(numpy.asarray(X[i]))
-        #for j in range(len(G[i])):
-        #    print "%10.5f %10.5f"%(X[i][j], G[i][j]) 
-
-    rho = numpy.corrcoef(spread) # don't need to transpose 
+    G, X, rho = mainmkvcmp.compute_copula_variables (ratings, spread)
     
-    #for i in range(rho.shape[0]):
-    #    for j in range(rho.shape[1]):
-    #        print "%10.5f "%(rho[i,j])
-
-    #eigvals, m =  numpy.linalg.eig(rho)
-    #print numpy.sort(eigvals)
-
+    # eigvals, m =  numpy.linalg.eig(rho)
+    # print numpy.sort(eigvals)
     # copula gaussian Kendall
-    #tau = 2.0*numpy.arcsin(rho)/math.pi
-    #print tau
+    # tau = 2.0*numpy.arcsin(rho)/math.pi
+    # print tau
 
     R_in = ratings[:,-1]
-
-    #print R_in
 
     spread_synth_tmp = numpy.zeros(Nnaz)
     spread_synth = numpy.zeros((Nsim,d,Nnaz));
 
     entropy_t = 0.4*numpy.ones((Nsim,d))
 
-    #print entropy_t
+    if verbose:
+        print "Start MC simulation  ..."
 
     for sim in range(Nsim):
         spread_synth[sim,0,:] = spread[:,-1].transpose()
         #print spread_synth[sim,0,:]
-        u = gaussian_copula_rnd (rho, d)
-
-        #print u.shape
-        #print u[:,0]
-        #plt.hist (u[:,1], bins=10)
-        #plt.show()
+        u = basicutils.gaussian_copula_rnd (rho, d)
 
         for j in range(1,d):
             v = numpy.random.uniform(0.0, 1.0, Nnaz)
@@ -205,8 +119,6 @@ if __name__ == "__main__" :
             for k in range(Nnaz):
                 jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                 
-                #plt.plot(G[jj[k]][1:])
-
                 func = interp1d(G[jj[k]][1:], X[jj[k]][1:], kind='linear')
 
                 xval = u[j,k]
@@ -218,11 +130,6 @@ if __name__ == "__main__" :
                     xval = xmax 
 
                 spread_synth_tmp[k] = max(func(xval), -0.9)
-
-                #xnew = numpy.linspace(min(G[jj[k]][1:]), max(G[jj[k]][1:]), num=10000, endpoint=True)
-                #ynew = func(xnew)
-                #plt.plot(G[jj[k]][1:], X[jj[k]][1:], 'o', xnew, ynew, '-')
-                #plt.show()
 
             R_in = jj
             spread_synth[sim,j,:] = numpy.multiply( \
