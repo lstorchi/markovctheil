@@ -325,7 +325,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
-   xi = numpy.random.rand(countries,tprev,numofrun)
+   xi = numpy.random.rand(countries,tprev)
 
    G = None 
    X = None  
@@ -349,23 +349,23 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    for run in range(numofrun):
    
        x[:, 0] = rm[:, time-1]
-   
+
        for c in range(countries):
-           if xi[c, 0, run] <= cdf[x[c, 0]-1, 0]:
+           if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
                x[c, 1] = 1
    
            for k in range(1,rating):
-               if (cdf[x[c, 0]-1, k-1] < xi[c, 0, run]) and \
-                   (xi[c, 0, run] <= cdf[x[c, 0]-1, k] ):
+               if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
+                   (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
                   x[c, 1] = k + 1
    
            for t in range(2,tprev):
-               if xi[c, t-1, run] <= cdf[x[c, t-1]-1, 0]:
+               if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
                    x[c, t] = 1
    
                for k in range(1,rating):
-                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1, run]) \
-                           and (xi[c, t-1, run] <= cdf[x[c, t-1]-1, k]):
+                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
+                           and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
                      x[c, t] = k + 1
    
        for t in range(tprev):
