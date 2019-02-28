@@ -134,3 +134,30 @@ def extract_ti_mean (dat, step, rtnum, numofrun, fname = "", verbose = False):
     return dat, numpy.mean(dat), tdat, nbins, numpy.std(dat)
 
 ###############################################################################
+# adapted from
+# https://stackoverflow.com/questions/33345780/empirical-cdf-in-python-similiar-to-matlabs-one
+
+def ecdf(raw_data):
+    
+    data = numpy.asarray(raw_data)
+    data = numpy.atleast_1d(data)
+    quantiles, counts = numpy.unique(data, return_counts=True)
+    cumprob = numpy.cumsum(counts).astype(numpy.double) / data.size
+
+    return quantiles, cumprob
+
+#######################################################################
+# adapted from 
+# https://github.com/stochasticresearch/copula-py
+
+def gaussian_copula_rnd (rho, m):
+    
+    n = rho.shape[0]
+    mu = numpy.zeros(n)
+    y = scipy.stats.multivariate_normal(mu,rho)
+    mvndata = y.rvs(size = m)
+    u = scipy.stats.norm.cdf(mvndata)
+
+    return u
+
+#######################################################################

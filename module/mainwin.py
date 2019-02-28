@@ -22,6 +22,8 @@ class main_window(QtGui.QMainWindow):
         self.__fileio__ = False
         self.__entropiadone__ = False
         self.__plot_done__ = False
+
+        self.__usecopula__ = False
        
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
@@ -402,6 +404,7 @@ class main_window(QtGui.QMainWindow):
             self.__allratings__ = []
             self.__allratingsnins__ = []
 
+
             if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
                     self.__options_dialog__.getinftime(), \
                     self.__options_dialog__.getstep(), \
@@ -409,7 +412,8 @@ class main_window(QtGui.QMainWindow):
                     self.__options_dialog__.getnofrun(), \
                     False, False, False, errmsg, self.__entropia__, \
                     self.__var__, self.__allratings__ , self.__allratingsnins__, \
-                    self.__pr__, self.__meanval__, self.__stdeval__, progdialog)):
+                    self.__pr__, self.__meanval__, self.__stdeval__, self.__usecopula__, \
+                    progdialog)):
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     errmsg[0])

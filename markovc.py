@@ -40,6 +40,10 @@ parser.add_argument("-i", "--time-inf", help="Simulation using stationary distri
         default=False, action="store_true", dest="timeinf")
 parser.add_argument("-S", "--seed", help="Using a seed for the random generator", \
         default=False, action="store_true", dest="seed")
+parser.add_argument("-c", "--use-copule", help="Using copula", \
+        default=False, action="store_true", dest="usecopula")
+
+
 
 if len(sys.argv) == 1:
     parser.print_help()
@@ -56,6 +60,7 @@ step = args.step
 tprev = args.tprev
 numofrun = args.maxrun
 namems = args.nameofmatrix
+usecopula = args.usecopula
 
 errmsg = []
 
@@ -101,7 +106,8 @@ allratingsnins = []
 
 if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
         numofrun, verbose, True, args.seed, errmsg, entropia, \
-        var, allratings, allratingsnins, pr, meanval, stdeval):
+        var, allratings, allratingsnins, pr, meanval, stdeval, \
+        usecopula):
     for m in errmsg:
         print m
     exit(1)

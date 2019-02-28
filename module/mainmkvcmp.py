@@ -13,6 +13,8 @@ import os.path
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
+from scipy.interpolate import interp1d
+
 import basicutils
 
 #####################################################################
@@ -20,8 +22,7 @@ import basicutils
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         numofrun, verbose, outfiles, seed, errmsg, \
         entropia, var, allratings, allratingsbins, \
-        pr, meanval, stdeval, \
-        setval=None):
+        pr, meanval, stdeval, usecopula, setval=None):
 
    if seed:
        numpy.random.seed(9001)
@@ -325,6 +326,14 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
    xi = numpy.random.rand(countries,tprev,numofrun)
+
+   G = None 
+   X = None  
+   rho = None 
+   if usecopula:
+       G, X, rho = compute_copula_variables (rm, r)
+
+   #print type(G), type(X), type(rho)
   
    for i in range (rating):
        cdf[i, 0] = pr[i, 0]
@@ -348,7 +357,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
            for k in range(1,rating):
                if (cdf[x[c, 0, run]-1, k-1] < xi[c, 0, run]) and \
-                       (xi[c, 0, run] <= cdf[x[c, 0, run]-1, k] ):
+                   (xi[c, 0, run] <= cdf[x[c, 0, run]-1, k] ):
                   x[c, 1, run] = k + 1
    
            for t in range(2,tprev):
@@ -479,3 +488,52 @@ def main_mkc_prop (rm, pr):
                  x[c, t] = k + 1
    
    return x
+
+#####################################################################
+
+def compute_copula_variables (ratings, spread):
+
+    if ratings.shape != spread.shape:
+        print "Error  in matrix dimension"
+        exit(1)
+    
+    N = numpy.max(ratings)
+    Nnaz = spread.shape[0]
+    Dst = max(spread.shape)
+    
+    inc_spread = numpy.zeros((Nnaz,Dst-1))
+    
+    end = spread.shape[1]
+    for i in range(Nnaz):
+        a = spread[i,1:end] - spread[i,0:end-1]
+        b = spread[i,0:end-1]
+        inc_spread[i,:] = numpy.divide(a, b, out=numpy.full_like(a, 
+            float("Inf")), where=b!=0)
+    
+    rttmp = ratings[:,1:end]
+    totdim = rttmp.shape[0]*rttmp.shape[1]
+    
+    rttmp = rttmp.reshape(totdim, order='F')
+    f_inc_spread = inc_spread.reshape(totdim, order='F')
+    
+    X = []
+    G = []
+    
+    for i in range(N):
+        tmp = numpy.where(rttmp == i+1)[0]
+        dist_sp = [f_inc_spread[j] for j in tmp]
+        dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
+        mind = scipy.stats.mstats.mquantiles(dist_sp, 0.05)
+        maxd = scipy.stats.mstats.mquantiles(dist_sp, 0.95)
+    
+        dist_sp = filter(lambda a: a >= mind and a <= maxd, dist_sp)
+    
+        x, y = basicutils.ecdf(dist_sp)
+        X.append(x)
+        G.append(y)
+
+    rho = numpy.corrcoef(spread) 
+
+    return G, X, rho
+
+#####################################################################
