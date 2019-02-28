@@ -313,95 +313,20 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
          errmsg.append("Cancelled!")
          return False
 
-   bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
-   ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
-   xm = numpy.zeros((countries,tprev), dtype='float64')
-   cdf = numpy.zeros((rating,rating), dtype='float64')
-   x = numpy.zeros((countries,tprev), dtype='int')
-   r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
-   term = numpy.zeros((tprev,numofrun), dtype='float64')
-   entr = numpy.zeros((tprev,numofrun), dtype='float64')
-   t1 = numpy.zeros((tprev,numofrun), dtype='float64')
-   t2 = numpy.zeros((tprev,numofrun), dtype='float64')
 
-   G = None 
-   X = None  
-   rho = None 
+   entr = None
+   ac = None
+   bp = None 
 
    if usecopula:
        G, X, rho = compute_copula_variables (rm, r)
-
-   #print type(G), type(X), type(rho)
-  
-   for i in range (rating):
-       cdf[i, 0] = pr[i, 0]
-   
-   for i in range(rating):
-       for j in range(1,rating):
-           cdf[i, j] = pr[i, j] + cdf[i, j-1]
-
-   if setval != None:
-        setval.setValue(0)
-        setval.setLabelText("Monte Carlo simulation")
-   
-   for run in range(numofrun):
-
-       tot = numpy.zeros((rating,tprev), dtype='float64')
-       cont = numpy.zeros((rating,tprev), dtype='int')
-       xi = numpy.random.rand(countries,tprev)
-       x[:, 0] = rm[:, time-1]
-
-       for c in range(countries):
-           if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
-               x[c, 1] = 1
-   
-           for k in range(1,rating):
-               if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
-                   (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
-                  x[c, 1] = k + 1
-   
-           for t in range(2,tprev):
-               if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
-                   x[c, t] = 1
-   
-               for k in range(1,rating):
-                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
-                           and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
-                     x[c, t] = k + 1
-   
-       for t in range(tprev):
-           for c in range(countries):
-               for i in range(rating):
-                   if x[c, t] == i+1:
-                       bp[c, t, run] = meanval[i]
-                       cont[i, t] = cont[i, t] + 1
-                       tot[i, t] = cont[i, t] * meanval[i]
-               
-           summa = 0.0
-           for a in range(bp.shape[0]):
-               summa += bp[a, t, run]
-           r_prev[t, run] = summa
-   
-       for t in range(tprev):
-           for i in range(rating):
-                ac[i, t, run] = tot[i, t]/r_prev[t, run]
-                if ac[i, t, run] != 0.0:
-                    t1[t, run] += (ac[i, t, run]*tiv[i])
-                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
-                    if cont[i, t] != 0:
-                       term[t, run] += ac[i, t, run]* \
-                               math.log(float(countries)/(float(rating)*cont[i, t]))
-    
-           entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
-   
-       if verbose:
-           basicutils.progress_bar(run+1, numofrun)
-
-       if setval != None:
-           setval.setValue(100.0*(float(run+1)/float(numofrun)))
-           if setval.wasCanceled():
-             errmsg.append("Cancelled!")
-             return False
+       
+       entr = runmcsimulation_copula (rm, r, pr, G, X, rho, countries, \
+               numofrun, tprev, T_t, verbose, setval)
+   else:
+       entr, ac, bp = runmcsimulation (rm, pr, meanval, \
+               tprev, numofrun, rating, countries, tiv, \
+               verbose, setval)
    
    if verbose:
      print " "
@@ -423,26 +348,28 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
          outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
     
      outf.close()
+
+   if not usecopula:
    
-   acm = numpy.zeros((rating,tprev), dtype='float64')
-   for i in range(acm.shape[0]):
-       for j in range(acm.shape[1]):
-           acm[i, j] = numpy.mean(ac[i, j])
-   
-   oufilename = "acm_"+str(numofrun)+".txt"
-   
-   if outfiles:
-     basicutils.mat_to_file (acm, oufilename)
-   
-   bpm = numpy.zeros((countries,tprev), dtype='float64')
-   for i in range(bpm.shape[0]):
-       for j in range(bpm.shape[1]):
-           bpm[i, j] = numpy.mean(bp[i, j])
-   
-   oufilename = "bpm_"+str(numofrun)+".txt"
-  
-   if outfiles:
-     basicutils.mat_to_file (bpm, oufilename)
+     acm = numpy.zeros((rating,tprev), dtype='float64')
+     for i in range(acm.shape[0]):
+         for j in range(acm.shape[1]):
+             acm[i, j] = numpy.mean(ac[i, j])
+     
+     oufilename = "acm_"+str(numofrun)+".txt"
+     
+     if outfiles:
+       basicutils.mat_to_file (acm, oufilename)
+     
+     bpm = numpy.zeros((countries,tprev), dtype='float64')
+     for i in range(bpm.shape[0]):
+         for j in range(bpm.shape[1]):
+             bpm[i, j] = numpy.mean(bp[i, j])
+     
+     oufilename = "bpm_"+str(numofrun)+".txt"
+    
+     if outfiles:
+       basicutils.mat_to_file (bpm, oufilename)
 
    return True
 
@@ -491,26 +418,26 @@ def main_mkc_prop (rm, pr):
 
 #####################################################################
 
-def compute_copula_variables (ratings, spread):
+def compute_copula_variables (rm, r):
 
-    if ratings.shape != spread.shape:
+    if rm.shape != r.shape:
         print "Error  in matrix dimension"
         exit(1)
     
-    N = numpy.max(ratings)
-    Nnaz = spread.shape[0]
-    Dst = max(spread.shape)
+    N = numpy.max(rm)
+    Nnaz = r.shape[0]
+    Dst = max(r.shape)
     
     inc_spread = numpy.zeros((Nnaz,Dst-1))
     
-    end = spread.shape[1]
+    end = r.shape[1]
     for i in range(Nnaz):
-        a = spread[i,1:end] - spread[i,0:end-1]
-        b = spread[i,0:end-1]
+        a = r[i,1:end] - r[i,0:end-1]
+        b = r[i,0:end-1]
         inc_spread[i,:] = numpy.divide(a, b, out=numpy.full_like(a, 
             float("Inf")), where=b!=0)
     
-    rttmp = ratings[:,1:end]
+    rttmp = rm[:,1:end]
     totdim = rttmp.shape[0]*rttmp.shape[1]
     
     rttmp = rttmp.reshape(totdim, order='F')
@@ -532,10 +459,161 @@ def compute_copula_variables (ratings, spread):
         X.append(x)
         G.append(y)
 
-    rho = numpy.corrcoef(spread) 
+    rho = numpy.corrcoef(r) 
 
     return G, X, rho
 
 #####################################################################
 
+def runmcsimulation_copula (rm, r, pr, G, X, rho, countries, \
+        numofrun, tprev, T_t, verbose, setval):
+
+    R_in = rm[:,-1]
+
+    spread_synth_tmp = numpy.zeros(countries)
+    spread_synth = numpy.zeros((numofrun,tprev,countries));
+
+    entropy_t = T_t[-1]*numpy.ones((tprev,numofrun))
+
+    if verbose:
+        print "Start MC simulation  ..."
+
+    for run in range(numofrun):
+        spread_synth[run,0,:] = r[:,-1].transpose()
+        #print spread_synth[run,0,:]
+        u = basicutils.gaussian_copula_rnd (rho, tprev)
+
+        for j in range(1,tprev):
+            v = numpy.random.uniform(0.0, 1.0, countries)
+            pp = numpy.cumsum(pr[R_in-1,:],1)
+            jj = numpy.zeros(countries, dtype=int)
+            for k in range(countries):
+                jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
+                
+                func = interp1d(G[jj[k]][1:], X[jj[k]][1:], kind='linear')
+
+                xval = u[j,k]
+                xmin = min(G[jj[k]][1:])
+                xmax = max(G[jj[k]][1:])
+                if u[j,k] < xmin:
+                    xval = xmin
+                if u[j,k] > xmax:
+                    xval = xmax 
+
+                spread_synth_tmp[k] = max(func(xval), -0.9)
+
+            R_in = jj
+            spread_synth[run,j,:] = numpy.multiply( \
+                    numpy.squeeze(spread_synth[run,j-1,:]), \
+                    (1+spread_synth_tmp[:].transpose()))
+
+            summa = numpy.sum(spread_synth[run,j,:])
+            if summa != 0.0:
+                summa = 1.0e-10
+
+            P_spread = spread_synth[run,j,:]/numpy.sum(spread_synth[run,j,:])
+
+            P_spread = P_spread.clip(min=1.0e-15)
+
+            entropy_t[j, run] =  numpy.sum(numpy.multiply(P_spread, \
+                    numpy.log(float(countries)*P_spread)))
+
+        if verbose:
+            basicutils.progress_bar(run+1, numofrun)
+        
+        if setval != None:
+            setval.setValue(100.0*(float(run+1)/float(numofrun)))
+            if setval.wasCanceled():
+               errmsg.append("Cancelled!")
+               return False
+
+    return entropy_t
+
+#####################################################################
+
+def runmcsimulation (rm, pr, meanval, tprev, numofrun, rating, \
+        countries, tiv, verbose, setval):
+
+   entr = numpy.zeros((tprev,numofrun), dtype='float64')
+
+   bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
+   ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
+   xm = numpy.zeros((countries,tprev), dtype='float64')
+   cdf = numpy.zeros((rating,rating), dtype='float64')
+   x = numpy.zeros((countries,tprev), dtype='int')
+   r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
+   term = numpy.zeros((tprev,numofrun), dtype='float64')
+   t1 = numpy.zeros((tprev,numofrun), dtype='float64')
+   t2 = numpy.zeros((tprev,numofrun), dtype='float64')
+
+   #print type(G), type(X), type(rho)
+  
+   for i in range (rating):
+       cdf[i, 0] = pr[i, 0]
+   
+   for i in range(rating):
+       for j in range(1,rating):
+           cdf[i, j] = pr[i, j] + cdf[i, j-1]
+
+   if setval != None:
+        setval.setValue(0)
+        setval.setLabelText("Monte Carlo simulation")
+   
+   for run in range(numofrun):
+
+       tot = numpy.zeros((rating,tprev), dtype='float64')
+       cont = numpy.zeros((rating,tprev), dtype='int')
+       xi = numpy.random.rand(countries,tprev)
+       x[:, 0] = rm[:, -1]
+
+       for c in range(countries):
+           if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
+               x[c, 1] = 1
+   
+           for k in range(1,rating):
+               if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
+                   (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
+                  x[c, 1] = k + 1
+   
+           for t in range(2,tprev):
+               if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
+                   x[c, t] = 1
+   
+               for k in range(1,rating):
+                   if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
+                           and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
+                     x[c, t] = k + 1
+
+       for t in range(tprev):
+           for c in range(countries):
+               for i in range(rating):
+                   if x[c, t] == i+1:
+                       bp[c, t, run] = meanval[i]
+                       cont[i, t] = cont[i, t] + 1
+                       tot[i, t] = cont[i, t] * meanval[i]
+               
+           r_prev[t, run] = numpy.sum(bp[:, t, run])
+   
+       for t in range(tprev):
+           for i in range(rating):
+                ac[i, t, run] = tot[i, t]/r_prev[t, run]
+                if ac[i, t, run] != 0.0:
+                    t1[t, run] += (ac[i, t, run]*tiv[i])
+                    t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
+                    if cont[i, t] != 0:
+                       term[t, run] += ac[i, t, run]* \
+                               math.log(float(countries)/(float(rating)*cont[i, t]))
+    
+           entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
+   
+       if verbose:
+           basicutils.progress_bar(run+1, numofrun)
+
+       if setval != None:
+           setval.setValue(100.0*(float(run+1)/float(numofrun)))
+           if setval.wasCanceled():
+             errmsg.append("Cancelled!")
+             return False
+    
+   return entr, ac, bp
 
