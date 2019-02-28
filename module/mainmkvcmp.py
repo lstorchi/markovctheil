@@ -314,7 +314,6 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
          return False
 
    bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
-   tot = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
    xm = numpy.zeros((countries,tprev), dtype='float64')
    cdf = numpy.zeros((rating,rating), dtype='float64')
@@ -347,6 +346,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
    for run in range(numofrun):
 
+       tot = numpy.zeros((rating,tprev), dtype='float64')
        cont = numpy.zeros((rating,tprev), dtype='int')
        xi = numpy.random.rand(countries,tprev)
        x[:, 0] = rm[:, time-1]
@@ -375,7 +375,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
                    if x[c, t] == i+1:
                        bp[c, t, run] = meanval[i]
                        cont[i, t] = cont[i, t] + 1
-                       tot[i, t, run] = cont[i, t] * meanval[i]
+                       tot[i, t] = cont[i, t] * meanval[i]
                
            summa = 0.0
            for a in range(bp.shape[0]):
@@ -384,7 +384,7 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    
        for t in range(tprev):
            for i in range(rating):
-                ac[i, t, run] = tot[i, t, run]/r_prev[t, run]
+                ac[i, t, run] = tot[i, t]/r_prev[t, run]
                 if ac[i, t, run] != 0.0:
                     t1[t, run] += (ac[i, t, run]*tiv[i])
                     t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
