@@ -325,11 +325,11 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
    entr = numpy.zeros((tprev,numofrun), dtype='float64')
    t1 = numpy.zeros((tprev,numofrun), dtype='float64')
    t2 = numpy.zeros((tprev,numofrun), dtype='float64')
-   xi = numpy.random.rand(countries,tprev)
 
    G = None 
    X = None  
    rho = None 
+
    if usecopula:
        G, X, rho = compute_copula_variables (rm, r)
 
@@ -347,7 +347,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
         setval.setLabelText("Monte Carlo simulation")
    
    for run in range(numofrun):
-   
+
+       xi = numpy.random.rand(countries,tprev)
        x[:, 0] = rm[:, time-1]
 
        for c in range(countries):
