@@ -17,6 +17,38 @@ from scipy.interpolate import interp1d
 
 import basicutils
 
+class markovkernel:
+
+    def __init__ (self):
+        """
+        Init markovkernel class.
+        """
+
+        # input
+        self.__metacommunity__ = None # rm
+        self.__attributes__ = None # ir
+
+        self.__infinite_time__ = False # timeinf
+        self.__use_a_seed__ = False # seed
+        self.__verbose__ = False # verbose
+
+        self.__num_of_mc_iterations__ = 100 # numofrun
+        self.__simulated_time__ = 365 # tprev
+        self.__step__ = 0.25 # step
+        self.__dump_files__  = False # outfiles
+
+        self.__usecopula__ = False # usecopula
+
+        # output
+        self.__entropy__ = None # entropia
+        self.__entropy_sigma__ = None # var
+
+        self.__attributes_pdf_values__ = None # allratings
+        self.__attributes_pdf_bins__ = None # allratingsbins
+        self.__transitions_probability_mtx__ = None # pr
+        self.__attributes_mean_values__ = None # meanval
+        self.__attributes_sigma_values__ = None # stdeval
+
 #####################################################################
 
 def main_mkc_comp (rm, ir, timeinf, step, tprev, \
@@ -373,6 +405,8 @@ def main_mkc_comp (rm, ir, timeinf, step, tprev, \
 
    return True
 
+#####################################################################
+# PRIVATE
 #####################################################################
 
 def main_mkc_prop (rm, pr):
