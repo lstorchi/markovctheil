@@ -29,15 +29,17 @@ class markovkernel:
         self.__attributes__ = None # ir
 
         self.__infinite_time__ = False # timeinf
+        
         self.__use_a_seed__ = False # seed
+        self.__seed_value__ = 9001
+
         self.__verbose__ = False # verbose
+        self.__usecopula__ = False # usecopula
+        self.__dump_files__  = False # outfiles
 
         self.__num_of_mc_iterations__ = 100 # numofrun
         self.__simulated_time__ = 365 # tprev
         self.__step__ = 0.25 # step
-        self.__dump_files__  = False # outfiles
-
-        self.__usecopula__ = False # usecopula
 
         # output
         self.__entropy__ = None # entropia
@@ -48,6 +50,67 @@ class markovkernel:
         self.__transitions_probability_mtx__ = None # pr
         self.__attributes_mean_values__ = None # meanval
         self.__attributes_sigma_values__ = None # stdeval
+
+    def set_metacommunity (self, inmat):
+        self.__metacommunity__ = inmat
+
+    def get_metacommunity (self):
+        return self.__metacommunity__
+
+    def set_attributes (self, inmat):
+        self.__attributes__ = inmat
+
+    def get_attributes (self):
+        return self.__attributes__
+
+    def set_infinite_time (self, flagin):
+        self.__infinite_time__ = flagin
+
+    def get_infinite_time (self):
+        return self.__infinite_time__
+
+    def set_use_a_seed (self, inflag, seedvalue=9001):
+        self.__use_a_seed__ = inflag
+        self.__seed_value__ = seedvalue
+
+    def get_use_a_seed (self):
+        return (self.__use_a_seed__, self.__seed_value__)
+
+    def set_verbose (self, flagin):
+        self.__verbose__ = flagin
+
+    def get_verbose (self):
+        return self.__verbose__
+ 
+    def set_usecopula (self, flagin):
+        self.__usecompula__ = flagin
+
+    def get_usecopula (self):
+        return self.__usecopula__
+
+    def set_dump_files (self, flagin):
+        self.__dump_files__ = flagin
+
+    def get_dump_files (self):
+        return self.__dump_files__
+
+    def set_num_of_mc_iterations (self, numin):
+        self.__num_of_mc_iterations__ = numin
+
+    def get_num_of_mc_iterations (self):
+        return self.__num_of_mc_iterations__
+
+    def set_simulated_time (self, numin):
+        self.__simulated_time__ = numin
+
+    def get_simulated_time (self):
+        return self.__simulated_time__
+
+
+       # self.__step__ = 0.25 # step
+ 
+ 
+
 
 #####################################################################
 
