@@ -30,12 +30,12 @@ class markovkernel:
 
         self.__infinite_time__ = False 
         
-        self.__use_a_seed__ = False # seed
+        self.__use_a_seed__ = False
         self.__seed_value__ = 9001
 
-        self.__verbose__ = False # verbose
-        self.__usecopula__ = False # usecopula
-        self.__dump_files__  = False # outfiles
+        self.__verbose__ = False 
+        self.__usecopula__ = False 
+        self.__dump_files__  = False 
 
         self.__num_of_mc_iterations__ = 100 # numofrun
         self.__simulated_time__ = 365 # tprev
@@ -195,8 +195,8 @@ class markovkernel:
     
     def main_mkc_comp (setval=None):
 
-        if seed:
-            numpy.random.seed(9001)
+        if self.__use_a_seed__:
+            numpy.random.seed(self.__seed_value__)
         
         countries = self.__metacommunity__.shape[0]
         rating = numpy.max(self.__metacommunity__)
@@ -226,7 +226,7 @@ class markovkernel:
         
                     den[i] = sum(num[i])
         
-            if verbose:
+            if self.__verbose__:
               basicutils.progress_bar(k+1, countries)
         
             if setval != None:
@@ -248,7 +248,7 @@ class markovkernel:
         
         if self.__infinite_time__: 
             # matrice delle probabilita' diventa stazionaria tempo elevato 
-            if verbose:
+            if self.__verbose__:
               print ""
               print "Solve ..."
         
@@ -270,14 +270,14 @@ class markovkernel:
                 for i in range(rating):
                     pr[i, j] = x[0][j] 
         
-        if verbose:
+        if self.__verbose__:
           print " "
           print "Solve SVD "
         
         npr = pr - numpy.identity(rating, dtype='float64')
         s, v, d = numpy.linalg.svd(npr)
         
-        if verbose:
+        if self.__verbose__:
             print " "
             print "mean value: ", numpy.mean(v)
         
@@ -324,7 +324,7 @@ class markovkernel:
         fname = ""
         
         if rating > 0:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "aaa"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
@@ -337,7 +337,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 1:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "aa"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
@@ -350,7 +350,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 2:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "a"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
@@ -363,7 +363,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 3: 
-            if outfiles:
+            if self.__dump_files__:
                 fname = "bbb"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
@@ -376,7 +376,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 4:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "bb"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
@@ -389,7 +389,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 5:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "b"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
@@ -402,7 +402,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 6:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "cc"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
@@ -415,7 +415,7 @@ class markovkernel:
             tiv.append(c)
         
         if rating > 7:
-            if outfiles:
+            if self.__dump_files__:
                 fname = "d"
         
             a, b, c, d, e = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
@@ -443,12 +443,12 @@ class markovkernel:
         
         fval, pval = scipy.stats.f_oneway (*args)
         
-        if verbose:
+        if self.__verbose__:
           print " "
         
         oufilename = "1wayanova_"+str(numofrun)+".txt"
         
-        if outfiles:
+        if self.__dump_files__:
           if os.path.exists(oufilename):
               os.remove(oufilename)
         
@@ -477,7 +477,7 @@ class markovkernel:
         
         oufilename = "entropy_histi_"+str(numofrun)+".txt"
         
-        if outfiles:
+        if self.__dump_files__:
           basicutils.vct_to_file(T_t, oufilename)
         
         if setval != None:
@@ -491,7 +491,7 @@ class markovkernel:
         ac = None
         bp = None 
         
-        if usecopula:
+        if self.__usecopula__:
             G, X, rho = compute_copula_variables (self.__metacommunity__, r)
             
             entr = runmcsimulation_copula (r, pr, G, X, rho, countries, \
@@ -501,7 +501,7 @@ class markovkernel:
                     tprev, numofrun, rating, countries, tiv, \
                     verbose, setval)
         
-        if verbose:
+        if self.__verbose__:
           print " "
         
         oufilename = "entropy_"+str(numofrun)+".txt"
@@ -510,7 +510,7 @@ class markovkernel:
             entropia[t] =numpy.mean(entr[t])
             var[t] = numpy.std(entr[t])
         
-        if outfiles:
+        if self.__dump_files__:
         
           if os.path.exists(oufilename):
               os.remove(oufilename)
@@ -522,7 +522,7 @@ class markovkernel:
          
           outf.close()
         
-        if not usecopula:
+        if not self.__usecopula__:
         
           acm = numpy.zeros((rating,tprev), dtype='float64')
           for i in range(acm.shape[0]):
@@ -531,7 +531,7 @@ class markovkernel:
           
           oufilename = "acm_"+str(numofrun)+".txt"
           
-          if outfiles:
+          if self.__dump_files__:
             basicutils.mat_to_file (acm, oufilename)
           
           bpm = numpy.zeros((countries,tprev), dtype='float64')
@@ -541,7 +541,7 @@ class markovkernel:
           
           oufilename = "bpm_"+str(numofrun)+".txt"
          
-          if outfiles:
+          if self.__dump_files__:
             basicutils.mat_to_file (bpm, oufilename)
         
         return True
@@ -639,7 +639,7 @@ class markovkernel:
         return G, X, rho
     
     def __runmcsimulation_copula__ (r, pr, G, X, rho, countries, \
-        numofrun, tprev, T_t, verbose, setval):
+        numofrun, tprev, T_t, setval):
 
         R_in = self.__metacommunity__[:,-1]
         
@@ -648,7 +648,7 @@ class markovkernel:
         
         entropy_t = T_t[-1]*numpy.ones((tprev,numofrun))
         
-        if verbose:
+        if self.__verbose__:
             print "Start MC simulation  ..."
         
         for run in range(numofrun):
@@ -691,7 +691,7 @@ class markovkernel:
                 entropy_t[j, run] =  numpy.sum(numpy.multiply(P_spread, \
                         numpy.log(float(countries)*P_spread)))
         
-            if verbose:
+            if self.__verbose__:
                 basicutils.progress_bar(run+1, numofrun)
             
             if setval != None:
@@ -704,7 +704,7 @@ class markovkernel:
     
     
     def __runmcsimulation__ (pr, meanval, tprev, numofrun, rating, \
-        countries, tiv, verbose, setval):
+        countries, tiv, setval):
 
         entr = numpy.zeros((tprev,numofrun), dtype='float64')
         
@@ -778,7 +778,7 @@ class markovkernel:
          
                 entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
         
-            if verbose:
+            if self.__verbose__:
                 basicutils.progress_bar(run+1, numofrun)
         
             if setval != None:
