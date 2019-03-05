@@ -37,19 +37,19 @@ class markovkernel:
         self.__usecopula__ = False 
         self.__dump_files__  = False 
 
-        self.__num_of_mc_iterations__ = 100 # numofrun
-        self.__simulated_time__ = 365 # tprev
-        self.__step__ = 0.25 # step
+        self.__num_of_mc_iterations__ = 100 
+        self.__simulated_time__ = 365 
+        self.__step__ = 0.25 
 
         # output
-        self.__entropy__ = None # entropia
-        self.__entropy_sigma__ = None # var
+        self.__entropy__ = None 
+        self.__entropy_sigma__ = None 
+        self.__transitions_probability_mtx__ = None 
 
-        self.__attributes_pdf_values__ = None # allratings
-        self.__attributes_pdf_bins__ = None # allratingsbins
-        self.__transitions_probability_mtx__ = None # pr
-        self.__attributes_mean_values__ = None # meanval
-        self.__attributes_sigma_values__ = None # stdeval
+        self.__attributes_pdf_values__ = [] 
+        self.__attributes_pdf_bins__ = [] 
+        self.__attributes_mean_values__ = [] 
+        self.__attributes_sigma_values__ = [] 
 
 
     def set_metacommunity (self, inmat):
@@ -203,8 +203,10 @@ class markovkernel:
         time = self.__metacommunity__.shape[1]
         
         if (rating <= 0) or (rating > 8):
-            errmsg.append("rating " + rating + " is not a valid value")
-            return False
+            raise ValueError("metacommunity has invalid values")
+
+        self.__transitions_probability_mtx__ = \
+                numpy.zeros((rating,rating), dtype='float64') 
         
         nk = numpy.zeros((rating,rating,countries), dtype='int64')
         num = numpy.zeros((rating,rating), dtype='int64')
@@ -218,8 +220,9 @@ class markovkernel:
             for t in range(time-1):
                 for i in range(rating):
                     for j in range(rating):
-                        if (self.__metacommunity__[k, t] == (i+1)) and \
-                                (self.__metacommunity__[k, t+1] == (j+1)):
+                        if (self.__metacommunity__[k, t] == (i+1)) \
+                                and (self.__metacommunity__[k, t+1] \
+                                == (j+1)):
                             nk[i, j, k] = nk[i, j, k] + 1
         
                         num[i, j] = sum(nk[i, j])
@@ -232,7 +235,7 @@ class markovkernel:
             if setval != None:
               setval.setValue(100.0*(float(k+1)/float(countries)))
               if setval.wasCanceled():
-                  errmsg.append("Cancelled!")
+                  #errmsg.append("Cancelled!")
                   return False
         
         if setval != None:
@@ -242,9 +245,10 @@ class markovkernel:
         for i in range(rating):
             for j in range(rating):
                 if den[i] != 0:
-                    pr[i, j] = float(num[i, j])/float(den[i])
+                    self.__transitions_probability_mtx__[i, j] = \
+                            float(num[i, j])/float(den[i])
                 else: 
-                    pr[i, j] = 0.0
+                    self.__transitions_probability_mtx__[i, j] = 0.0
         
         if self.__infinite_time__: 
             # matrice delle probabilita' diventa stazionaria tempo elevato 
@@ -252,7 +256,8 @@ class markovkernel:
               print ""
               print "Solve ..."
         
-            ai = numpy.identity(rating, dtype='float64') - numpy.matrix.transpose(pr)
+            ai = numpy.identity(rating, dtype='float64') - \
+                    numpy.matrix.transpose(self.__transitions_probability_mtx__)
             a = numpy.zeros((rating+1,rating), dtype='float64')
         
             for i in range(rating):
@@ -268,13 +273,14 @@ class markovkernel:
             
             for j in range(rating):
                 for i in range(rating):
-                    pr[i, j] = x[0][j] 
+                    self.__transitions_probability_mtx__[i, j] = x[0][j] 
         
         if self.__verbose__:
           print " "
           print "Solve SVD "
         
-        npr = pr - numpy.identity(rating, dtype='float64')
+        npr = self.__transitions_probability_mtx__ - \
+                numpy.identity(rating, dtype='float64')
         s, v, d = numpy.linalg.svd(npr)
         
         if self.__verbose__:
@@ -305,7 +311,7 @@ class markovkernel:
         if setval != None:
           setval.setValue(50.0)
           if setval.wasCanceled():
-              errmsg.append("Cancelled!")
+              #errmsg.append("Cancelled!")
               return False
         
         for i in range(rating):
@@ -327,104 +333,119 @@ class markovkernel:
             if self.__dump_files__:
                 fname = "aaa"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[0, :nn[0]], step, 0, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean (y[0, :nn[0]], \
+                    self.__step__, 0, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 1:
             if self.__dump_files__:
                 fname = "aa"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[1, :nn[1]], step, 1, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[1, :nn[1]], self.__step__, \
+                    1, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 2:
             if self.__dump_files__:
                 fname = "a"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[2, :nn[2]], step, 2, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[2, :nn[2]], self.__step__, \
+                    2, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 3: 
             if self.__dump_files__:
                 fname = "bbb"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[3, :nn[3]], step, 3, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[3, :nn[3]], self.__step__, \
+                    3, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 4:
             if self.__dump_files__:
                 fname = "bb"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[4, :nn[4]], step, 4, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[4, :nn[4]], self.__step__, \
+                    4, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 5:
             if self.__dump_files__:
                 fname = "b"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[5, :nn[5]], step, 5, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[5, :nn[5]], self.__step__, \
+                    5, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 6:
             if self.__dump_files__:
                 fname = "cc"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[6, :nn[6]], step, 6, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[6, :nn[6]], self.__step__, \
+                    6, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         if rating > 7:
             if self.__dump_files__:
                 fname = "d"
         
-            a, b, c, d, e = basicutils.extract_ti_mean (y[7, :nn[7]], step, 7, numofrun, \
+            a, b, c, d, e = basicutils.extract_ti_mean ( \
+                    y[7, :nn[7]], self.__step__, \
+                    7, self.__num_of_mc_iterations__, \
                     fname)
         
-            allratingsbins.append(d)
-            allratings.append(a)
-            stdeval.append(e)
-            meanval.append(b)
+            self.__attributes_pdf_bins__.append(d)
+            self.__attributes_pdf_values__.append(a)
+            self.__attributes_sigma_values__.append(e)
+            self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
         fval = 0.0
@@ -433,20 +454,21 @@ class markovkernel:
         if setval != None:
           setval.setValue(75.0)
           if setval.wasCanceled():
-              errmsg.append("Cancelled!")
+              #errmsg.append("Cancelled!")
               return False
         
         args = [] 
         
-        for i in range(len(allratings)):
-            args.append(allratings[i])
+        for i in range(len(self.__attributes_pdf_values__)):
+            args.append(self.__attributes_pdf_values__[i])
         
         fval, pval = scipy.stats.f_oneway (*args)
         
         if self.__verbose__:
           print " "
         
-        oufilename = "1wayanova_"+str(numofrun)+".txt"
+        oufilename = "1wayanova_"+\
+                str(self.__num_of_mc_iterations__)+".txt"
         
         if self.__dump_files__:
           if os.path.exists(oufilename):
@@ -473,9 +495,11 @@ class markovkernel:
             for k in range(countries):
                 s_t[k, t] = r[k, t] / R_t[t]
                 if s_t[k, t] != 0:
-                    T_t[t] += s_t[k, t]*math.log(float(countries) * s_t[k, t])
+                    T_t[t] += s_t[k, t]*math.log(float(countries) \
+                            * s_t[k, t])
         
-        oufilename = "entropy_histi_"+str(numofrun)+".txt"
+        oufilename = "entropy_histi_"+\
+                str(self.__num_of_mc_iterations__)+".txt"
         
         if self.__dump_files__:
           basicutils.vct_to_file(T_t, oufilename)
@@ -483,7 +507,7 @@ class markovkernel:
         if setval != None:
           setval.setValue(100.0)
           if setval.wasCanceled():
-              errmsg.append("Cancelled!")
+              #errmsg.append("Cancelled!")
               return False
         
         
@@ -492,23 +516,38 @@ class markovkernel:
         bp = None 
         
         if self.__usecopula__:
-            G, X, rho = compute_copula_variables (self.__metacommunity__, r)
+            G, X, rho = compute_copula_variables (\
+                    self.__metacommunity__, r)
             
-            entr = runmcsimulation_copula (r, pr, G, X, rho, countries, \
-                    numofrun, tprev, T_t, verbose, setval)
+            try:
+                entr = runmcsimulation_copula (r, G, \
+                    X, rho, countries, \
+                    T_t, verbose, setval)
+            except StopIteration:
+                return False
+
         else:
-            entr, ac, bp = runmcsimulation (pr, meanval, \
-                    tprev, numofrun, rating, countries, tiv, \
+            try:
+                entr, ac, bp = runmcsimulation (\
+                    rating, countries, tiv, \
                     verbose, setval)
+            except StopIteration:
+                return False
         
         if self.__verbose__:
           print " "
         
-        oufilename = "entropy_"+str(numofrun)+".txt"
-        
-        for t in range(tprev):
-            entropia[t] =numpy.mean(entr[t])
-            var[t] = numpy.std(entr[t])
+        oufilename = "entropy_"+\
+                str(self.__num_of_mc_iterations__)+".txt"
+
+        self.__entropy__ = numpy.zeros(self.__simulated_time__, \
+                dtype='float64')
+        self.__entropy_sigma__ = numpy.zeros(self.__simulated_time__, \
+                dtype='float64')
+
+        for t in range(self.__simulated_time__):
+            self.__entropy__[t] =numpy.mean(entr[t])
+            self.__entropy_sigma__[t] = numpy.std(entr[t])
         
         if self.__dump_files__:
         
@@ -517,29 +556,34 @@ class markovkernel:
         
           outf = open(oufilename, "w")
        
-          for t in range(tprev):
-              outf.write("%d %f %f \n"%(t+1, entropia[t], var[t]))
+          for t in range(self.__simulated_time__):
+              outf.write("%d %f %f \n"%(t+1, self.__entropy__[t], \
+                      self.__entropy_sigma__[t]))
          
           outf.close()
         
         if not self.__usecopula__:
         
-          acm = numpy.zeros((rating,tprev), dtype='float64')
+          acm = numpy.zeros((rating,self.__simulated_time__), \
+                  dtype='float64')
           for i in range(acm.shape[0]):
               for j in range(acm.shape[1]):
                   acm[i, j] = numpy.mean(ac[i, j])
           
-          oufilename = "acm_"+str(numofrun)+".txt"
+          oufilename = "acm_"+\
+                  str(self.__num_of_mc_iterations__)+".txt"
           
           if self.__dump_files__:
             basicutils.mat_to_file (acm, oufilename)
           
-          bpm = numpy.zeros((countries,tprev), dtype='float64')
+          bpm = numpy.zeros((countries,self.__simulated_time__), \
+                  dtype='float64')
           for i in range(bpm.shape[0]):
               for j in range(bpm.shape[1]):
                   bpm[i, j] = numpy.mean(bp[i, j])
           
-          oufilename = "bpm_"+str(numofrun)+".txt"
+          oufilename = "bpm_"+\
+                  str(self.__num_of_mc_iterations__)+".txt"
          
           if self.__dump_files__:
             basicutils.mat_to_file (bpm, oufilename)
@@ -551,7 +595,7 @@ class markovkernel:
 # PRIVATE
 #####################################################################
 
-    def __main_mkc_prop__ (pr):
+    def __main_mkc_prop__ (slef):
 
         countries = self.__metacommunity__.shape[0]
         rating = numpy.max(self.__metacommunity__)
@@ -560,11 +604,12 @@ class markovkernel:
         cdf = numpy.zeros((rating,rating), dtype='float64')
         
         for i in range (rating):
-            cdf[i, 0] = pr[i, 0]
+            cdf[i, 0] = self.__transitions_probability_mtx__[i, 0]
         
         for i in range(rating):
             for j in range(1,rating):
-                cdf[i, j] = pr[i, j] + cdf[i, j-1]
+                cdf[i, j] = self.__transitions_probability_mtx__[i, j] \
+                        + cdf[i, j-1]
         
         x = numpy.zeros((countries,time), dtype='int')
         xi = numpy.random.rand(countries,time)
@@ -593,7 +638,7 @@ class markovkernel:
         return x
 
 
-    def __compute_copula_variables__ (r):
+    def __compute_copula_variables__ (self, r):
 
         if self.__metacommunity__.shape != r.shape:
             print "Error  in matrix dimension"
@@ -609,7 +654,8 @@ class markovkernel:
         for i in range(Nnaz):
             a = r[i,1:end] - r[i,0:end-1]
             b = r[i,0:end-1]
-            inc_spread[i,:] = numpy.divide(a, b, out=numpy.full_like(a, 
+            inc_spread[i,:] = numpy.divide(a, b, \
+                    out=numpy.full_like(a, 
                 float("Inf")), where=b!=0)
         
         rttmp = self.__metacommunity__[:,1:end]
@@ -628,7 +674,8 @@ class markovkernel:
             mind = scipy.stats.mstats.mquantiles(dist_sp, 0.05)
             maxd = scipy.stats.mstats.mquantiles(dist_sp, 0.95)
         
-            dist_sp = filter(lambda a: a >= mind and a <= maxd, dist_sp)
+            dist_sp = filter(lambda a: a >= mind and a <= maxd, \
+                    dist_sp)
         
             x, y = basicutils.ecdf(dist_sp)
             X.append(x)
@@ -637,33 +684,39 @@ class markovkernel:
         rho = numpy.corrcoef(r) 
         
         return G, X, rho
+
     
-    def __runmcsimulation_copula__ (r, pr, G, X, rho, countries, \
-        numofrun, tprev, T_t, setval):
+    def __runmcsimulation_copula__ (self, r, G, X, rho, countries, \
+        T_t, setval):
 
         R_in = self.__metacommunity__[:,-1]
         
         spread_synth_tmp = numpy.zeros(countries)
-        spread_synth = numpy.zeros((numofrun,tprev,countries));
+        spread_synth = numpy.zeros(self.__num_of_mc_iterations__,\
+                self.__simulated_time__,countries)
         
-        entropy_t = T_t[-1]*numpy.ones((tprev,numofrun))
+        entropy_t = T_t[-1]*numpy.ones((self.__simulated_time__,\
+               self.__num_of_mc_iterations__))
         
         if self.__verbose__:
             print "Start MC simulation  ..."
         
-        for run in range(numofrun):
+        for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
-            u = basicutils.gaussian_copula_rnd (rho, tprev)
+            u = basicutils.gaussian_copula_rnd (rho, \
+                    self.__simulated_time__)
         
-            for j in range(1,tprev):
+            for j in range(1,self.__simulated_time__):
                 v = numpy.random.uniform(0.0, 1.0, countries)
-                pp = numpy.cumsum(pr[R_in-1,:],1)
+                pp = numpy.cumsum(\
+                        self.__transitions_probability_mtx__[R_in-1,:],1)
                 jj = numpy.zeros(countries, dtype=int)
                 for k in range(countries):
                     jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                     
-                    func = interp1d(G[jj[k]][1:], X[jj[k]][1:], kind='linear')
+                    func = interp1d(G[jj[k]][1:], X[jj[k]][1:], \
+                            kind='linear')
         
                     xval = u[j,k]
                     xmin = min(G[jj[k]][1:])
@@ -684,58 +737,74 @@ class markovkernel:
                 if summa != 0.0:
                     summa = 1.0e-10
         
-                P_spread = spread_synth[run,j,:]/numpy.sum(spread_synth[run,j,:])
+                P_spread = spread_synth[run,j,:]/numpy.sum(\
+                        spread_synth[run,j,:])
         
                 P_spread = P_spread.clip(min=1.0e-15)
         
-                entropy_t[j, run] =  numpy.sum(numpy.multiply(P_spread, \
+                entropy_t[j, run] =  numpy.sum(\
+                        numpy.multiply(P_spread, \
                         numpy.log(float(countries)*P_spread)))
         
             if self.__verbose__:
-                basicutils.progress_bar(run+1, numofrun)
+                basicutils.progress_bar(run+1, \
+                        self.__num_of_mc_iterations__)
             
             if setval != None:
-                setval.setValue(100.0*(float(run+1)/float(numofrun)))
+                setval.setValue(100.0*(float(run+1)/ \
+                        float(self.__num_of_mc_iterations__)))
                 if setval.wasCanceled():
-                   errmsg.append("Cancelled!")
-                   return False
+                   #errmsg.append("Cancelled!")
+                   raise StopIteration("Cancelled!")
         
         return entropy_t
     
     
-    def __runmcsimulation__ (pr, meanval, tprev, numofrun, rating, \
+    def __runmcsimulation__ (self, rating, \
         countries, tiv, setval):
 
-        entr = numpy.zeros((tprev,numofrun), dtype='float64')
+        entr = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
         
-        bp = numpy.zeros((countries,tprev,numofrun), dtype='float64')
-        ac = numpy.zeros((rating,tprev,numofrun), dtype='float64')
-        xm = numpy.zeros((countries,tprev), dtype='float64')
+        bp = numpy.zeros((countries,self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
+        ac = numpy.zeros((rating,self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
+        xm = numpy.zeros((countries,self.__simulated_time__), \
+                dtype='float64')
         cdf = numpy.zeros((rating,rating), dtype='float64')
-        x = numpy.zeros((countries,tprev), dtype='int')
-        r_prev = numpy.zeros((tprev,numofrun), dtype='float64')
-        term = numpy.zeros((tprev,numofrun), dtype='float64')
-        t1 = numpy.zeros((tprev,numofrun), dtype='float64')
-        t2 = numpy.zeros((tprev,numofrun), dtype='float64')
+        x = numpy.zeros((countries,self.__simulated_time__), \
+                dtype='int')
+        r_prev = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
+        term = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
+        t1 = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
+        t2 = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype='float64')
         
         #print type(G), type(X), type(rho)
        
         for i in range (rating):
-            cdf[i, 0] = pr[i, 0]
+            cdf[i, 0] = self.__transitions_probability_mtx__[i, 0]
         
         for i in range(rating):
             for j in range(1,rating):
-                cdf[i, j] = pr[i, j] + cdf[i, j-1]
+                cdf[i, j] = self.__transitions_probability_mtx__[i, j] \
+                        + cdf[i, j-1]
         
         if setval != None:
              setval.setValue(0)
              setval.setLabelText("Monte Carlo simulation")
         
-        for run in range(numofrun):
+        for run in range(self.__num_of_mc_iterations__):
         
-            tot = numpy.zeros((rating,tprev), dtype='float64')
-            cont = numpy.zeros((rating,tprev), dtype='int')
-            xi = numpy.random.rand(countries,tprev)
+            tot = numpy.zeros((rating,self.__simulated_time__), \
+                    dtype='float64')
+            cont = numpy.zeros((rating,self.__simulated_time__), \
+                    dtype='int')
+            xi = numpy.random.rand(countries,self.__simulated_time__)
             x[:, 0] = self.__metacommunity__[:, -1]
         
             for c in range(countries):
@@ -747,7 +816,7 @@ class markovkernel:
                         (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
                        x[c, 1] = k + 1
         
-                for t in range(2,tprev):
+                for t in range(2,self.__simulated_time__):
                     if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
                         x[c, t] = 1
         
@@ -756,36 +825,44 @@ class markovkernel:
                                 and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
                           x[c, t] = k + 1
         
-            for t in range(tprev):
+            for t in range(self.__simulated_time__):
                 for c in range(countries):
                     for i in range(rating):
                         if x[c, t] == i+1:
-                            bp[c, t, run] = meanval[i]
+                            bp[c, t, run] = \
+                                    self.__attributes_mean_values__[i]
                             cont[i, t] = cont[i, t] + 1
-                            tot[i, t] = cont[i, t] * meanval[i]
+                            tot[i, t] = cont[i, t] * \
+                                    self.__attributes_mean_values__[i]
                     
                 r_prev[t, run] = numpy.sum(bp[:, t, run])
         
-            for t in range(tprev):
+            for t in range(self.__simulated_time__):
                 for i in range(rating):
                      ac[i, t, run] = tot[i, t]/r_prev[t, run]
                      if ac[i, t, run] != 0.0:
                          t1[t, run] += (ac[i, t, run]*tiv[i])
-                         t2[t, run] += (ac[i, t, run]*math.log(float(rating)*ac[i, t, run]))
+                         t2[t, run] += (ac[i, t, \
+                                 run]*math.log(\
+                                 float(rating)*ac[i, t, run]))
                          if cont[i, t] != 0:
                             term[t, run] += ac[i, t, run]* \
-                                    math.log(float(countries)/(float(rating)*cont[i, t]))
+                                    math.log(float(countries)/ \
+                                    (float(rating)*cont[i, t]))
          
                 entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
         
             if self.__verbose__:
-                basicutils.progress_bar(run+1, numofrun)
+                basicutils.progress_bar(run+1, \
+                        self.__num_of_mc_iterations__)
         
             if setval != None:
-                setval.setValue(100.0*(float(run+1)/float(numofrun)))
+                setval.setValue(100.0*(float(run+1)/float(\
+                        self.__num_of_mc_iterations__)))
                 if setval.wasCanceled():
-                  errmsg.append("Cancelled!")
-                  return False
+                  #errmsg.append("Cancelled!")
+                  raise StopIteration("Cancelled!")
+ 
          
         return entr, ac, bp
 

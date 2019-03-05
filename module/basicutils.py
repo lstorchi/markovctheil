@@ -117,7 +117,8 @@ def get_histo (v, step):
 
 ###############################################################################
 
-def extract_ti_mean (dat, step, rtnum, numofrun, fname = "", verbose = False):
+def extract_ti_mean (dat, step, rtnum, numofrun, \
+        fname = "", verbose = False):
 
     dat = dat[numpy.isfinite(dat)]
     pdat, tdat, hdat, xdat, nbins = get_histo(dat, step)
