@@ -388,17 +388,6 @@ class main_window(QtGui.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-
-            tprev = self.__options_dialog__.gettprev()
-            self.__entropia__ = numpy.zeros(tprev, dtype='float64')
-            rating = numpy.max(self.__rm__)
-            self.__pr__ = numpy.zeros((rating,rating), dtype='float64')
-            self.__meanval__ = []
-            self.__stdeval__ = []
-            self.__var__ = numpy.zeros((tprev), dtype='float64')
-            self.__allratings__ = []
-            self.__allratingsnins__ = []
-
             markovrun = mainmkvcmp.markovkernel()
 
             try:
@@ -448,7 +437,6 @@ class main_window(QtGui.QMainWindow):
             self.__meanval__ = markovrun.get_attributes_mean_values()
             self.__stdeval__ = markovrun.get_attributes_sigma_values()
             self.__pr__ = markovrun.get_transitions_probability_mtx()
-
 
             progdialog.setValue(100.0)
             progdialog.close()
