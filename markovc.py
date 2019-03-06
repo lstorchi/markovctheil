@@ -91,18 +91,6 @@ if __name__ == "__main__" :
     ms = msd[namems]
     ir = bpd[namebp]
     
-    entropia = numpy.zeros(tprev, dtype='float64')
-    var = numpy.zeros((tprev), dtype='float64')
-    
-    rating = numpy.max(ms)
-    
-    pr = numpy.zeros((rating,rating), dtype='float64')
-    meanval = []
-    stdeval = []
-     
-    allratings = []
-    allratingsnins = []
-
     try:
         markovrun = mainmkvcmp.markovkernel()
 

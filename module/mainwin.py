@@ -388,40 +388,67 @@ class main_window(QtGui.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-            errmsg = []
 
             tprev = self.__options_dialog__.gettprev()
-
             self.__entropia__ = numpy.zeros(tprev, dtype='float64')
-            
             rating = numpy.max(self.__rm__)
             self.__pr__ = numpy.zeros((rating,rating), dtype='float64')
-
             self.__meanval__ = []
             self.__stdeval__ = []
- 
             self.__var__ = numpy.zeros((tprev), dtype='float64')
             self.__allratings__ = []
             self.__allratingsnins__ = []
 
+            markovrun = mainmkvcmp.markovkernel()
 
-            if (not mainmkvcmp.main_mkc_comp (self.__rm__, self.__ir__, \
-                    self.__options_dialog__.getinftime(), \
-                    self.__options_dialog__.getstep(), \
-                    self.__options_dialog__.gettprev(), \
-                    self.__options_dialog__.getnofrun(), \
-                    False, False, False, errmsg, self.__entropia__, \
-                    self.__var__, self.__allratings__ , self.__allratingsnins__, \
-                    self.__pr__, self.__meanval__, self.__stdeval__, self.__usecopula__, \
-                    progdialog)):
-                QtGui.QMessageBox.critical( self, \
+            try:
+            
+                markovrun.set_metacommunity(self.__rm__)
+                markovrun.set_attributes(self.__ir__)
+                markovrun.set_step( \
+                        self.__options_dialog__.getstep())
+            
+                markovrun.set_infinite_time( \
+                        self.__options_dialog__.getinftime())
+                markovrun.set_simulated_time( \
+                        self.__options_dialog__.gettprev())
+            
+                markovrun.set_num_of_mc_iterations( \
+                        self.__options_dialog__.getnofrun())
+                markovrun.set_use_a_seed(False)
+                markovrun.set_verbose(False)
+                markovrun.set_dump_files(False)
+
+                markovrun.set_usecopula(self.__usecopula__)
+
+                if not markovrun.main_mkc_comp(progdialog):
+                    
+                    QtGui.QMessageBox.critical( self, \
                     "ERROR", \
-                    errmsg[0])
+                    "Error in main markov kernel")
+
+                    progdialog.setValue(100.0)
+                    progdialog.close()
                 
+                    return 
+
+            except TypeError as err:
+                QtGui.QMessageBox.critical( self, \
+                        "ERROR", err)
+
                 progdialog.setValue(100.0)
                 progdialog.close()
                 
                 return 
+
+            self.__entropy__ = markovrun.get_entropy()
+            self.__var__ = markovrun.get_get_entropy_sigma()
+            self.__allratings__ = markovrun.get_attributes_pdf_values()
+            self.__allratingsnins__ = markovrun.get_attributes_pdf_bins()
+            self.__meanval__ = markovrun.get_attributes_mean_values()
+            self.__stdeval__ = markovrun.get_attributes_sigma_values()
+            self.__pr__ = markovrun.get_transitions_probability_mtx()
+
 
             progdialog.setValue(100.0)
             progdialog.close()
