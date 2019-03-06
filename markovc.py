@@ -89,7 +89,7 @@ if __name__ == "__main__" :
         exit(1)
     
     ms = msd[namems]
-    i_r = bpd[namebp]
+    ir = bpd[namebp]
     
     entropia = numpy.zeros(tprev, dtype='float64')
     var = numpy.zeros((tprev), dtype='float64')
@@ -102,11 +102,27 @@ if __name__ == "__main__" :
      
     allratings = []
     allratingsnins = []
-    
-    if not mainmkvcmp.main_mkc_comp (ms, i_r, timeinf, step, tprev, \
-            numofrun, verbose, True, args.seed, errmsg, entropia, \
-            var, allratings, allratingsnins, pr, meanval, stdeval, \
-            usecopula):
-        for m in errmsg:
-            print m
+
+    try:
+        markovrun = mainmkvcmp.markovkernel()
+
+        markovrun.set_metacommunity(ms)
+        markovrun.set_attributes(ir)
+        markovrun.set_step(step)
+
+        markovrun.set_infinite_time(timeinf)
+        markovrun.set_simulated_time(tprev)
+
+        markovrun.set_num_of_mc_iterations(numofrun)
+        markovrun.set_use_a_seed(args.seed)
+        markovrun.set_usecopula(usecopula)
+        markovrun.set_verbose(verbose)
+        markovrun.set_dump_files(True)
+
+        if not markovrun.main_mkc_comp():
+            print "Error in main markov kernel"
+            exit(1)
+
+    except TypeError as err:
+        print err
         exit(1)

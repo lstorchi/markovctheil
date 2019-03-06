@@ -53,7 +53,7 @@ class markovkernel:
 
 
     def set_metacommunity (self, inmat):
-        if not isinstance(inmat, numpy.array):
+        if not isinstance(inmat, numpy.ndarray):
             raise TypeError("input must be a numpy array")
 
         self.__metacommunity__ = inmat
@@ -64,7 +64,7 @@ class markovkernel:
 
 
     def set_attributes (self, inmat):
-        if not isinstance(inmat, numpy,array):
+        if not isinstance(inmat, numpy.ndarray):
             raise TypeError("input must be a numpy array")
 
         self.__attributes__ = inmat
@@ -155,7 +155,7 @@ class markovkernel:
 
 
     def set_step(self, inval):
-        if not isinstance(numin, float):
+        if not isinstance(inval, float):
             raise TypeError("input must be a float")
 
         self.__step__ = inval
@@ -193,7 +193,7 @@ class markovkernel:
         return self.__attributes_sigma_values__ 
     
     
-    def main_mkc_comp (setval=None):
+    def main_mkc_comp (self, setval=None):
 
         if self.__use_a_seed__:
             numpy.random.seed(self.__seed_value__)
@@ -511,26 +511,26 @@ class markovkernel:
               return False
         
         
-        entr = None
+        entropy = None
         ac = None
         bp = None 
         
         if self.__usecopula__:
-            G, X, rho = compute_copula_variables (\
+            G, X, rho = self.__compute_copula_variables__ (\
                     self.__metacommunity__, r)
             
             try:
-                entr = runmcsimulation_copula (r, G, \
+                entropy = self.__runmcsimulation_copula__ (r, G, \
                     X, rho, countries, \
-                    T_t, verbose, setval)
+                    T_t, setval)
             except StopIteration:
                 return False
 
         else:
             try:
-                entr, ac, bp = runmcsimulation (\
+               entropy, ac, bp = self.__runmcsimulation__ (\
                     rating, countries, tiv, \
-                    verbose, setval)
+                    setval)
             except StopIteration:
                 return False
         
@@ -546,8 +546,8 @@ class markovkernel:
                 dtype='float64')
 
         for t in range(self.__simulated_time__):
-            self.__entropy__[t] =numpy.mean(entr[t])
-            self.__entropy_sigma__[t] = numpy.std(entr[t])
+            self.__entropy__[t] = numpy.mean(entropy[t])
+            self.__entropy_sigma__[t] = numpy.std(entropy[t])
         
         if self.__dump_files__:
         
@@ -595,7 +595,7 @@ class markovkernel:
 # PRIVATE
 #####################################################################
 
-    def __main_mkc_prop__ (slef):
+    def __main_mkc_prop__ (self):
 
         countries = self.__metacommunity__.shape[0]
         rating = numpy.max(self.__metacommunity__)
@@ -695,7 +695,7 @@ class markovkernel:
         spread_synth = numpy.zeros(self.__num_of_mc_iterations__,\
                 self.__simulated_time__,countries)
         
-        entropy_t = T_t[-1]*numpy.ones((self.__simulated_time__,\
+        entropy = T_t[-1]*numpy.ones((self.__simulated_time__,\
                self.__num_of_mc_iterations__))
         
         if self.__verbose__:
@@ -742,7 +742,7 @@ class markovkernel:
         
                 P_spread = P_spread.clip(min=1.0e-15)
         
-                entropy_t[j, run] =  numpy.sum(\
+                entropy[j, run] =  numpy.sum(\
                         numpy.multiply(P_spread, \
                         numpy.log(float(countries)*P_spread)))
         
@@ -756,14 +756,14 @@ class markovkernel:
                 if setval.wasCanceled():
                    #errmsg.append("Cancelled!")
                    raise StopIteration("Cancelled!")
+
+        return entropy
         
-        return entropy_t
-    
     
     def __runmcsimulation__ (self, rating, \
         countries, tiv, setval):
 
-        entr = numpy.zeros((self.__simulated_time__,\
+        entropy = numpy.zeros((self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
         
         bp = numpy.zeros((countries,self.__simulated_time__,\
@@ -850,7 +850,7 @@ class markovkernel:
                                     math.log(float(countries)/ \
                                     (float(rating)*cont[i, t]))
          
-                entr[t, run] = t1[t, run] + t2[t, run] + term[t, run]
+                entropy[t, run] = t1[t, run] + t2[t, run] + term[t, run]
         
             if self.__verbose__:
                 basicutils.progress_bar(run+1, \
@@ -864,5 +864,5 @@ class markovkernel:
                   raise StopIteration("Cancelled!")
  
          
-        return entr, ac, bp
+        return entropy, ac, bp
 
