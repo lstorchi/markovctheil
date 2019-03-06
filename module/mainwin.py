@@ -24,6 +24,14 @@ class main_window(QtGui.QMainWindow):
         self.__plot_done__ = False
 
         self.__usecopula__ = False
+
+        self.__entropy__ = None
+        self.__var__ = None
+        self.__allratings__ = None
+        self.__allratingsnins__ = None
+        self.__meanval__ = None
+        self.__stdeval__ = None
+        self.__pr__ = None
        
         QtGui.QMainWindow.__init__(self) 
         self.resize(640, 480) 
@@ -136,7 +144,7 @@ class main_window(QtGui.QMainWindow):
            outf.write("\n")
 
            if self.__options_dialog__.getinftime():
-                ev = self.__entropia__[1:]
+                ev = self.__entropy__[1:]
                 m = numpy.mean(ev)
                 s = numpy.std(ev)
                 outf.write("Stationary value: " + \
@@ -144,7 +152,7 @@ class main_window(QtGui.QMainWindow):
            else:
                 outf.write("t E(DT) STD(DT)\n")
                 for t in range(self.__options_dialog__.gettprev()):
-                    outf.write("%d %f %f \n"%(t+1, self.__entropia__[t], \
+                    outf.write("%d %f %f \n"%(t+1, self.__entropy__[t], \
                             self.__var__[t]))
 
            outf.close()
@@ -388,17 +396,6 @@ class main_window(QtGui.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-
-            tprev = self.__options_dialog__.gettprev()
-            self.__entropia__ = numpy.zeros(tprev, dtype='float64')
-            rating = numpy.max(self.__rm__)
-            self.__pr__ = numpy.zeros((rating,rating), dtype='float64')
-            self.__meanval__ = []
-            self.__stdeval__ = []
-            self.__var__ = numpy.zeros((tprev), dtype='float64')
-            self.__allratings__ = []
-            self.__allratingsnins__ = []
-
             markovrun = mainmkvcmp.markovkernel()
 
             try:
@@ -449,7 +446,6 @@ class main_window(QtGui.QMainWindow):
             self.__stdeval__ = markovrun.get_attributes_sigma_values()
             self.__pr__ = markovrun.get_transitions_probability_mtx()
 
-
             progdialog.setValue(100.0)
             progdialog.close()
 
@@ -459,13 +455,13 @@ class main_window(QtGui.QMainWindow):
             self.__mats__.setEnabled(True)
 
             if self.__options_dialog__.getinftime():
-                ev = self.__entropia__[1:]
+                ev = self.__entropy__[1:]
                 QtGui.QMessageBox.information( self, \
                         "Value", "Stationary value: " +\
                         str(numpy.mean(ev)) + " stdev: " + \
                         str(numpy.std(ev)))
             else:
-                self.plot(self.__entropia__)
+                self.plot(self.__entropy__)
 
         else:
             QtGui.QMessageBox.critical( self, \
