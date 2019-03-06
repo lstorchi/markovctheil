@@ -442,7 +442,7 @@ class main_window(QtGui.QMainWindow):
                 return 
 
             self.__entropy__ = markovrun.get_entropy()
-            self.__var__ = markovrun.get_get_entropy_sigma()
+            self.__var__ = markovrun.get_entropy_sigma()
             self.__allratings__ = markovrun.get_attributes_pdf_values()
             self.__allratingsnins__ = markovrun.get_attributes_pdf_bins()
             self.__meanval__ = markovrun.get_attributes_mean_values()
