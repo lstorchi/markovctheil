@@ -734,7 +734,7 @@ class changepoint:
 # PRIVATE
 ###############################################################################
 
-    def __compute_cps__ (slef, rm, c_p1, performtest = False, \
+    def __compute_cps__ (self, rm, c_p1, performtest = False, \
             c_p2 = -1, c_p3 = -1):
 
         countries=rm.shape[0]
@@ -993,7 +993,7 @@ class changepoint:
         raise Error ("at least cp1 should be > 0")
 
 
-    def __mkc_prop__ (metacommunity, transitions_probability_mtx): 
+    def __mkc_prop__ (slef, metacommunity, transitions_probability_mtx): 
 
         mcrows = metacommunity.shape[0]
         mcmaxvalue = numpy.max(metacommunity)
