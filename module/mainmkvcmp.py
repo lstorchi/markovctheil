@@ -53,6 +53,10 @@ class markovkernel:
 
 
     def set_metacommunity (self, inmat):
+        """
+        Specify the metacommunity matrix.
+        """
+
         if not isinstance(inmat, numpy.ndarray):
             raise TypeError("input must be a numpy array")
 
@@ -328,6 +332,9 @@ class markovkernel:
         tiv = []
         
         fname = ""
+
+        fnamemap = {1:"aaa", 2:"aa", 3:"a", 4:"bbb", \
+                5:"bb", 6:"b", 7:"c", 8:"d"}
         
         if mcmaxvalue > 0:
             if self.__dump_files__:
