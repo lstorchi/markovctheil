@@ -335,128 +335,24 @@ class markovkernel:
 
         fnamemap = {1:"aaa", 2:"aa", 3:"a", 4:"bbb", \
                 5:"bb", 6:"b", 7:"c", 8:"d"}
-        
-        if mcmaxvalue > 0:
-            if self.__dump_files__:
-                fname = "aaa"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean (y[0, :nn[0]], \
-                    self.__step__, 0, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 1:
-            if self.__dump_files__:
-                fname = "aa"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[1, :nn[1]], self.__step__, \
-                    1, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 2:
-            if self.__dump_files__:
-                fname = "a"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[2, :nn[2]], self.__step__, \
-                    2, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 3: 
-            if self.__dump_files__:
-                fname = "bbb"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[3, :nn[3]], self.__step__, \
-                    3, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 4:
-            if self.__dump_files__:
-                fname = "bb"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[4, :nn[4]], self.__step__, \
-                    4, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 5:
-            if self.__dump_files__:
-                fname = "b"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[5, :nn[5]], self.__step__, \
-                    5, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 6:
-            if self.__dump_files__:
-                fname = "cc"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[6, :nn[6]], self.__step__, \
-                    6, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        if mcmaxvalue > 7:
-            if self.__dump_files__:
-                fname = "d"
-        
-            a, b, c, d, e = basicutils.extract_ti_mean ( \
-                    y[7, :nn[7]], self.__step__, \
-                    7, self.__num_of_mc_iterations__, \
-                    fname)
-        
-            self.__attributes_pdf_bins__.append(d)
-            self.__attributes_pdf_values__.append(a)
-            self.__attributes_sigma_values__.append(e)
-            self.__attributes_mean_values__.append(b)
-            tiv.append(c)
-        
-        fval = 0.0
-        pval = 0.0
+
+        for imcval in range(0,8):
+            if mcmaxvalue > imcval:
+                if self.__dump_files__:
+                    fname = fnamemap[imcval+1]
+
+                a, b, c, d, e = basicutils.extract_ti_mean (\
+                        y[imcval, :nn[imcval]], \
+                        self.__step__, imcval, \
+                        self.__num_of_mc_iterations__, \
+                        fname)
+                
+                self.__attributes_pdf_bins__.append(d)
+                self.__attributes_pdf_values__.append(a)
+                self.__attributes_sigma_values__.append(e)
+                self.__attributes_mean_values__.append(b)
+                tiv.append(c)
+ 
         
         if setval != None:
           setval.setValue(75.0)

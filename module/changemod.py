@@ -12,259 +12,200 @@ class Error(Exception):
     """Base class for exceptions in this module."""
     pass
 
-def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
-
-    countries=rm.shape[0]
-    rating=numpy.max(rm)
-    time=rm.shape[1]
-
-    if (rating <= 0) or (rating > 8):
-        raise Error ("rating " + rating + " is not a valid value")
-
-    if c_p1 > 0:
-
-        pr = 0
-        pr1 = 0
-        pr2 = 0
-        pr3 = 0
-        pr4 = 0
-
-        if performtest:
-            pr = numpy.zeros((rating,rating),dtype='float64')
-            pr1 = numpy.zeros((rating,rating),dtype='float64')
-            pr2 = numpy.zeros((rating,rating),dtype='float64')
-
-            nk = numpy.zeros((rating,rating,countries), dtype='int64')
-            num = numpy.zeros((rating,rating), dtype='int64')
-            den = numpy.zeros(rating, dtype='int64')
-            
-            L = 0.0
-            
-            for i in range(rating):
-                for j in range(rating):
-            
-                    for c  in range(countries):
-                        for t in range(time-1):
-                            if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                nk[i, j, c] = nk[i, j, c] + 1
-                            
-                    num[i, j] = sum(nk[i, j])
-                
-                den[i] = sum(num[i])
-            
-                if (den[i] > 0.0):
-                    for j in range(rating):
-                        val = numpy.float64(num[i,j])/numpy.float64(den[i])
-                        if (val > 0.0):
-                            L += num[i,j]*math.log(val) 
-            
-            for i in range(rating):
-                for j in range(rating):
-                    if den[i] != 0:
-                       pr[i, j] = float(num[i, j])/float(den[i])
-                    else: 
-                       pr[i, j] = 0
-                       pr[i, i] = 1
- 
-
-        num1 = numpy.zeros((rating,rating), dtype='int64')
-        den1 = numpy.zeros(rating, dtype='int64')
-        
-        L1 = 0.0 
-        
-        for i in range(rating):
-             for j in range(rating):
-                for c in range(countries):
-                     for t in range(c_p1-1):
-                        if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                            num1[i, j] = num1[i, j] + 1
-                
-             den1[i] = sum(num1[i])
-        
-             if (den1[i] > 0.0):
-                for j in range(rating):
-                   val = numpy.float64(num1[i,j])/numpy.float64(den1[i])
-                   if (val > 0.0):
-                      L1 += num1[i,j]*math.log(val) 
-        
-        if performtest:
-             for i in range(rating):
-                 for j in range(rating):
-                     if den1[i] != 0:
-                        pr1[i, j] = float(num1[i, j])/float(den1[i])
-                     else: 
-                        pr1[i, j] = 0        
-                        pr1[i,i] = 1  
-
-        num2 = numpy.zeros((rating,rating), dtype='int64')
-        den2 = numpy.zeros(rating, dtype='int64')
-         
-        L2 = 0.0 
-       
-        if c_p2 > 0:
-
-            if performtest:
-                pr3 = numpy.zeros((rating,rating),dtype='float64')
-           
-            for i in range(rating):
-                 for j in range(rating):
-                     for c in range(countries):
-                          for t in range(c_p1,c_p2-1) :
-                              if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                  num2[i, j] = num2[i, j] + 1
-                     
-                 den2[i] = sum(num2[i])
-            
-                 if (den2[i] > 0.0):
-                     for j in range(rating):
-                        val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
-                        if (val > 0.0):
-                            L2 += num2[i,j]*math.log(val) 
-
-            if performtest:
-
-                 for i in range(rating):
-                     for j in range(rating):
-                         if den2[i] != 0:
-                            pr2[i, j] = float(num2[i, j])/float(den2[i])
-                         else: 
-                            pr2[i, j] = 0        
-                            pr2[i,i] = 1  
-
-            num3 = numpy.zeros((rating,rating), dtype='int64')
-            den3 = numpy.zeros(rating, dtype='int64')
-             
-            L3 = 0.0 
-
-            if c_p3 > 0:
-
-                if performtest:
-                    pr4 = numpy.zeros((rating,rating),dtype='float64')
-           
-                for i in range(rating):
-                     for j in range(rating):
-                         for c in range(countries):
-                              for t in range(c_p2,c_p3-1) :
-                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                      num3[i, j] = num3[i, j] + 1
-                         
-                     den3[i] = sum(num3[i])
-                
-                     if (den3[i] > 0.0):
-                         for j in range(rating):
-                            val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
-                            if (val > 0.0):
-                                L3 += num3[i,j]*math.log(val) 
-
-                if performtest:
-
-                    for i in range(rating):
-                        for j in range(rating):
-                            if den3[i] != 0:
-                               pr3[i, j] = float(num3[i, j])/float(den3[i])
-                            else: 
-                               pr3[i, j] = 0
-                               pr3[i,i] = 1
-                
-                num4 = numpy.zeros((rating,rating), dtype='int64')
-                den4 = numpy.zeros(rating, dtype='int64')
-                 
-                L4 = 0.0 
-                
-                for i in range(rating):
-                     for j in range(rating):
-                         for c in range(countries):
-                              for t in range(c_p3,time-1) :
-                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                      num4[i, j] = num4[i, j] + 1
-                         
-                     den4[i] = sum(num4[i])
-                     if (den4[i] > 0.0):
-                         for j in range(rating):
-                            val = numpy.float64(num4[i,j])/numpy.float64(den4[i])
-                            if (val > 0.0):
-                                L4 += num4[i,j]*math.log(val) 
-
-                if performtest:
-
-                     for i in range(rating):
-                         for j in range(rating):
-                             if den4[i] != 0:
-                                pr4[i, j] = float(num4[i, j])/float(den4[i])
-                             else: 
-                                pr4[i, j] = 0        
-                                pr4[i,i] = 1  
-
-                     return L, L1, L2, L3, L4, pr1, pr2, pr3, pr4
-
-                
-                return L1, L2, L3, L4
-
-            else:
-                for i in range(rating):
-                     for j in range(rating):
-                         for c in range(countries):
-                              for t in range(c_p2,time-1) :
-                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                      num3[i, j] = num3[i, j] + 1
-                         
-                     den3[i] = sum(num3[i])
-                
-                     if (den3[i] > 0.0):
-                         for j in range(rating):
-                            val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
-                            if (val > 0.0):
-                                L3 += num3[i,j]*math.log(val) 
-
-                if performtest:
-
-                    for i in range(rating):
-                        for j in range(rating):
-                            if den3[i] != 0:
-                               pr3[i, j] = float(num3[i, j])/float(den3[i])
-                            else: 
-                               pr3[i, j] = 0
-                               pr3[i,i] = 1
-
-                    return L, L1, L2, L3, pr1, pr2, pr3
- 
-                return L1, L2, L3 
-
-        else:
-
-            for i in range(rating):
-                 for j in range(rating):
-                     for c in range(countries):
-                          for t in range(c_p1,time-1) :
-                              if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
-                                  num2[i, j] = num2[i, j] + 1
-                     
-                 den2[i] = sum(num2[i])
-            
-                 if (den2[i] > 0.0):
-                     for j in range(rating):
-                        val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
-                        if (val > 0.0):
-                            L2 += num2[i,j]*math.log(val) 
-
-                 if performtest:
-
-                     for i in range(rating):
-                         for j in range(rating):
-                             if den2[i] != 0:
-                                pr2[i, j] = float(num2[i, j])/float(den2[i])
-                             else: 
-                                pr2[i, j] = 0
-                                pr2[i,i] = 1
-
-                     return L, L1, L2, pr1, pr2
- 
- 
-            return L1, L2
-
-    raise Error ("at least cp1 should be > 0")
-
 ###############################################################################
+
+
+class changepoint:
+
+    def __init__(self):
+
+        self.__metacommunity__ = None # ms
+        self.__num_of_bootstrap_iter__ = 100 # num_of_run
+        
+        self.__cp_fortest__ = False # cp_fortest
+        self.__cp_fortest_2__ = False # cp_fortest_2
+        self.__cp_fortest_3__ = False # cp_fortest_3
+
+        self.__num_of_cps__ = 1 # anumofcp
+        self.__cp1_start__ = -1 # acp1start
+        self.__cp2_start__ = -1 # acp2start
+        self.__cp3_start__ = -1 # acp3start
+
+        self.__cp1_stop__ = -1 # acp1stop
+        self.__cp2_stop__ = -1 # acp2stop
+        self.__cp3_stop__ = -1 # acp3stop
+        
+        self.__delta_cp__ = 1 # adeltacp
+
+        self.__print_iter_info__ = False # aiterations
+
+        self.__verbose__ = False # verbose 
+        self.__fp__ = None # fp
+
+    def set_metacommunity(self, inmat):
+        if not isinstance(inmat, numpy.ndarray):
+            raise TypeError("input must be a numpy array")
+
+        self.__metacommunity__ = inmat
+
+
+    def get_metacommunity(self):
+
+        return self.__metacommunity__
+
+    det set_num_of_bootstrap_iter (self, inval):
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
+
+        self.__num_of_bootstrap_iter__ = inval
+
+
+    def get_num_of_bootstrap_iter (self):
+
+        return self.__num_of_bootstrap_iter__
+        
+
+    def set_cp1_fortest (self, inval):
+        if not isinstance(inval, bool):
+            raise TypeError("input must be a boolean")
+
+        self.__cp_fortest_1__ = inval
+
+
+    def get_cp1_fortest (self):
+
+        return self.__cp_fortest_1__
+
+
+    def set_cp2_fortest (self, inval):
+        if not isinstance(inval, bool):
+            raise TypeError("input must be a boolean")
+
+        self.__cp_fortest_2__ = inval
+
+
+    def get_cp2_fortest (self):
+
+        return self.__cp_fortest_2__
+
+
+    def set_cp3_fortest (self, inval):
+        if not isinstance(inval, bool):
+            raise TypeError("input must be a boolean")
+
+        self.__cp_fortest_3__ = inval
+
+
+    def get_cp3_fortest (self):
+
+        return self.__cp_fortest_3__
+
+
+    def set_num_of_cps (self, inval):
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
+
+        self.__num_of_cps__ = inval
+
+
+    def get_num_of_cps (self):
+
+        return self.__num_of_cps__
+
+    def set_cp1_start_stop (self, start=-1, stop=-1):
+        if not isinstance(start, int):
+            raise TypeError("input must be an integer")
+
+        if not isinstance(stop, int):
+            raise TypeError("input must be an integer")
+
+        self.__cp1_start__ = start
+        self.__cp1_stop__ = stop
+
+
+    def get_cp1_start_stop (self):
+
+        return self.__cp1_start__, self.__cp1_stop__
+
+
+    def set_cp2_start_stop (self, start=-1, stop=-1):
+        if not isinstance(start, int):
+            raise TypeError("input must be an integer")
+
+        if not isinstance(stop, int):
+            raise TypeError("input must be an integer")
+
+        self.__cp2_start__ = start
+        self.__cp2_stop__ = stop
+
+
+    def get_cp2_start_stop (self):
+
+        return self.__cp2_start__, self.__cp2_stop__
+
+
+    def set_cp3_start_stop (self, start=-1, stop=-1):
+        if not isinstance(start, int):
+            raise TypeError("input must be an integer")
+
+        if not isinstance(stop, int):
+            raise TypeError("input must be an integer")
+
+        self.__cp3_start__ = start
+        self.__cp3_stop__ = stop
+
+
+    def get_cp3_start_stop (self):
+
+        return self.__cp3_start__, self.__cp3_stop__
+
+
+    def set_delta_cp (self, inval):
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
+
+        self.__delta_cp__ = inval
+
+
+    def get_delta_cp (self):
+
+        return self.__delta_cp__
+
+    
+    def set_file_pointer (self, fpin):
+        if not isinstance(fpin, io.IOBase):
+            raise TypeError("input must be a file pointer")
+
+        self.__fp__ = fpin
+
+
+    def get_file_pointer (self):
+        
+        return self.__fp__
+
+
+    def set_print_iter_info (self, inval):
+        if not isinstance(fpin, bool):
+            raise TypeError("input must be a bool")
+
+        self.__print_iter_info__ = inval
+
+
+    def get_print_iter_info (self):
+
+        return self.__print_iter_info__
+
+
+    def set_verbose (self, inval):
+        if not isinstance(fpin, bool):
+            raise TypeError("input must be a bool")
+
+        self.__verbose__ = inval
+
+    def get_verbose (self):
+
+        return self.__verbose__
+
 
 def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, 
         anumofcp, acp1start, acp2start, acp3start, acp1stop, acp2stop, 
@@ -788,4 +729,261 @@ def main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3,
                return vals
 
     raise Error ("Nothing todo")
+
+
+###############################################################################
+# PRIVATE
+###############################################################################
+
+def compute_cps (rm, c_p1, performtest = False, c_p2 = -1, c_p3 = -1):
+
+    countries=rm.shape[0]
+    rating=numpy.max(rm)
+    time=rm.shape[1]
+
+    if (rating <= 0) or (rating > 8):
+        raise Error ("rating " + rating + " is not a valid value")
+
+    if c_p1 > 0:
+
+        pr = 0
+        pr1 = 0
+        pr2 = 0
+        pr3 = 0
+        pr4 = 0
+
+        if performtest:
+            pr = numpy.zeros((rating,rating),dtype='float64')
+            pr1 = numpy.zeros((rating,rating),dtype='float64')
+            pr2 = numpy.zeros((rating,rating),dtype='float64')
+
+            nk = numpy.zeros((rating,rating,countries), dtype='int64')
+            num = numpy.zeros((rating,rating), dtype='int64')
+            den = numpy.zeros(rating, dtype='int64')
+            
+            L = 0.0
+            
+            for i in range(rating):
+                for j in range(rating):
+            
+                    for c  in range(countries):
+                        for t in range(time-1):
+                            if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                nk[i, j, c] = nk[i, j, c] + 1
+                            
+                    num[i, j] = sum(nk[i, j])
+                
+                den[i] = sum(num[i])
+            
+                if (den[i] > 0.0):
+                    for j in range(rating):
+                        val = numpy.float64(num[i,j])/numpy.float64(den[i])
+                        if (val > 0.0):
+                            L += num[i,j]*math.log(val) 
+            
+            for i in range(rating):
+                for j in range(rating):
+                    if den[i] != 0:
+                       pr[i, j] = float(num[i, j])/float(den[i])
+                    else: 
+                       pr[i, j] = 0
+                       pr[i, i] = 1
+ 
+
+        num1 = numpy.zeros((rating,rating), dtype='int64')
+        den1 = numpy.zeros(rating, dtype='int64')
+        
+        L1 = 0.0 
+        
+        for i in range(rating):
+             for j in range(rating):
+                for c in range(countries):
+                     for t in range(c_p1-1):
+                        if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                            num1[i, j] = num1[i, j] + 1
+                
+             den1[i] = sum(num1[i])
+        
+             if (den1[i] > 0.0):
+                for j in range(rating):
+                   val = numpy.float64(num1[i,j])/numpy.float64(den1[i])
+                   if (val > 0.0):
+                      L1 += num1[i,j]*math.log(val) 
+        
+        if performtest:
+             for i in range(rating):
+                 for j in range(rating):
+                     if den1[i] != 0:
+                        pr1[i, j] = float(num1[i, j])/float(den1[i])
+                     else: 
+                        pr1[i, j] = 0        
+                        pr1[i,i] = 1  
+
+        num2 = numpy.zeros((rating,rating), dtype='int64')
+        den2 = numpy.zeros(rating, dtype='int64')
+         
+        L2 = 0.0 
+       
+        if c_p2 > 0:
+
+            if performtest:
+                pr3 = numpy.zeros((rating,rating),dtype='float64')
+           
+            for i in range(rating):
+                 for j in range(rating):
+                     for c in range(countries):
+                          for t in range(c_p1,c_p2-1) :
+                              if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                  num2[i, j] = num2[i, j] + 1
+                     
+                 den2[i] = sum(num2[i])
+            
+                 if (den2[i] > 0.0):
+                     for j in range(rating):
+                        val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
+                        if (val > 0.0):
+                            L2 += num2[i,j]*math.log(val) 
+
+            if performtest:
+
+                 for i in range(rating):
+                     for j in range(rating):
+                         if den2[i] != 0:
+                            pr2[i, j] = float(num2[i, j])/float(den2[i])
+                         else: 
+                            pr2[i, j] = 0        
+                            pr2[i,i] = 1  
+
+            num3 = numpy.zeros((rating,rating), dtype='int64')
+            den3 = numpy.zeros(rating, dtype='int64')
+             
+            L3 = 0.0 
+
+            if c_p3 > 0:
+
+                if performtest:
+                    pr4 = numpy.zeros((rating,rating),dtype='float64')
+           
+                for i in range(rating):
+                     for j in range(rating):
+                         for c in range(countries):
+                              for t in range(c_p2,c_p3-1) :
+                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                      num3[i, j] = num3[i, j] + 1
+                         
+                     den3[i] = sum(num3[i])
+                
+                     if (den3[i] > 0.0):
+                         for j in range(rating):
+                            val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
+                            if (val > 0.0):
+                                L3 += num3[i,j]*math.log(val) 
+
+                if performtest:
+
+                    for i in range(rating):
+                        for j in range(rating):
+                            if den3[i] != 0:
+                               pr3[i, j] = float(num3[i, j])/float(den3[i])
+                            else: 
+                               pr3[i, j] = 0
+                               pr3[i,i] = 1
+                
+                num4 = numpy.zeros((rating,rating), dtype='int64')
+                den4 = numpy.zeros(rating, dtype='int64')
+                 
+                L4 = 0.0 
+                
+                for i in range(rating):
+                     for j in range(rating):
+                         for c in range(countries):
+                              for t in range(c_p3,time-1) :
+                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                      num4[i, j] = num4[i, j] + 1
+                         
+                     den4[i] = sum(num4[i])
+                     if (den4[i] > 0.0):
+                         for j in range(rating):
+                            val = numpy.float64(num4[i,j])/numpy.float64(den4[i])
+                            if (val > 0.0):
+                                L4 += num4[i,j]*math.log(val) 
+
+                if performtest:
+
+                     for i in range(rating):
+                         for j in range(rating):
+                             if den4[i] != 0:
+                                pr4[i, j] = float(num4[i, j])/float(den4[i])
+                             else: 
+                                pr4[i, j] = 0        
+                                pr4[i,i] = 1  
+
+                     return L, L1, L2, L3, L4, pr1, pr2, pr3, pr4
+
+                
+                return L1, L2, L3, L4
+
+            else:
+                for i in range(rating):
+                     for j in range(rating):
+                         for c in range(countries):
+                              for t in range(c_p2,time-1) :
+                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                      num3[i, j] = num3[i, j] + 1
+                         
+                     den3[i] = sum(num3[i])
+                
+                     if (den3[i] > 0.0):
+                         for j in range(rating):
+                            val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
+                            if (val > 0.0):
+                                L3 += num3[i,j]*math.log(val) 
+
+                if performtest:
+
+                    for i in range(rating):
+                        for j in range(rating):
+                            if den3[i] != 0:
+                               pr3[i, j] = float(num3[i, j])/float(den3[i])
+                            else: 
+                               pr3[i, j] = 0
+                               pr3[i,i] = 1
+
+                    return L, L1, L2, L3, pr1, pr2, pr3
+ 
+                return L1, L2, L3 
+
+        else:
+
+            for i in range(rating):
+                 for j in range(rating):
+                     for c in range(countries):
+                          for t in range(c_p1,time-1) :
+                              if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                  num2[i, j] = num2[i, j] + 1
+                     
+                 den2[i] = sum(num2[i])
+            
+                 if (den2[i] > 0.0):
+                     for j in range(rating):
+                        val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
+                        if (val > 0.0):
+                            L2 += num2[i,j]*math.log(val) 
+
+                 if performtest:
+
+                     for i in range(rating):
+                         for j in range(rating):
+                             if den2[i] != 0:
+                                pr2[i, j] = float(num2[i, j])/float(den2[i])
+                             else: 
+                                pr2[i, j] = 0
+                                pr2[i,i] = 1
+
+                     return L, L1, L2, pr1, pr2
+ 
+ 
+            return L1, L2
+
+    raise Error ("at least cp1 should be > 0")
 
