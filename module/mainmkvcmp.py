@@ -198,28 +198,28 @@ class markovkernel:
         if self.__use_a_seed__:
             numpy.random.seed(self.__seed_value__)
         
-        countries = self.__metacommunity__.shape[0]
-        rating = numpy.max(self.__metacommunity__)
-        time = self.__metacommunity__.shape[1]
+        mcrows = self.__metacommunity__.shape[0]
+        mcmaxvalue = numpy.max(self.__metacommunity__)
+        mccols = self.__metacommunity__.shape[1]
         
-        if (rating <= 0) or (rating > 8):
+        if (mcmaxvalue <= 0) or (mcmaxvalue > 8):
             raise ValueError("metacommunity has invalid values")
 
         self.__transitions_probability_mtx__ = \
-                numpy.zeros((rating,rating), dtype='float64') 
+                numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64') 
         
-        nk = numpy.zeros((rating,rating,countries), dtype='int64')
-        num = numpy.zeros((rating,rating), dtype='int64')
-        den = numpy.zeros(rating, dtype='int64')
+        nk = numpy.zeros((mcmaxvalue,mcmaxvalue,mcrows), dtype='int64')
+        num = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='int64')
+        den = numpy.zeros(mcmaxvalue, dtype='int64')
         
         if setval != None:
              setval.setValue(0)
              setval.setLabelText("Historical data analysis")
         
-        for k in range(countries):
-            for t in range(time-1):
-                for i in range(rating):
-                    for j in range(rating):
+        for k in range(mcrows):
+            for t in range(mccols-1):
+                for i in range(mcmaxvalue):
+                    for j in range(mcmaxvalue):
                         if (self.__metacommunity__[k, t] == (i+1)) \
                                 and (self.__metacommunity__[k, t+1] \
                                 == (j+1)):
@@ -230,10 +230,10 @@ class markovkernel:
                     den[i] = sum(num[i])
         
             if self.__verbose__:
-              basicutils.progress_bar(k+1, countries)
+              basicutils.progress_bar(k+1, mcrows)
         
             if setval != None:
-              setval.setValue(100.0*(float(k+1)/float(countries)))
+              setval.setValue(100.0*(float(k+1)/float(mcrows)))
               if setval.wasCanceled():
                   #errmsg.append("Cancelled!")
                   return False
@@ -242,8 +242,8 @@ class markovkernel:
              setval.setValue(0)
              setval.setLabelText("Running...")
         
-        for i in range(rating):
-            for j in range(rating):
+        for i in range(mcmaxvalue):
+            for j in range(mcmaxvalue):
                 if den[i] != 0:
                     self.__transitions_probability_mtx__[i, j] = \
                             float(num[i, j])/float(den[i])
@@ -256,23 +256,23 @@ class markovkernel:
               print ""
               print "Solve ..."
         
-            ai = numpy.identity(rating, dtype='float64') - \
+            ai = numpy.identity(mcmaxvalue, dtype='float64') - \
                     numpy.matrix.transpose(self.__transitions_probability_mtx__)
-            a = numpy.zeros((rating+1,rating), dtype='float64')
+            a = numpy.zeros((mcmaxvalue+1,mcmaxvalue), dtype='float64')
         
-            for i in range(rating):
-                for j in range(rating):
+            for i in range(mcmaxvalue):
+                for j in range(mcmaxvalue):
                     a[i, j] = ai[i, j]
         
-            for i in range(rating):
-                a[rating, i] = 1.0 
+            for i in range(mcmaxvalue):
+                a[mcmaxvalue, i] = 1.0 
         
-            b = numpy.zeros(rating+1, dtype='float64')
-            b[rating] = 1.0
+            b = numpy.zeros(mcmaxvalue+1, dtype='float64')
+            b[mcmaxvalue] = 1.0
             x = numpy.linalg.lstsq(a, b)
             
-            for j in range(rating):
-                for i in range(rating):
+            for j in range(mcmaxvalue):
+                for i in range(mcmaxvalue):
                     self.__transitions_probability_mtx__[i, j] = x[0][j] 
         
         if self.__verbose__:
@@ -280,7 +280,7 @@ class markovkernel:
           print "Solve SVD "
         
         npr = self.__transitions_probability_mtx__ - \
-                numpy.identity(rating, dtype='float64')
+                numpy.identity(mcmaxvalue, dtype='float64')
         s, v, d = numpy.linalg.svd(npr)
         
         if self.__verbose__:
@@ -294,10 +294,10 @@ class markovkernel:
         
         benchmark = numpy.amin(self.__attributes__, 0)
         
-        r = numpy.zeros((countries,time), dtype='float64') 
+        r = numpy.zeros((mcrows,mccols), dtype='float64') 
         
-        for i in range(countries):
-            for j in range(time):
+        for i in range(mcrows):
+            for j in range(mccols):
                 r[i, j] = self.__attributes__[i, j] - benchmark[j]
         
         for i in range(len(r)):
@@ -305,8 +305,8 @@ class markovkernel:
                 if (r[i, j] == float('Inf')):
                    r[i, j] = float('nan')
         
-        ist = numpy.zeros((rating,time*countries), dtype='float64')
-        nn = numpy.zeros((rating), dtype='int')
+        ist = numpy.zeros((mcmaxvalue,mccols*mcrows), dtype='float64')
+        nn = numpy.zeros((mcmaxvalue), dtype='int')
         
         if setval != None:
           setval.setValue(50.0)
@@ -314,9 +314,9 @@ class markovkernel:
               #errmsg.append("Cancelled!")
               return False
         
-        for i in range(rating):
-            for j in range(countries):
-                for k in range(time):
+        for i in range(mcmaxvalue):
+            for j in range(mcrows):
+                for k in range(mccols):
                     if self.__metacommunity__[j, k] == i+1: 
                         nn[i] = nn[i] + 1 
                         ist[i, nn[i]-1] = r[j, k]
@@ -329,7 +329,7 @@ class markovkernel:
         
         fname = ""
         
-        if rating > 0:
+        if mcmaxvalue > 0:
             if self.__dump_files__:
                 fname = "aaa"
         
@@ -343,7 +343,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 1:
+        if mcmaxvalue > 1:
             if self.__dump_files__:
                 fname = "aa"
         
@@ -358,7 +358,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 2:
+        if mcmaxvalue > 2:
             if self.__dump_files__:
                 fname = "a"
         
@@ -373,7 +373,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 3: 
+        if mcmaxvalue > 3: 
             if self.__dump_files__:
                 fname = "bbb"
         
@@ -388,7 +388,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 4:
+        if mcmaxvalue > 4:
             if self.__dump_files__:
                 fname = "bb"
         
@@ -403,7 +403,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 5:
+        if mcmaxvalue > 5:
             if self.__dump_files__:
                 fname = "b"
         
@@ -418,7 +418,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 6:
+        if mcmaxvalue > 6:
             if self.__dump_files__:
                 fname = "cc"
         
@@ -433,7 +433,7 @@ class markovkernel:
             self.__attributes_mean_values__.append(b)
             tiv.append(c)
         
-        if rating > 7:
+        if mcmaxvalue > 7:
             if self.__dump_files__:
                 fname = "d"
         
@@ -481,7 +481,7 @@ class markovkernel:
         
           outf.close()
         
-        s_t = numpy.zeros((countries,time), dtype='float64')
+        s_t = numpy.zeros((mcrows,mccols), dtype='float64')
         
         for i in range(r.shape[0]):
             for j in range(r.shape[1]):
@@ -489,20 +489,20 @@ class markovkernel:
                     r[i, j] = 0.0
         
         R_t = numpy.sum(r, axis=0)
-        T_t = numpy.zeros(time, dtype='float64')
+        t_t = numpy.zeros(mccols, dtype='float64')
         
-        for t in range(time):
-            for k in range(countries):
+        for t in range(mccols):
+            for k in range(mcrows):
                 s_t[k, t] = r[k, t] / R_t[t]
                 if s_t[k, t] != 0:
-                    T_t[t] += s_t[k, t]*math.log(float(countries) \
+                    t_t[t] += s_t[k, t]*math.log(float(mcrows) \
                             * s_t[k, t])
         
         oufilename = "entropy_histi_"+\
                 str(self.__num_of_mc_iterations__)+".txt"
         
         if self.__dump_files__:
-          basicutils.vct_to_file(T_t, oufilename)
+          basicutils.vct_to_file(t_t, oufilename)
         
         if setval != None:
           setval.setValue(100.0)
@@ -516,21 +516,18 @@ class markovkernel:
         bp = None 
         
         if self.__usecopula__:
-            G, X, rho = self.__compute_copula_variables__ (\
-                    self.__metacommunity__, r)
+            valuevec, binvec, rho = self.__compute_copula_variables__ (r)
             
             try:
-                entropy = self.__runmcsimulation_copula__ (r, G, \
-                    X, rho, countries, \
-                    T_t, setval)
+                entropy = self.__runmcsimulation_copula__ (r, valuevec, \
+                    binvec, rho, t_t, setval)
             except StopIteration:
                 return False
 
         else:
             try:
                entropy, ac, bp = self.__runmcsimulation__ (\
-                    rating, countries, tiv, \
-                    setval)
+                    tiv, setval)
             except StopIteration:
                 return False
         
@@ -563,8 +560,8 @@ class markovkernel:
           outf.close()
         
         if not self.__usecopula__:
-        
-          acm = numpy.zeros((rating,self.__simulated_time__), \
+
+          acm = numpy.zeros((mcmaxvalue,self.__simulated_time__), \
                   dtype='float64')
           for i in range(acm.shape[0]):
               for j in range(acm.shape[1]):
@@ -576,7 +573,7 @@ class markovkernel:
           if self.__dump_files__:
             basicutils.mat_to_file (acm, oufilename)
           
-          bpm = numpy.zeros((countries,self.__simulated_time__), \
+          bpm = numpy.zeros((mcrows,self.__simulated_time__), \
                   dtype='float64')
           for i in range(bpm.shape[0]):
               for j in range(bpm.shape[1]):
@@ -597,40 +594,40 @@ class markovkernel:
 
     def __main_mkc_prop__ (self):
 
-        countries = self.__metacommunity__.shape[0]
-        rating = numpy.max(self.__metacommunity__)
-        time = self.__metacommunity__.shape[1]
+        mcrows = self.__metacommunity__.shape[0]
+        mcmaxvalue = numpy.max(self.__metacommunity__)
+        mccols = self.__metacommunity__.shape[1]
         
-        cdf = numpy.zeros((rating,rating), dtype='float64')
+        cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
         
-        for i in range (rating):
+        for i in range (mcmaxvalue):
             cdf[i, 0] = self.__transitions_probability_mtx__[i, 0]
         
-        for i in range(rating):
-            for j in range(1,rating):
+        for i in range(mcmaxvalue):
+            for j in range(1,mcmaxvalue):
                 cdf[i, j] = self.__transitions_probability_mtx__[i, j] \
                         + cdf[i, j-1]
         
-        x = numpy.zeros((countries,time), dtype='int')
-        xi = numpy.random.rand(countries,time)
+        x = numpy.zeros((mcrows,mccols), dtype='int')
+        xi = numpy.random.rand(mcrows,mccols)
         
-        for c in range(countries):
+        for c in range(mcrows):
             x[c, 0] = self.__metacommunity__[c, 0]
         
-        for c in range(countries):
+        for c in range(mcrows):
             if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
                 x[c, 1] = 1
         
-            for k in range(1,rating):
+            for k in range(1,mcmaxvalue):
                 if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
                         (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
                    x[c, 1] = k + 1
         
-            for t in range(2,time):
+            for t in range(2,mccols):
                 if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
                     x[c, t] = 1
         
-                for k in range(1,rating):
+                for k in range(1,mcmaxvalue):
                     if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
                             and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
                       x[c, t] = k + 1
@@ -644,14 +641,14 @@ class markovkernel:
             print "Error  in matrix dimension"
             exit(1)
         
-        N = numpy.max(self.__metacommunity__)
-        Nnaz = r.shape[0]
+        mcmaxvalue = numpy.max(self.__metacommunity__)
+        rrows = r.shape[0]
         Dst = max(r.shape)
         
-        inc_spread = numpy.zeros((Nnaz,Dst-1))
+        inc_spread = numpy.zeros((rrows,Dst-1))
         
         end = r.shape[1]
-        for i in range(Nnaz):
+        for i in range(rrows):
             a = r[i,1:end] - r[i,0:end-1]
             b = r[i,0:end-1]
             inc_spread[i,:] = numpy.divide(a, b, \
@@ -664,10 +661,10 @@ class markovkernel:
         rttmp = rttmp.reshape(totdim, order='F')
         f_inc_spread = inc_spread.reshape(totdim, order='F')
         
-        X = []
-        G = []
+        valuevec = []
+        binvec = []
         
-        for i in range(N):
+        for i in range(mcmaxvalue):
             tmp = numpy.where(rttmp == i+1)[0]
             dist_sp = [f_inc_spread[j] for j in tmp]
             dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
@@ -678,24 +675,25 @@ class markovkernel:
                     dist_sp)
         
             x, y = basicutils.ecdf(dist_sp)
-            X.append(x)
-            G.append(y)
+            valuevec.append(x)
+            binvec.append(y)
         
         rho = numpy.corrcoef(r) 
         
-        return G, X, rho
+        return valuevec, binvec, rho
 
     
-    def __runmcsimulation_copula__ (self, r, G, X, rho, countries, \
-        T_t, setval):
+    def __runmcsimulation_copula__ (self, r, valuevec, binvec, rho, \
+        t_t, setval):
 
-        R_in = self.__metacommunity__[:,-1]
+        r_in = self.__metacommunity__[:,-1]
+        mcrows = self.__metacommunity__.shape[0]
         
-        spread_synth_tmp = numpy.zeros(countries)
+        spread_synth_tmp = numpy.zeros(mcrows)
         spread_synth = numpy.zeros(self.__num_of_mc_iterations__,\
-                self.__simulated_time__,countries)
+                self.__simulated_time__,mcrows)
         
-        entropy = T_t[-1]*numpy.ones((self.__simulated_time__,\
+        entropy = t_t[-1]*numpy.ones((self.__simulated_time__,\
                self.__num_of_mc_iterations__))
         
         if self.__verbose__:
@@ -708,19 +706,19 @@ class markovkernel:
                     self.__simulated_time__)
         
             for j in range(1,self.__simulated_time__):
-                v = numpy.random.uniform(0.0, 1.0, countries)
+                v = numpy.random.uniform(0.0, 1.0, mcrows)
                 pp = numpy.cumsum(\
-                        self.__transitions_probability_mtx__[R_in-1,:],1)
-                jj = numpy.zeros(countries, dtype=int)
-                for k in range(countries):
+                        self.__transitions_probability_mtx__[r_in-1,:],1)
+                jj = numpy.zeros(mcrows, dtype=int)
+                for k in range(mcrows):
                     jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                     
-                    func = interp1d(G[jj[k]][1:], X[jj[k]][1:], \
+                    func = interp1d(valuevec[jj[k]][1:], binvec[jj[k]][1:], \
                             kind='linear')
         
                     xval = u[j,k]
-                    xmin = min(G[jj[k]][1:])
-                    xmax = max(G[jj[k]][1:])
+                    xmin = min(valuevec[jj[k]][1:])
+                    xmax = max(valuevec[jj[k]][1:])
                     if u[j,k] < xmin:
                         xval = xmin
                     if u[j,k] > xmax:
@@ -728,7 +726,7 @@ class markovkernel:
         
                     spread_synth_tmp[k] = max(func(xval), -0.9)
         
-                R_in = jj
+                r_in = jj
                 spread_synth[run,j,:] = numpy.multiply( \
                         numpy.squeeze(spread_synth[run,j-1,:]), \
                         (1+spread_synth_tmp[:].transpose()))
@@ -744,7 +742,7 @@ class markovkernel:
         
                 entropy[j, run] =  numpy.sum(\
                         numpy.multiply(P_spread, \
-                        numpy.log(float(countries)*P_spread)))
+                        numpy.log(float(mcrows)*P_spread)))
         
             if self.__verbose__:
                 basicutils.progress_bar(run+1, \
@@ -760,20 +758,21 @@ class markovkernel:
         return entropy
         
     
-    def __runmcsimulation__ (self, rating, \
-        countries, tiv, setval):
+    def __runmcsimulation__ (self, tiv, setval):
 
         entropy = numpy.zeros((self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
+        mcmaxvalue = numpy.max(self.__metacommunity__)
+        mcrows = self.__metacommunity__.shape[0]
         
-        bp = numpy.zeros((countries,self.__simulated_time__,\
+        bp = numpy.zeros((mcrows,self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
-        ac = numpy.zeros((rating,self.__simulated_time__,\
+        ac = numpy.zeros((mcmaxvalue,self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
-        xm = numpy.zeros((countries,self.__simulated_time__), \
+        xm = numpy.zeros((mcrows,self.__simulated_time__), \
                 dtype='float64')
-        cdf = numpy.zeros((rating,rating), dtype='float64')
-        x = numpy.zeros((countries,self.__simulated_time__), \
+        cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
+        x = numpy.zeros((mcrows,self.__simulated_time__), \
                 dtype='int')
         r_prev = numpy.zeros((self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
@@ -784,13 +783,11 @@ class markovkernel:
         t2 = numpy.zeros((self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
         
-        #print type(G), type(X), type(rho)
-       
-        for i in range (rating):
+        for i in range (mcmaxvalue):
             cdf[i, 0] = self.__transitions_probability_mtx__[i, 0]
         
-        for i in range(rating):
-            for j in range(1,rating):
+        for i in range(mcmaxvalue):
+            for j in range(1,mcmaxvalue):
                 cdf[i, j] = self.__transitions_probability_mtx__[i, j] \
                         + cdf[i, j-1]
         
@@ -800,18 +797,18 @@ class markovkernel:
         
         for run in range(self.__num_of_mc_iterations__):
         
-            tot = numpy.zeros((rating,self.__simulated_time__), \
+            tot = numpy.zeros((mcmaxvalue,self.__simulated_time__), \
                     dtype='float64')
-            cont = numpy.zeros((rating,self.__simulated_time__), \
+            cont = numpy.zeros((mcmaxvalue,self.__simulated_time__), \
                     dtype='int')
-            xi = numpy.random.rand(countries,self.__simulated_time__)
+            xi = numpy.random.rand(mcrows,self.__simulated_time__)
             x[:, 0] = self.__metacommunity__[:, -1]
         
-            for c in range(countries):
+            for c in range(mcrows):
                 if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
                     x[c, 1] = 1
         
-                for k in range(1,rating):
+                for k in range(1,mcmaxvalue):
                     if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
                         (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
                        x[c, 1] = k + 1
@@ -820,14 +817,14 @@ class markovkernel:
                     if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
                         x[c, t] = 1
         
-                    for k in range(1,rating):
+                    for k in range(1,mcmaxvalue):
                         if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
                                 and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
                           x[c, t] = k + 1
         
             for t in range(self.__simulated_time__):
-                for c in range(countries):
-                    for i in range(rating):
+                for c in range(mcrows):
+                    for i in range(mcmaxvalue):
                         if x[c, t] == i+1:
                             bp[c, t, run] = \
                                     self.__attributes_mean_values__[i]
@@ -838,17 +835,17 @@ class markovkernel:
                 r_prev[t, run] = numpy.sum(bp[:, t, run])
         
             for t in range(self.__simulated_time__):
-                for i in range(rating):
+                for i in range(mcmaxvalue):
                      ac[i, t, run] = tot[i, t]/r_prev[t, run]
                      if ac[i, t, run] != 0.0:
                          t1[t, run] += (ac[i, t, run]*tiv[i])
                          t2[t, run] += (ac[i, t, \
                                  run]*math.log(\
-                                 float(rating)*ac[i, t, run]))
+                                 float(mcmaxvalue)*ac[i, t, run]))
                          if cont[i, t] != 0:
                             term[t, run] += ac[i, t, run]* \
-                                    math.log(float(countries)/ \
-                                    (float(rating)*cont[i, t]))
+                                    math.log(float(mcrows)/ \
+                                    (float(mcmaxvalue)*cont[i, t]))
          
                 entropy[t, run] = t1[t, run] + t2[t, run] + term[t, run]
         
