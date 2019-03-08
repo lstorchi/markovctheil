@@ -53,7 +53,7 @@ class changepoint:
 
         return self.__metacommunity__
 
-    det set_num_of_bootstrap_iter (self, inval):
+    def set_num_of_bootstrap_iter (self, inval):
         if not isinstance(inval, int):
             raise TypeError("input must be an integer")
 
@@ -211,523 +211,523 @@ class changepoint:
         acp3stop, adeltacp, aiterations, fp = None, verbose = False,
         setval=None):
 
-    if setval != None:
-        setval.setValue(0)
-        setval.setLabelText("ChangePoint analysis")
-
-    rating = numpy.max(ms)
-    time = ms.shape[1]
-
-    if cp_fortest >= 0 and num_of_run >= 0:
-    
-        if (verbose):
-            print "Startint CP test..."
-    
-        L = 0.0
-        L1 = 0.0
-        L2 = 0.0
-        L3 = 0.0
-        L4 = 0.0
-    
-        pr1 = 0.0
-        lambdastart = 0.0
-    
-        if anumofcp == 1:
-            L, L1, L2, pr1, pr2 = self.__compute_cps__ (ms, cp_fortest, True)
-            lambdastart = 2.0*((L1+L2)-L)
-        elif anumofcp == 2:
-            L, L1, L2, L3, pr1, pr2, pr3 = \
-            self.__compute_cps__ (ms, cp_fortest, True, cp_fortest_2)
-            lambdastart = 2.0*((L1+L2+L3)-L)
+        if setval != None:
+            setval.setValue(0)
+            setval.setLabelText("ChangePoint analysis")
+        
+        rating = numpy.max(ms)
+        time = ms.shape[1]
+        
+        if cp_fortest >= 0 and num_of_run >= 0:
+        
             if (verbose):
-                print L, L1, L2, L3
-        elif anumofcp == 3:
-            L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
-                    self.__compute_cps__ (ms, cp_fortest, True, \
-                    cp_fortest_2, cp_fortest_3)
-            lambdastart = 2.0*((L1+L2+L3+L4)-L)
-            if (verbose):
-                print L, L1, L2, L3, L4
-    
-        lambdas = []
-    
-        if (verbose):
-            print "Starting iterations..."
-    
-        for i in range(num_of_run):
-    
-            start = tempo.time()
-            cstart = tempo.clock()
-     
-            x = mainmkvcmp.main_mkc_prop (ms, pr1)
-    
-            lambdav = 0.0
-    
-            L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
-    
+                print "Startint CP test..."
+        
+            L = 0.0
+            L1 = 0.0
+            L2 = 0.0
+            L3 = 0.0
+            L4 = 0.0
+        
+            pr1 = 0.0
+            lambdastart = 0.0
+        
             if anumofcp == 1:
-                L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
-                lambdav = 2.0*((L1+L2)-L)
+                L, L1, L2, pr1, pr2 = self.__compute_cps__ (ms, cp_fortest, True)
+                lambdastart = 2.0*((L1+L2)-L)
             elif anumofcp == 2:
-                L, L1, L2, L3, pr1_o, pr2_o, pr3_o = \
-                self.__compute_cps__ (x, cp_fortest, True, cp_fortest_2)
-                lambdav = 2.0*((L1+L2+L3)-L)
+                L, L1, L2, L3, pr1, pr2, pr3 = \
+                self.__compute_cps__ (ms, cp_fortest, True, cp_fortest_2)
+                lambdastart = 2.0*((L1+L2+L3)-L)
+                if (verbose):
+                    print L, L1, L2, L3
             elif anumofcp == 3:
-                L, L1, L2, L3, L4, pr1_o, pr2_o, pr3_o, pr4_o = \
-                        self.__compute_cps__ (x, cp_fortest, True, \
+                L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
+                        self.__compute_cps__ (ms, cp_fortest, True, \
                         cp_fortest_2, cp_fortest_3)
-                lambdav = 2.0*((L1+L2+L3+L4)-L)
-    
-            lambdas.append(lambdav) 
-    
-            if not (fp is None):
-                fp.write(str(i+1) + " " + str(lambdav) + "\n") 
-    
-            end = tempo.time()
-            cend = tempo.clock()
+                lambdastart = 2.0*((L1+L2+L3+L4)-L)
+                if (verbose):
+                    print L, L1, L2, L3, L4
+        
+            lambdas = []
         
             if (verbose):
-                print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(i+1 , num_of_run, 
-                     end - start, cend - cstart)
-     
-    
-        idx95 = int(num_of_run*0.95+0.5)
-    
-        if idx95 >= num_of_run:
-            idx95 = num_of_run - 1
-    
-        lamda95 = lambdas[idx95]
-    
-        minrat = numpy.min(ms)
-        maxrat = numpy.max(ms)
-    
-        #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
-        #ndof = max (positive1, positive2)
-    
-        #chi2 = scipy.stats.chi2.isf(0.05, ndof)
-        #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
-    
-        pvalue = (1.0 / numpy.float64(num_of_run + 1)) * \
-                (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
-    
-        if (verbose):
-            #print "Ndof        : ", ndof
-            print "Lambda(95%) : ", lamda95
-            print "Lambda      : ", lambdastart
-            print "P-Value     : ", pvalue
-
-        vals = [lamda95, lambdastart, pvalue]
-        return vals
-    
-    else:
-    
-        maxval = -1.0 * float("inf")
-    
-        if (anumofcp == 1):
+                print "Starting iterations..."
         
-            cp1stop = time-1
+            for i in range(num_of_run):
         
-            if acp1start <= 0 or acp1start > time-1:
-                raise Error ("CP1 start invalid value")
-        
-            if acp1stop < 0:
-                cp1stop = time-1
-            else:
-                cp1stop = acp1stop
-        
-            if cp1stop <= acp1start or cp1stop > time-1:
-                raise Error ("CP1 stop invalid value")
-        
-            cp = 0
-            idx = 0
-            allvalues = []
-            for c_p in range(acp1start, cp1stop):
                 start = tempo.time()
                 cstart = tempo.clock()
-
+         
+                x = self.__mkc_prop__ (ms, pr1)
         
-                try:
-                    L1, L2 = self.__compute_cps__ (ms, c_p)
-                except Error:
-                    raise Error ("Oops! error in the main function") 
+                lambdav = 0.0
         
-                if (maxval < L1+L2):
-                    maxval = L1 + L2
-                    cp = c_p
-            
+                L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
+        
+                if anumofcp == 1:
+                    L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
+                    lambdav = 2.0*((L1+L2)-L)
+                elif anumofcp == 2:
+                    L, L1, L2, L3, pr1_o, pr2_o, pr3_o = \
+                    self.__compute_cps__ (x, cp_fortest, True, cp_fortest_2)
+                    lambdav = 2.0*((L1+L2+L3)-L)
+                elif anumofcp == 3:
+                    L, L1, L2, L3, L4, pr1_o, pr2_o, pr3_o, pr4_o = \
+                            self.__compute_cps__ (x, cp_fortest, True, \
+                            cp_fortest_2, cp_fortest_3)
+                    lambdav = 2.0*((L1+L2+L3+L4)-L)
+        
+                lambdas.append(lambdav) 
+        
                 if not (fp is None):
-                    fp.write(str(c_p) + " " + str(L1+L2) + "\n")
-                allvalues.append((c_p, L1+L2))
+                    fp.write(str(i+1) + " " + str(lambdav) + "\n") 
         
                 end = tempo.time()
                 cend = tempo.clock()
-        
+            
                 if (verbose):
-                    if aiterations:
-                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , cp1stop-acp1start, 
-                            end - start, cend - cstart)
-                    else:
-                        basicutils.progress_bar(idx+1, cp1stop-acp1start)
-
-                if not(setval is None):
-                    setval.setValue(100.0*(float(idx+1)/float(cp1stop-acp1start)))
-                    if setval.wasCanceled():
-                        raise Error("Cancelled")
-
-                idx = idx + 1 
+                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(i+1 , num_of_run, 
+                         end - start, cend - cstart)
+         
+        
+            idx95 = int(num_of_run*0.95+0.5)
+        
+            if idx95 >= num_of_run:
+                idx95 = num_of_run - 1
+        
+            lamda95 = lambdas[idx95]
+        
+            minrat = numpy.min(ms)
+            maxrat = numpy.max(ms)
+        
+            #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
+            #ndof = max (positive1, positive2)
+        
+            #chi2 = scipy.stats.chi2.isf(0.05, ndof)
+            #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
+        
+            pvalue = (1.0 / numpy.float64(num_of_run + 1)) * \
+                    (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
         
             if (verbose):
-                print ""
-                print ""
-                print "Change Point: ", cp, " (",maxval, ")"
-            
-            vals = [cp, maxval, allvalues]
+                #print "Ndof        : ", ndof
+                print "Lambda(95%) : ", lamda95
+                print "Lambda      : ", lambdastart
+                print "P-Value     : ", pvalue
+        
+            vals = [lamda95, lambdastart, pvalue]
             return vals
-
-        elif (anumofcp == 2):
-            cp1 = 0
-            cp2 = 0
         
-            if adeltacp > 1:
+        else:
         
-               cp1stop = time-1
+            maxval = -1.0 * float("inf")
         
-               if acp1start <= 0 or acp1start > time-1:
-                   raise ("CP1 start invalid value")
-              
-               if acp1stop < 0:
-                   cp1stop = time-1
-               else:
-                   cp1stop = acp1stop
-              
-               if cp1stop <= acp1start or cp1stop > time-1:
-                   raise Error ("CP1 stop invalid value")
+            if (anumofcp == 1):
+            
+                cp1stop = time-1
+            
+                if acp1start <= 0 or acp1start > time-1:
+                    raise Error ("CP1 start invalid value")
+            
+                if acp1stop < 0:
+                    cp1stop = time-1
+                else:
+                    cp1stop = acp1stop
+            
+                if cp1stop <= acp1start or cp1stop > time-1:
+                    raise Error ("CP1 stop invalid value")
+            
+                cp = 0
+                idx = 0
+                allvalues = []
+                for c_p in range(acp1start, cp1stop):
+                    start = tempo.time()
+                    cstart = tempo.clock()
         
-               # I am lazy 
-               tot = 0
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(c_p1 + adeltacp, time-1):
-                       tot = tot + 1
+            
+                    try:
+                        L1, L2 = self.__compute_cps__ (ms, c_p)
+                    except Error:
+                        raise Error ("Oops! error in the main function") 
+            
+                    if (maxval < L1+L2):
+                        maxval = L1 + L2
+                        cp = c_p
+                
+                    if not (fp is None):
+                        fp.write(str(c_p) + " " + str(L1+L2) + "\n")
+                    allvalues.append((c_p, L1+L2))
+            
+                    end = tempo.time()
+                    cend = tempo.clock()
+            
+                    if (verbose):
+                        if aiterations:
+                            print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , cp1stop-acp1start, 
+                                end - start, cend - cstart)
+                        else:
+                            basicutils.progress_bar(idx+1, cp1stop-acp1start)
         
-               idx = 0
-               allvalues = []
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(c_p1 + adeltacp, time-1):
-                       start = tempo.time()
-                       cstart = tempo.clock()
+                    if not(setval is None):
+                        setval.setValue(100.0*(float(idx+1)/float(cp1stop-acp1start)))
+                        if setval.wasCanceled():
+                            raise Error("Cancelled")
         
-                       try:
-                           L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
-                       except Error:
-                           raise Error ("Oops! error in the main function")
-         
-                       if (maxval < L1+L2+L3):
-                           maxval = L1 + L2 + L3
-                           cp1 = c_p1
-                           cp2 = c_p2
-        
-                       end = tempo.time()
-                       cend = tempo.clock()
-        
-                       if (verbose):
-                            if aiterations:
-                                print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                    end - start, cend - cstart)
-                            else:
-                                basicutils.progress_bar(idx+1, tot)
-
-                       if not(setval is None):
-                           setval.setValue(100.0*(float(idx+1)/float(tot)))
-                           if setval.wasCanceled():
-                               raise Error("Cancelled")
-
-                       idx = idx + 1 
-         
-                       if not (fp is None):
-                          fp.write(str(c_p1) + " " + str(c_p2) + " " 
-                               + str(L1+L2+L3) + "\n")
-
-                       allvalues.append((c_p1, c_p2, L1+L2+L3))
-
-               if (verbose):
-                   print ""
-                   print ""
-                   print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
-               
-               vals = [cp1, cp2, maxval, allvalues]
-               return vals
-
-            else:
-        
-               cp1stop = time-1
-        
-               if acp1start <= 0 or acp1start > time-1:
-                   raise Error ("CP1 start invalid value")
-              
-               if acp1stop < 0:
-                   cp1stop = time-1
-               else:
-                   cp1stop = acp1stop
-              
-               if cp1stop <= acp1start or cp1stop > time-1:
-                   raise Error ("CP1 stop invalid value")
-        
-               cp2stop = time-1
-        
-               if acp2start <= 0 or acp2start > time-1:
-                   raise Error ("CP2 start invalid value")
-              
-               if acp2stop < 0:
-                   cp2stop = time-1
-               else:
-                   cp2stop = acp2stop
-              
-               if cp2stop <= acp2start or cp2stop > time-1:
-                   raise Error ("CP2 stop invalid value")
-        
-               if acp2start <= acp1start:
-                   raise Error ("CP2 start invalid value")
-         
-               # I am lazy
-               tot = 0
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(acp2start, cp2stop):
-                       tot = tot + 1
-
-               idx = 0
-               allvalues = []
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(acp2start, cp2stop):
-        
-                       start = tempo.time()
-                       cstart = tempo.clock()
-        
-                       try:
-                           L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
-                       except Error:
-                           raise Error ("Oops! error in the main function") 
-               
-                       if (maxval < L1+L2+L3):
-                           maxval = L1 + L2 + L3
-                           cp1 = c_p1
-                           cp2 = c_p2
-        
-                       end = tempo.time()
-                       cend = tempo.clock()
-        
-                       if (verbose):
-                            if aiterations:
-                                print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                    end - start, cend - cstart)
-                            else:
-                                basicutils.progress_bar(idx+1, tot)
-
-                       if not(setval is None):
-                           setval.setValue(100.0*(float(idx+1)/float(tot)))
-                           if setval.wasCanceled():
-                               raise Error("Cancelled")
-        
-                       idx = idx + 1 
-         
-                       if not (fp is None):
-                          fp.write(str(c_p1) + " " + str(c_p2) + " " 
-                               + str(L1+L2+L3) + "\n")
-
-                       allvalues.append((c_p1, c_p2, L1+L2+L3))
-
-               if (verbose):
+                    idx = idx + 1 
+            
+                if (verbose):
                     print ""
                     print ""
-                    print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
-
-               vals = [cp1, cp2, maxval, allvalues]
-               return vals
-
-        elif (anumofcp == 3):
-            cp1 = 0
-            cp2 = 0
-            cp3 = 0
+                    print "Change Point: ", cp, " (",maxval, ")"
+                
+                vals = [cp, maxval, allvalues]
+                return vals
         
-            if adeltacp > 1:
-        
-               cp1stop = time-1
-        
-               if acp1start <= 0 or acp1start > time-1:
-                   raise Error ("CP1 start invalid value")
-              
-               if acp1stop < 0:
+            elif (anumofcp == 2):
+                cp1 = 0
+                cp2 = 0
+            
+                if adeltacp > 1:
+            
                    cp1stop = time-1
-               else:
-                   cp1stop = acp1stop
-              
-               if cp1stop <= acp1start or cp1stop > time-1:
-                   raise Error ("CP1 stop invalid value")
-        
-               # I am lazy
-               tot = 0
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(c_p1 + adeltacp, time-1):
-                       for c_p3 in range(c_p2 + adeltacp, time-1):
+            
+                   if acp1start <= 0 or acp1start > time-1:
+                       raise ("CP1 start invalid value")
+                  
+                   if acp1stop < 0:
+                       cp1stop = time-1
+                   else:
+                       cp1stop = acp1stop
+                  
+                   if cp1stop <= acp1start or cp1stop > time-1:
+                       raise Error ("CP1 stop invalid value")
+            
+                   # I am lazy 
+                   tot = 0
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(c_p1 + adeltacp, time-1):
                            tot = tot + 1
-        
-               idx = 0
-               allvalues = []
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(c_p1 + adeltacp, time-1):
-                       for c_p3 in range(c_p2 + adeltacp, time-1):
-        
+            
+                   idx = 0
+                   allvalues = []
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(c_p1 + adeltacp, time-1):
                            start = tempo.time()
                            cstart = tempo.clock()
-        
+            
                            try:
-                               L1, L2, L3, L4 = self.__compute_cps__ (ms, c_p1, False, c_p2, c_p3)
+                               L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
                            except Error:
-                               raise Error ("Oops! error in the main function") 
-                           
-                           if (maxval < L1+L2+L3+L4):
-                               maxval = L1 + L2 + L3 + L4
+                               raise Error ("Oops! error in the main function")
+             
+                           if (maxval < L1+L2+L3):
+                               maxval = L1 + L2 + L3
                                cp1 = c_p1
                                cp2 = c_p2
-                               cp3 = c_p3
-        
+            
                            end = tempo.time()
                            cend = tempo.clock()
-              
+            
                            if (verbose):
                                 if aiterations:
                                     print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                            end - start, cend - cstart)
+                                        end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
-
+        
                            if not(setval is None):
                                setval.setValue(100.0*(float(idx+1)/float(tot)))
                                if setval.wasCanceled():
-                                  raise Error("Cancelled")
-                            
+                                   raise Error("Cancelled")
+        
                            idx = idx + 1 
-                          
+             
                            if not (fp is None):
                               fp.write(str(c_p1) + " " + str(c_p2) + " " 
-                                   + str(c_p3) + " " 
-                                   + str(L1+L2+L3+L4) + "\n")
-                           allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
-
-               if (verbose):
-                    print ""
-                    print ""
-                    print "Change Point: ", cp1, " , ", cp2, " ", cp3, " (",maxval, ")"
-
-               vals = [cp1, cp2, cp3, maxval, allvalues]
-               return vals
-
-            else:
+                                   + str(L1+L2+L3) + "\n")
         
-               cp1stop = time-1
+                           allvalues.append((c_p1, c_p2, L1+L2+L3))
         
-               if acp1start <= 0 or acp1start > time-1:
-                   raise Error ("CP1 start invalid value")
-              
-               if acp1stop < 0:
+                   if (verbose):
+                       print ""
+                       print ""
+                       print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
+                   
+                   vals = [cp1, cp2, maxval, allvalues]
+                   return vals
+        
+                else:
+            
                    cp1stop = time-1
-               else:
-                   cp1stop = acp1stop
-              
-               if cp1stop <= acp1start or cp1stop > time-1:
-                   raise Error ("CP1 stop invalid value")
-        
-               cp2stop = time-1
-        
-               if acp2start <= 0 or acp2start > time-1:
-                   raise Error ("CP2 start invalid value")
-              
-               if acp2stop < 0:
+            
+                   if acp1start <= 0 or acp1start > time-1:
+                       raise Error ("CP1 start invalid value")
+                  
+                   if acp1stop < 0:
+                       cp1stop = time-1
+                   else:
+                       cp1stop = acp1stop
+                  
+                   if cp1stop <= acp1start or cp1stop > time-1:
+                       raise Error ("CP1 stop invalid value")
+            
                    cp2stop = time-1
-               else:
-                   cp2stop = acp2stop
-              
-               if cp2stop <= acp2start or cp2stop > time-1:
-                   raise Error ("CP2 stop invalid value")
-        
-               if acp2start <= acp1start:
-                   raise Error ("CP2 start invalid value")
-        
-               cp3stop = time-1
-        
-               if acp3start <= 0 or acp3start > time-1:
-                   raise Error ("CP3 start invalid value")
-              
-               if acp3stop < 0:
-                   cp3stop = time-1
-               else:
-                   cp3stop = acp3stop
-              
-               if cp3stop <= acp3start or cp3stop > time-1:
-                   raise Error ("CP3 stop invalid value")
-        
-               if acp3start <= acp2start:
-                   raise Error ("CP3 start invalid value")
-         
-               tot = 0
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(acp2start, cp2stop):
-                       for c_p3 in range(acp3start, cp3stop):
+            
+                   if acp2start <= 0 or acp2start > time-1:
+                       raise Error ("CP2 start invalid value")
+                  
+                   if acp2stop < 0:
+                       cp2stop = time-1
+                   else:
+                       cp2stop = acp2stop
+                  
+                   if cp2stop <= acp2start or cp2stop > time-1:
+                       raise Error ("CP2 stop invalid value")
+            
+                   if acp2start <= acp1start:
+                       raise Error ("CP2 start invalid value")
+             
+                   # I am lazy
+                   tot = 0
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(acp2start, cp2stop):
                            tot = tot + 1
         
-               idx = 0
-               allvalues = []
-               for c_p1 in range(acp1start, cp1stop):
-                   for c_p2 in range(acp2start, cp2stop):
-                       for c_p3 in range(acp3start, cp3stop):
-        
+                   idx = 0
+                   allvalues = []
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(acp2start, cp2stop):
+            
                            start = tempo.time()
                            cstart = tempo.clock()
-        
+            
                            try:
-                               L1, L2, L3, L4 = self.__compute_cps__ (ms,  
-                                   c_p1, False, c_p2, c_p3)
+                               L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
                            except Error:
                                raise Error ("Oops! error in the main function") 
-         
-                           if (maxval < L1+L2+L3+L4):
-                               maxval = L1 + L2 + L3 + L4
+                   
+                           if (maxval < L1+L2+L3):
+                               maxval = L1 + L2 + L3
                                cp1 = c_p1
                                cp2 = c_p2
-                               cp3 = c_p3
-        
+            
                            end = tempo.time()
                            cend = tempo.clock()
-              
-
+            
                            if (verbose):
                                 if aiterations:
                                     print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                            end - start, cend - cstart)
+                                        end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
-
+        
                            if not(setval is None):
                                setval.setValue(100.0*(float(idx+1)/float(tot)))
                                if setval.wasCanceled():
-                                  raise Error("Cancelled")
- 
-                           
+                                   raise Error("Cancelled")
+            
                            idx = idx + 1 
+             
                            if not (fp is None):
-                                fp.write(str(c_p1) + " " + str(c_p2) + " " 
-                                   + str(c_p3) + " " 
-                                   + str(L1+L2+L3+L4) + "\n")
-                           allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
-
-               if (verbose):
-                    print ""
-                    print ""
-                    print "Change Point: ", cp1, " , ", cp2 , " ", cp3, " (",maxval, ")"
-               
-               vals = [cp1, cp2, cp3, maxval, allvalues]
-               return vals
-
-    raise Error ("Nothing todo")
+                              fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                                   + str(L1+L2+L3) + "\n")
+        
+                           allvalues.append((c_p1, c_p2, L1+L2+L3))
+        
+                   if (verbose):
+                        print ""
+                        print ""
+                        print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
+        
+                   vals = [cp1, cp2, maxval, allvalues]
+                   return vals
+        
+            elif (anumofcp == 3):
+                cp1 = 0
+                cp2 = 0
+                cp3 = 0
+            
+                if adeltacp > 1:
+            
+                   cp1stop = time-1
+            
+                   if acp1start <= 0 or acp1start > time-1:
+                       raise Error ("CP1 start invalid value")
+                  
+                   if acp1stop < 0:
+                       cp1stop = time-1
+                   else:
+                       cp1stop = acp1stop
+                  
+                   if cp1stop <= acp1start or cp1stop > time-1:
+                       raise Error ("CP1 stop invalid value")
+            
+                   # I am lazy
+                   tot = 0
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(c_p1 + adeltacp, time-1):
+                           for c_p3 in range(c_p2 + adeltacp, time-1):
+                               tot = tot + 1
+            
+                   idx = 0
+                   allvalues = []
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(c_p1 + adeltacp, time-1):
+                           for c_p3 in range(c_p2 + adeltacp, time-1):
+            
+                               start = tempo.time()
+                               cstart = tempo.clock()
+            
+                               try:
+                                   L1, L2, L3, L4 = self.__compute_cps__ (ms, c_p1, False, c_p2, c_p3)
+                               except Error:
+                                   raise Error ("Oops! error in the main function") 
+                               
+                               if (maxval < L1+L2+L3+L4):
+                                   maxval = L1 + L2 + L3 + L4
+                                   cp1 = c_p1
+                                   cp2 = c_p2
+                                   cp3 = c_p3
+            
+                               end = tempo.time()
+                               cend = tempo.clock()
+                  
+                               if (verbose):
+                                    if aiterations:
+                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
+                                                end - start, cend - cstart)
+                                    else:
+                                        basicutils.progress_bar(idx+1, tot)
+        
+                               if not(setval is None):
+                                   setval.setValue(100.0*(float(idx+1)/float(tot)))
+                                   if setval.wasCanceled():
+                                      raise Error("Cancelled")
+                                
+                               idx = idx + 1 
+                              
+                               if not (fp is None):
+                                  fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                                       + str(c_p3) + " " 
+                                       + str(L1+L2+L3+L4) + "\n")
+                               allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+        
+                   if (verbose):
+                        print ""
+                        print ""
+                        print "Change Point: ", cp1, " , ", cp2, " ", cp3, " (",maxval, ")"
+        
+                   vals = [cp1, cp2, cp3, maxval, allvalues]
+                   return vals
+        
+                else:
+            
+                   cp1stop = time-1
+            
+                   if acp1start <= 0 or acp1start > time-1:
+                       raise Error ("CP1 start invalid value")
+                  
+                   if acp1stop < 0:
+                       cp1stop = time-1
+                   else:
+                       cp1stop = acp1stop
+                  
+                   if cp1stop <= acp1start or cp1stop > time-1:
+                       raise Error ("CP1 stop invalid value")
+            
+                   cp2stop = time-1
+            
+                   if acp2start <= 0 or acp2start > time-1:
+                       raise Error ("CP2 start invalid value")
+                  
+                   if acp2stop < 0:
+                       cp2stop = time-1
+                   else:
+                       cp2stop = acp2stop
+                  
+                   if cp2stop <= acp2start or cp2stop > time-1:
+                       raise Error ("CP2 stop invalid value")
+            
+                   if acp2start <= acp1start:
+                       raise Error ("CP2 start invalid value")
+            
+                   cp3stop = time-1
+            
+                   if acp3start <= 0 or acp3start > time-1:
+                       raise Error ("CP3 start invalid value")
+                  
+                   if acp3stop < 0:
+                       cp3stop = time-1
+                   else:
+                       cp3stop = acp3stop
+                  
+                   if cp3stop <= acp3start or cp3stop > time-1:
+                       raise Error ("CP3 stop invalid value")
+            
+                   if acp3start <= acp2start:
+                       raise Error ("CP3 start invalid value")
+             
+                   tot = 0
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(acp2start, cp2stop):
+                           for c_p3 in range(acp3start, cp3stop):
+                               tot = tot + 1
+            
+                   idx = 0
+                   allvalues = []
+                   for c_p1 in range(acp1start, cp1stop):
+                       for c_p2 in range(acp2start, cp2stop):
+                           for c_p3 in range(acp3start, cp3stop):
+            
+                               start = tempo.time()
+                               cstart = tempo.clock()
+            
+                               try:
+                                   L1, L2, L3, L4 = self.__compute_cps__ (ms,  
+                                       c_p1, False, c_p2, c_p3)
+                               except Error:
+                                   raise Error ("Oops! error in the main function") 
+             
+                               if (maxval < L1+L2+L3+L4):
+                                   maxval = L1 + L2 + L3 + L4
+                                   cp1 = c_p1
+                                   cp2 = c_p2
+                                   cp3 = c_p3
+            
+                               end = tempo.time()
+                               cend = tempo.clock()
+                  
+        
+                               if (verbose):
+                                    if aiterations:
+                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
+                                                end - start, cend - cstart)
+                                    else:
+                                        basicutils.progress_bar(idx+1, tot)
+        
+                               if not(setval is None):
+                                   setval.setValue(100.0*(float(idx+1)/float(tot)))
+                                   if setval.wasCanceled():
+                                      raise Error("Cancelled")
+        
+                               
+                               idx = idx + 1 
+                               if not (fp is None):
+                                    fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                                       + str(c_p3) + " " 
+                                       + str(L1+L2+L3+L4) + "\n")
+                               allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+        
+                   if (verbose):
+                        print ""
+                        print ""
+                        print "Change Point: ", cp1, " , ", cp2 , " ", cp3, " (",maxval, ")"
+                   
+                   vals = [cp1, cp2, cp3, maxval, allvalues]
+                   return vals
+        
+        raise Error ("Nothing todo")
 
 
 ###############################################################################
@@ -991,4 +991,48 @@ class changepoint:
                 return L1, L2
         
         raise Error ("at least cp1 should be > 0")
+
+
+    def __mkc_prop__ (metacommunity, transitions_probability_mtx): 
+
+        mcrows = metacommunity.shape[0]
+        mcmaxvalue = numpy.max(metacommunity)
+        mccols = metacommunity.shape[1]
+        
+        cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
+        
+        for i in range (mcmaxvalue):
+            cdf[i, 0] = transitions_probability_mtx[i, 0]
+        
+        for i in range(mcmaxvalue):
+            for j in range(1,mcmaxvalue):
+                cdf[i, j] = transitions_probability_mtx[i, j] \
+                        + cdf[i, j-1]
+        
+        x = numpy.zeros((mcrows,mccols), dtype='int')
+        xi = numpy.random.rand(mcrows,mccols)
+        
+        for c in range(mcrows):
+            x[c, 0] = metacommunity[c, 0]
+        
+        for c in range(mcrows):
+            if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
+                x[c, 1] = 1
+        
+            for k in range(1,mcmaxvalue):
+                if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
+                        (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
+                   x[c, 1] = k + 1
+        
+            for t in range(2,mccols):
+                if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
+                    x[c, t] = 1
+        
+                for k in range(1,mcmaxvalue):
+                    if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
+                            and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
+                      x[c, t] = k + 1
+        
+        return x
+
 

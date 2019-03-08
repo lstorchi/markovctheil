@@ -491,51 +491,10 @@ class markovkernel:
         return True
 
 
+
 #####################################################################
 # PRIVATE
 #####################################################################
-
-    def __main_mkc_prop__ (self):
-
-        mcrows = self.__metacommunity__.shape[0]
-        mcmaxvalue = numpy.max(self.__metacommunity__)
-        mccols = self.__metacommunity__.shape[1]
-        
-        cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
-        
-        for i in range (mcmaxvalue):
-            cdf[i, 0] = self.__transitions_probability_mtx__[i, 0]
-        
-        for i in range(mcmaxvalue):
-            for j in range(1,mcmaxvalue):
-                cdf[i, j] = self.__transitions_probability_mtx__[i, j] \
-                        + cdf[i, j-1]
-        
-        x = numpy.zeros((mcrows,mccols), dtype='int')
-        xi = numpy.random.rand(mcrows,mccols)
-        
-        for c in range(mcrows):
-            x[c, 0] = self.__metacommunity__[c, 0]
-        
-        for c in range(mcrows):
-            if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
-                x[c, 1] = 1
-        
-            for k in range(1,mcmaxvalue):
-                if (cdf[x[c, 0]-1, k-1] < xi[c, 0]) and \
-                        (xi[c, 0] <= cdf[x[c, 0]-1, k] ):
-                   x[c, 1] = k + 1
-        
-            for t in range(2,mccols):
-                if xi[c, t-1] <= cdf[x[c, t-1]-1, 0]:
-                    x[c, t] = 1
-        
-                for k in range(1,mcmaxvalue):
-                    if (cdf[x[c, t-1]-1, k-1] < xi[c, t-1]) \
-                            and (xi[c, t-1] <= cdf[x[c, t-1]-1, k]):
-                      x[c, t] = k + 1
-        
-        return x
 
 
     def __compute_copula_variables__ (self, r):
