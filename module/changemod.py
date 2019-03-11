@@ -19,28 +19,29 @@ class changepoint:
 
     def __init__(self):
 
-        self.__metacommunity__ = None # ms
-        self.__num_of_bootstrap_iter__ = 100 # num_of_run
+        self.__metacommunity__ = None 
+        self.__num_of_bootstrap_iter__ = 100 
         
-        self.__cp_fortest__ = False # cp_fortest
-        self.__cp_fortest_2__ = False # cp_fortest_2
-        self.__cp_fortest_3__ = False # cp_fortest_3
+        self.__cp_fortest_1__ = -1
+        self.__cp_fortest_2__ = -1
+        self.__cp_fortest_3__ = -1
 
-        self.__num_of_cps__ = 1 # anumofcp
-        self.__cp1_start__ = -1 # acp1start
-        self.__cp2_start__ = -1 # acp2start
-        self.__cp3_start__ = -1 # acp3start
+        self.__num_of_cps__ = 1 
 
-        self.__cp1_stop__ = -1 # acp1stop
-        self.__cp2_stop__ = -1 # acp2stop
-        self.__cp3_stop__ = -1 # acp3stop
+        self.__cp1_start__ = -1 
+        self.__cp2_start__ = -1 
+        self.__cp3_start__ = -1 
+
+        self.__cp1_stop__ = -1 
+        self.__cp2_stop__ = -1 
+        self.__cp3_stop__ = -1 
         
-        self.__delta_cp__ = 1 # adeltacp
+        self.__delta_cp__ = 1 
 
-        self.__print_iter_info__ = False # aiterations
+        self.__print_iter_info__ = False 
 
-        self.__verbose__ = False # verbose 
-        self.__fp__ = None # fp
+        self.__verbose__ = False 
+        self.__fp__ = None 
 
     def set_metacommunity(self, inmat):
         if not isinstance(inmat, numpy.ndarray):
@@ -66,8 +67,8 @@ class changepoint:
         
 
     def set_cp1_fortest (self, inval):
-        if not isinstance(inval, bool):
-            raise TypeError("input must be a boolean")
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
 
         self.__cp_fortest_1__ = inval
 
@@ -78,8 +79,8 @@ class changepoint:
 
 
     def set_cp2_fortest (self, inval):
-        if not isinstance(inval, bool):
-            raise TypeError("input must be a boolean")
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
 
         self.__cp_fortest_2__ = inval
 
@@ -90,8 +91,8 @@ class changepoint:
 
 
     def set_cp3_fortest (self, inval):
-        if not isinstance(inval, bool):
-            raise TypeError("input must be a boolean")
+        if not isinstance(inval, int):
+            raise TypeError("input must be an integer")
 
         self.__cp_fortest_3__ = inval
 
@@ -173,8 +174,8 @@ class changepoint:
 
     
     def set_file_pointer (self, fpin):
-        if not isinstance(fpin, io.IOBase):
-            raise TypeError("input must be a file pointer")
+        if not hasattr(fpin, 'write'):
+            raise TypeError("input has not write attribute")
 
         self.__fp__ = fpin
 
@@ -185,7 +186,7 @@ class changepoint:
 
 
     def set_print_iter_info (self, inval):
-        if not isinstance(fpin, bool):
+        if not isinstance(inval, bool):
             raise TypeError("input must be a bool")
 
         self.__print_iter_info__ = inval
@@ -197,7 +198,7 @@ class changepoint:
 
 
     def set_verbose (self, inval):
-        if not isinstance(fpin, bool):
+        if not isinstance(inval, bool):
             raise TypeError("input must be a bool")
 
         self.__verbose__ = inval
@@ -206,21 +207,18 @@ class changepoint:
 
         return self.__verbose__
     
-    def compute_cps (self, ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, 
-        anumofcp, acp1start, acp2start, acp3start, acp1stop, acp2stop, 
-        acp3stop, adeltacp, aiterations, fp = None, verbose = False,
-        setval=None):
+    def compute_cps (self, setval=None):
 
         if setval != None:
             setval.setValue(0)
             setval.setLabelText("ChangePoint analysis")
         
-        rating = numpy.max(ms)
-        time = ms.shape[1]
+        rating = numpy.max(self.__metacommunity__)
+        time = self.__metacommunity__.shape[1]
         
-        if cp_fortest >= 0 and num_of_run >= 0:
+        if self.__cp_fortest_1__ >= 0 and self.__num_of_bootstrap_iter__ >= 0:
         
-            if (verbose):
+            if (self.__verbose__):
                 print "Startint CP test..."
         
             L = 0.0
@@ -232,74 +230,81 @@ class changepoint:
             pr1 = 0.0
             lambdastart = 0.0
         
-            if anumofcp == 1:
-                L, L1, L2, pr1, pr2 = self.__compute_cps__ (ms, cp_fortest, True)
+            if self.__num_of_cps__ == 1:
+                L, L1, L2, pr1, pr2 = self.__compute_cps__ (\
+                        self.__metacommunity__, self.__cp_fortest_1__, True)
                 lambdastart = 2.0*((L1+L2)-L)
-            elif anumofcp == 2:
+            elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
-                self.__compute_cps__ (ms, cp_fortest, True, cp_fortest_2)
+                self.__compute_cps__ (self.__metacommunity__, \
+                self.__cp_fortest_1__, True, self.__cp_fortest_2__)
                 lambdastart = 2.0*((L1+L2+L3)-L)
-                if (verbose):
+                if (self.__verbose__):
                     print L, L1, L2, L3
-            elif anumofcp == 3:
+            elif self.__num_of_cps__ == 3:
                 L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
-                        self.__compute_cps__ (ms, cp_fortest, True, \
-                        cp_fortest_2, cp_fortest_3)
+                        self.__compute_cps__ (self.__metacommunity__, \
+                        self.__cp_fortest_1__, True, \
+                        elf.__cp_fortest_2__, self.__cp_fortest_3__)
                 lambdastart = 2.0*((L1+L2+L3+L4)-L)
-                if (verbose):
+                if (self.__verbose__):
                     print L, L1, L2, L3, L4
         
             lambdas = []
         
-            if (verbose):
+            if (self.__verbose__):
                 print "Starting iterations..."
         
-            for i in range(num_of_run):
+            for i in range(self.__num_of_bootstrap_iter__):
         
                 start = tempo.time()
                 cstart = tempo.clock()
          
-                x = self.__mkc_prop__ (ms, pr1)
+                x = self.__mkc_prop__ (self.__metacommunity__, pr1)
         
                 lambdav = 0.0
         
-                L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
+                L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, \
+                        self.__cp_fortest_1__, True)
         
-                if anumofcp == 1:
-                    L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, cp_fortest, True)
+                if self.__num_of_cps__ == 1:
+                    L, L1, L2, pr1_o, pr2_o = self.__compute_cps__ (x, \
+                            self.__cp_fortest_1__, True)
                     lambdav = 2.0*((L1+L2)-L)
-                elif anumofcp == 2:
+                elif self.__num_of_cps__ == 2:
                     L, L1, L2, L3, pr1_o, pr2_o, pr3_o = \
-                    self.__compute_cps__ (x, cp_fortest, True, cp_fortest_2)
+                    self.__compute_cps__ (x, \
+                    self.__cp_fortest_1__, True, self.__cp_fortest_2__)
                     lambdav = 2.0*((L1+L2+L3)-L)
-                elif anumofcp == 3:
+                elif self.__num_of_cps__ == 3:
                     L, L1, L2, L3, L4, pr1_o, pr2_o, pr3_o, pr4_o = \
-                            self.__compute_cps__ (x, cp_fortest, True, \
-                            cp_fortest_2, cp_fortest_3)
+                            self.__compute_cps__ (x, self.__cp_fortest_1__, True, \
+                            self.__cp_fortest_2__, self.__cp_fortest_3__)
                     lambdav = 2.0*((L1+L2+L3+L4)-L)
         
                 lambdas.append(lambdav) 
         
-                if not (fp is None):
-                    fp.write(str(i+1) + " " + str(lambdav) + "\n") 
+                if not (self.__fp__ is None):
+                    self.__fp__.write(str(i+1) + " " + str(lambdav) + "\n") 
         
                 end = tempo.time()
                 cend = tempo.clock()
             
-                if (verbose):
-                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(i+1 , num_of_run, 
+                if (self.__verbose__):
+                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                            i+1 , self.__num_of_bootstrap_iter__, 
                          end - start, cend - cstart)
          
         
-            idx95 = int(num_of_run*0.95+0.5)
+            idx95 = int(self.__num_of_bootstrap_iter__*0.95+0.5)
         
-            if idx95 >= num_of_run:
-                idx95 = num_of_run - 1
+            if idx95 >= self.__num_of_bootstrap_iter__:
+                idx95 = self.__num_of_bootstrap_iter__ - 1
         
             lamda95 = lambdas[idx95]
         
-            minrat = numpy.min(ms)
-            maxrat = numpy.max(ms)
+            minrat = numpy.min(self.__metacommunity__)
+            maxrat = numpy.max(self.__metacommunity__)
         
             #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
             #ndof = max (positive1, positive2)
@@ -307,10 +312,10 @@ class changepoint:
             #chi2 = scipy.stats.chi2.isf(0.05, ndof)
             #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
         
-            pvalue = (1.0 / numpy.float64(num_of_run + 1)) * \
+            pvalue = (1.0 / numpy.float64(self.__num_of_bootstrap_iter__ + 1)) * \
                     (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
         
-            if (verbose):
+            if (self.__verbose__):
                 #print "Ndof        : ", ndof
                 print "Lambda(95%) : ", lamda95
                 print "Lambda      : ", lambdastart
@@ -323,31 +328,31 @@ class changepoint:
         
             maxval = -1.0 * float("inf")
         
-            if (anumofcp == 1):
+            if (self.__num_of_cps__ == 1):
             
                 cp1stop = time-1
             
-                if acp1start <= 0 or acp1start > time-1:
+                if self.__cp1_start__ <= 0 or self.__cp1_start__ > time-1:
                     raise Error ("CP1 start invalid value")
             
-                if acp1stop < 0:
+                if self.__cp1_stop__ < 0:
                     cp1stop = time-1
                 else:
-                    cp1stop = acp1stop
+                    cp1stop = self.__cp1_stop__
             
-                if cp1stop <= acp1start or cp1stop > time-1:
+                if cp1stop <= self.__cp1_start__ or cp1stop > time-1:
                     raise Error ("CP1 stop invalid value")
             
                 cp = 0
                 idx = 0
                 allvalues = []
-                for c_p in range(acp1start, cp1stop):
+                for c_p in range(self.__cp1_start__, cp1stop):
                     start = tempo.time()
                     cstart = tempo.clock()
         
             
                     try:
-                        L1, L2 = self.__compute_cps__ (ms, c_p)
+                        L1, L2 = self.__compute_cps__ (self.__metacommunity__, c_p)
                     except Error:
                         raise Error ("Oops! error in the main function") 
             
@@ -355,28 +360,29 @@ class changepoint:
                         maxval = L1 + L2
                         cp = c_p
                 
-                    if not (fp is None):
-                        fp.write(str(c_p) + " " + str(L1+L2) + "\n")
+                    if not (self.__fp__ is None):
+                        self.__fp__.write(str(c_p) + " " + str(L1+L2) + "\n")
                     allvalues.append((c_p, L1+L2))
             
                     end = tempo.time()
                     cend = tempo.clock()
             
-                    if (verbose):
-                        if aiterations:
-                            print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , cp1stop-acp1start, 
-                                end - start, cend - cstart)
+                    if (self.__verbose__):
+                        if self.__print_iter_info__:
+                            print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                    idx+1 , cp1stop-self.__cp1_start__, \
+                                    end - start, cend - cstart)
                         else:
-                            basicutils.progress_bar(idx+1, cp1stop-acp1start)
+                            basicutils.progress_bar(idx+1, cp1stop-self.__cp1_start__)
         
                     if not(setval is None):
-                        setval.setValue(100.0*(float(idx+1)/float(cp1stop-acp1start)))
+                        setval.setValue(100.0*(float(idx+1)/float(cp1stop-self.__cp1_start__)))
                         if setval.wasCanceled():
                             raise Error("Cancelled")
         
                     idx = idx + 1 
             
-                if (verbose):
+                if (self.__verbose__):
                     print ""
                     print ""
                     print "Change Point: ", cp, " (",maxval, ")"
@@ -384,40 +390,41 @@ class changepoint:
                 vals = [cp, maxval, allvalues]
                 return vals
         
-            elif (anumofcp == 2):
+            elif (self.__num_of_cps__ == 2):
                 cp1 = 0
                 cp2 = 0
             
-                if adeltacp > 1:
+                if self.__delta_cp__ > 1:
             
                    cp1stop = time-1
             
-                   if acp1start <= 0 or acp1start > time-1:
+                   if self.__cp1_start__ <= 0 or self.__cp1_start__ > time-1:
                        raise ("CP1 start invalid value")
                   
-                   if acp1stop < 0:
+                   if self.__cp1_stop__ < 0:
                        cp1stop = time-1
                    else:
-                       cp1stop = acp1stop
+                       cp1stop = self.__cp1_stop__
                   
-                   if cp1stop <= acp1start or cp1stop > time-1:
+                   if cp1stop <= self.__cp1_start__ or cp1stop > time-1:
                        raise Error ("CP1 stop invalid value")
             
                    # I am lazy 
                    tot = 0
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(c_p1 + adeltacp, time-1):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
                            tot = tot + 1
             
                    idx = 0
                    allvalues = []
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(c_p1 + adeltacp, time-1):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
                            start = tempo.time()
                            cstart = tempo.clock()
             
                            try:
-                               L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
+                               L1, L2, L3 = self.__compute_cps__ (\
+                                       self.__metacommunity__, c_p1, False, c_p2)
                            except Error:
                                raise Error ("Oops! error in the main function")
              
@@ -429,10 +436,10 @@ class changepoint:
                            end = tempo.time()
                            cend = tempo.clock()
             
-                           if (verbose):
-                                if aiterations:
-                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                        end - start, cend - cstart)
+                           if (self.__verbose__):
+                                if self.__print_iter_info__:
+                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                            idx+1 , tot, end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
         
@@ -443,13 +450,13 @@ class changepoint:
         
                            idx = idx + 1 
              
-                           if not (fp is None):
-                              fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                           if not (self.__fp__ is None):
+                              self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(L1+L2+L3) + "\n")
         
                            allvalues.append((c_p1, c_p2, L1+L2+L3))
         
-                   if (verbose):
+                   if (self.__verbose__):
                        print ""
                        print ""
                        print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
@@ -461,49 +468,50 @@ class changepoint:
             
                    cp1stop = time-1
             
-                   if acp1start <= 0 or acp1start > time-1:
+                   if self.__cp1_start__ <= 0 or self.__cp1_start__ > time-1:
                        raise Error ("CP1 start invalid value")
                   
-                   if acp1stop < 0:
+                   if self.__cp1_stop__ < 0:
                        cp1stop = time-1
                    else:
-                       cp1stop = acp1stop
+                       cp1stop = self.__cp1_stop__
                   
-                   if cp1stop <= acp1start or cp1stop > time-1:
+                   if cp1stop <= self.__cp1_start__ or cp1stop > time-1:
                        raise Error ("CP1 stop invalid value")
             
                    cp2stop = time-1
             
-                   if acp2start <= 0 or acp2start > time-1:
+                   if self.__cp2_start__ <= 0 or self.__cp2_start__ > time-1:
                        raise Error ("CP2 start invalid value")
                   
-                   if acp2stop < 0:
+                   if self.__cp2_stop__ < 0:
                        cp2stop = time-1
                    else:
-                       cp2stop = acp2stop
+                       cp2stop = self.__cp2_stop__
                   
-                   if cp2stop <= acp2start or cp2stop > time-1:
+                   if cp2stop <= self.__cp2_start__ or cp2stop > time-1:
                        raise Error ("CP2 stop invalid value")
             
-                   if acp2start <= acp1start:
+                   if self.__cp2_start__ <= self.__cp1_start__:
                        raise Error ("CP2 start invalid value")
              
                    # I am lazy
                    tot = 0
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(acp2start, cp2stop):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(self.__cp2_start__, cp2stop):
                            tot = tot + 1
         
                    idx = 0
                    allvalues = []
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(acp2start, cp2stop):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(self.__cp2_start__, cp2stop):
             
                            start = tempo.time()
                            cstart = tempo.clock()
             
                            try:
-                               L1, L2, L3 = self.__compute_cps__ (ms, c_p1, False, c_p2)
+                               L1, L2, L3 = self.__compute_cps__ (\
+                                       self.__metacommunity__, c_p1, False, c_p2)
                            except Error:
                                raise Error ("Oops! error in the main function") 
                    
@@ -515,10 +523,10 @@ class changepoint:
                            end = tempo.time()
                            cend = tempo.clock()
             
-                           if (verbose):
-                                if aiterations:
-                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                        end - start, cend - cstart)
+                           if (self.__verbose__):
+                                if self.__print_iter_info__:
+                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                            idx+1 , tot, end - start, cend - cstart)
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
         
@@ -529,13 +537,13 @@ class changepoint:
             
                            idx = idx + 1 
              
-                           if not (fp is None):
-                              fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                           if not (self.__fp__ is None):
+                              self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(L1+L2+L3) + "\n")
         
                            allvalues.append((c_p1, c_p2, L1+L2+L3))
         
-                   if (verbose):
+                   if (self.__verbose__):
                         print ""
                         print ""
                         print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
@@ -543,44 +551,46 @@ class changepoint:
                    vals = [cp1, cp2, maxval, allvalues]
                    return vals
         
-            elif (anumofcp == 3):
+            elif (self.__num_of_cps__ == 3):
                 cp1 = 0
                 cp2 = 0
                 cp3 = 0
             
-                if adeltacp > 1:
+                if self.__delta_cp__ > 1:
             
                    cp1stop = time-1
             
-                   if acp1start <= 0 or acp1start > time-1:
+                   if self.__cp1_start__ <= 0 or self.__cp1_start__ > time-1:
                        raise Error ("CP1 start invalid value")
                   
-                   if acp1stop < 0:
+                   if self.__cp1_stop__ < 0:
                        cp1stop = time-1
                    else:
-                       cp1stop = acp1stop
+                       cp1stop = self.__cp1_stop__
                   
-                   if cp1stop <= acp1start or cp1stop > time-1:
+                   if cp1stop <= self.__cp1_start__ or cp1stop > time-1:
                        raise Error ("CP1 stop invalid value")
             
                    # I am lazy
                    tot = 0
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(c_p1 + adeltacp, time-1):
-                           for c_p3 in range(c_p2 + adeltacp, time-1):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
+                           for c_p3 in range(c_p2 + self.__delta_cp__, time-1):
                                tot = tot + 1
             
                    idx = 0
                    allvalues = []
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(c_p1 + adeltacp, time-1):
-                           for c_p3 in range(c_p2 + adeltacp, time-1):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
+                           for c_p3 in range(c_p2 + self.__delta_cp__, time-1):
             
                                start = tempo.time()
                                cstart = tempo.clock()
             
                                try:
-                                   L1, L2, L3, L4 = self.__compute_cps__ (ms, c_p1, False, c_p2, c_p3)
+                                   L1, L2, L3, L4 = self.__compute_cps__ (\
+                                           self.__metacommunity__, \
+                                           c_p1, False, c_p2, c_p3)
                                except Error:
                                    raise Error ("Oops! error in the main function") 
                                
@@ -593,10 +603,10 @@ class changepoint:
                                end = tempo.time()
                                cend = tempo.clock()
                   
-                               if (verbose):
-                                    if aiterations:
-                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                                end - start, cend - cstart)
+                               if (self.__verbose__):
+                                    if self.__print_iter_info__:
+                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                                idx+1 , tot, end - start, cend - cstart)
                                     else:
                                         basicutils.progress_bar(idx+1, tot)
         
@@ -607,16 +617,17 @@ class changepoint:
                                 
                                idx = idx + 1 
                               
-                               if not (fp is None):
-                                  fp.write(str(c_p1) + " " + str(c_p2) + " " 
+                               if not (self.__fp__ is None):
+                                  self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                        + str(c_p3) + " " 
                                        + str(L1+L2+L3+L4) + "\n")
                                allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
-                   if (verbose):
+                   if (self.__verbose__):
                         print ""
                         print ""
-                        print "Change Point: ", cp1, " , ", cp2, " ", cp3, " (",maxval, ")"
+                        print "Change Point: ", cp1, " , ", cp2, \
+                                " ", cp3, " (",maxval, ")"
         
                    vals = [cp1, cp2, cp3, maxval, allvalues]
                    return vals
@@ -625,67 +636,68 @@ class changepoint:
             
                    cp1stop = time-1
             
-                   if acp1start <= 0 or acp1start > time-1:
+                   if self.__cp1_start__ <= 0 or self.__cp1_start__ > time-1:
                        raise Error ("CP1 start invalid value")
                   
-                   if acp1stop < 0:
+                   if self.__cp1_stop__ < 0:
                        cp1stop = time-1
                    else:
-                       cp1stop = acp1stop
+                       cp1stop = self.__cp1_stop__
                   
-                   if cp1stop <= acp1start or cp1stop > time-1:
+                   if cp1stop <= self.__cp1_start__ or cp1stop > time-1:
                        raise Error ("CP1 stop invalid value")
             
                    cp2stop = time-1
             
-                   if acp2start <= 0 or acp2start > time-1:
+                   if self.__cp2_start__ <= 0 or self.__cp2_start__ > time-1:
                        raise Error ("CP2 start invalid value")
                   
-                   if acp2stop < 0:
+                   if self.__cp2_stop__ < 0:
                        cp2stop = time-1
                    else:
-                       cp2stop = acp2stop
+                       cp2stop = self.__cp2_stop__
                   
-                   if cp2stop <= acp2start or cp2stop > time-1:
+                   if cp2stop <= self.__cp2_start__ or cp2stop > time-1:
                        raise Error ("CP2 stop invalid value")
             
-                   if acp2start <= acp1start:
+                   if self.__cp2_start__ <= self.__cp1_start__:
                        raise Error ("CP2 start invalid value")
             
                    cp3stop = time-1
             
-                   if acp3start <= 0 or acp3start > time-1:
+                   if self.__cp3_start__ <= 0 or self.__cp3_start__ > time-1:
                        raise Error ("CP3 start invalid value")
                   
-                   if acp3stop < 0:
+                   if self.__cp3_stop__ < 0:
                        cp3stop = time-1
                    else:
-                       cp3stop = acp3stop
+                       cp3stop = self.__cp3_stop__
                   
-                   if cp3stop <= acp3start or cp3stop > time-1:
+                   if cp3stop <= self.__cp3_start__ or cp3stop > time-1:
                        raise Error ("CP3 stop invalid value")
             
-                   if acp3start <= acp2start:
+                   if self.__cp3_start__ <= self.__cp2_start__:
                        raise Error ("CP3 start invalid value")
              
                    tot = 0
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(acp2start, cp2stop):
-                           for c_p3 in range(acp3start, cp3stop):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(self.__cp2_start__, cp2stop):
+                           for c_p3 in range(self.__cp3_start__, cp3stop):
                                tot = tot + 1
             
                    idx = 0
                    allvalues = []
-                   for c_p1 in range(acp1start, cp1stop):
-                       for c_p2 in range(acp2start, cp2stop):
-                           for c_p3 in range(acp3start, cp3stop):
+                   for c_p1 in range(self.__cp1_start__, cp1stop):
+                       for c_p2 in range(self.__cp2_start__, cp2stop):
+                           for c_p3 in range(self.__cp3_start__, cp3stop):
             
                                start = tempo.time()
                                cstart = tempo.clock()
             
                                try:
-                                   L1, L2, L3, L4 = self.__compute_cps__ (ms,  
-                                       c_p1, False, c_p2, c_p3)
+                                   L1, L2, L3, L4 = self.__compute_cps__ (\
+                                           self.__metacommunity__,  \
+                                           c_p1, False, c_p2, c_p3)
                                except Error:
                                    raise Error ("Oops! error in the main function") 
              
@@ -699,10 +711,10 @@ class changepoint:
                                cend = tempo.clock()
                   
         
-                               if (verbose):
-                                    if aiterations:
-                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(idx+1 , tot, 
-                                                end - start, cend - cstart)
+                               if (self.__verbose__):
+                                    if self.__print_iter_info__:
+                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                                idx+1 , tot, end - start, cend - cstart)
                                     else:
                                         basicutils.progress_bar(idx+1, tot)
         
@@ -713,16 +725,17 @@ class changepoint:
         
                                
                                idx = idx + 1 
-                               if not (fp is None):
-                                    fp.write(str(c_p1) + " " + str(c_p2) + " " 
-                                       + str(c_p3) + " " 
+                               if not (self.__fp__ is None):
+                                    self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " \
+                                       + str(c_p3) + " " \
                                        + str(L1+L2+L3+L4) + "\n")
                                allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
-                   if (verbose):
+                   if (self.__verbose__):
                         print ""
                         print ""
-                        print "Change Point: ", cp1, " , ", cp2 , " ", cp3, " (",maxval, ")"
+                        print "Change Point: ", cp1, " , ", cp2 , \
+                                " ", cp3, " (",maxval, ")"
                    
                    vals = [cp1, cp2, cp3, maxval, allvalues]
                    return vals
@@ -734,12 +747,12 @@ class changepoint:
 # PRIVATE
 ###############################################################################
 
-    def __compute_cps__ (self, rm, c_p1, performtest = False, \
+    def __compute_cps__ (self, metacommunity, c_p1, performtest = False, \
             c_p2 = -1, c_p3 = -1):
 
-        countries=rm.shape[0]
-        rating=numpy.max(rm)
-        time=rm.shape[1]
+        countries=metacommunity.shape[0]
+        rating=numpy.max(metacommunity)
+        time=metacommunity.shape[1]
         
         if (rating <= 0) or (rating > 8):
             raise Error ("rating " + rating + \
@@ -769,7 +782,8 @@ class changepoint:
                 
                         for c  in range(countries):
                             for t in range(time-1):
-                                if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                if (metacommunity[c, t] == (i+1)) and \
+                                        (metacommunity[c, t+1] == (j+1)):
                                     nk[i, j, c] = nk[i, j, c] + 1
                                 
                         num[i, j] = sum(nk[i, j])
@@ -800,7 +814,8 @@ class changepoint:
                  for j in range(rating):
                     for c in range(countries):
                          for t in range(c_p1-1):
-                            if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                            if (metacommunity[c, t] == (i+1)) and \
+                                    (metacommunity[c, t+1] == (j+1)):
                                 num1[i, j] = num1[i, j] + 1
                     
                  den1[i] = sum(num1[i])
@@ -834,7 +849,8 @@ class changepoint:
                      for j in range(rating):
                          for c in range(countries):
                               for t in range(c_p1,c_p2-1) :
-                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] == (j+1)):
+                                  if (metacommunity[c, t] == (i+1)) and \
+                                          (metacommunity[c, t+1] == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
                      den2[i] = sum(num2[i])
@@ -869,7 +885,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p2,c_p3-1) :
-                                      if (rm[c, t] == (i+1)) and (rm[c, t+1] == \
+                                      if (metacommunity[c, t] == (i+1)) and \
+                                              (metacommunity[c, t+1] == \
                                               (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
@@ -900,7 +917,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p3,time-1) :
-                                      if (rm[c, t] == (i+1)) and (rm[c, t+1] \
+                                      if (metacommunity[c, t] == (i+1)) and \
+                                              (metacommunity[c, t+1] \
                                               == (j+1)):
                                           num4[i, j] = num4[i, j] + 1
                              
@@ -931,7 +949,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p2,time-1) :
-                                      if (rm[c, t] == (i+1)) and (rm[c, t+1] \
+                                      if (metacommunity[c, t] == (i+1)) and \
+                                              (metacommunity[c, t+1] \
                                               == (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
@@ -963,7 +982,8 @@ class changepoint:
                      for j in range(rating):
                          for c in range(countries):
                               for t in range(c_p1,time-1) :
-                                  if (rm[c, t] == (i+1)) and (rm[c, t+1] \
+                                  if (metacommunity[c, t] == (i+1)) and \
+                                          (metacommunity[c, t+1] \
                                           == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
@@ -993,7 +1013,7 @@ class changepoint:
         raise Error ("at least cp1 should be > 0")
 
 
-    def __mkc_prop__ (slef, metacommunity, transitions_probability_mtx): 
+    def __mkc_prop__ (self, metacommunity, transitions_probability_mtx): 
 
         mcrows = metacommunity.shape[0]
         mcmaxvalue = numpy.max(metacommunity)

@@ -101,12 +101,32 @@ if cp_fortest >= 0:
         cp_fortest_2 = int(args.performtest.split(";")[1])
         cp_fortest_3 = int(args.performtest.split(";")[2])
         num_of_run = int(args.performtest.split(";")[3])
+
+runcps = changemod.changepoint()
+
 try:
-    changemod.main_compute_cps (ms, num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, 
-        args.numofcp, args.cp1start, args.cp2start, args.cp3start, args.cp1stop, args.cp2stop, 
-        args.cp3stop, args.deltacp, args.iterations, fp, True)
-except changemod.Error:
+    runcps.set_metacommunity (ms)
+    runcps.set_num_of_bootstrap_iter (num_of_run)
+    runcps.set_cp1_fortest (cp_fortest)
+    runcps.set_cp2_fortest (cp_fortest_2)
+    runcps.set_cp3_fortest (cp_fortest_3)
+    runcps.set_cp1_start_stop (args.cp1start, args.cp1stop)
+    runcps.set_cp2_start_stop (args.cp2start, args.cp2stop)
+    runcps.set_cp3_start_stop (args.cp3start, args.cp3stop)
+    runcps.set_num_of_cps (args.numofcp)
+    runcps.set_delta_cp (args.deltacp)
+    runcps.set_print_iter_info(args.iterations)
+    runcps.set_verbose(True)
+    runcps.set_file_pointer(fp)
+
+    runcps.compute_cps ()
+
+except changemod.Error as err:
     print "Oops! error in the main function" 
+    print err
+    exit(1)
+except TypeError as err:
+    print err
     exit(1)
  
 fp.close()

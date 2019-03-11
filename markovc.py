@@ -107,7 +107,7 @@ if __name__ == "__main__" :
         markovrun.set_verbose(verbose)
         markovrun.set_dump_files(True)
 
-        if not markovrun.main_mkc_comp():
+        if not markovrun.run_computation():
             print "Error in main markov kernel"
             exit(1)
 

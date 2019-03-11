@@ -418,7 +418,7 @@ class main_window(QtGui.QMainWindow):
 
                 markovrun.set_usecopula(self.__usecopula__)
 
-                if not markovrun.main_mkc_comp(progdialog):
+                if not markovrun.run_computation(progdialog):
                     
                     QtGui.QMessageBox.critical( self, \
                     "ERROR", \

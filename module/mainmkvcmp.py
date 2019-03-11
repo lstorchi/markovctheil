@@ -197,7 +197,7 @@ class markovkernel:
         return self.__attributes_sigma_values__ 
     
     
-    def main_mkc_comp (self, setval=None):
+    def run_computation (self, setval=None):
 
         if self.__use_a_seed__:
             numpy.random.seed(self.__seed_value__)
