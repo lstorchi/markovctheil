@@ -45,7 +45,7 @@ class changepoint:
 
     def set_metacommunity(self, inmat):
         if not isinstance(inmat, numpy.ndarray):
-            raise TypeError("input must be a numpy array")
+            raise TypeError("set_metacommunity: input must be a numpy array")
 
         self.__metacommunity__ = inmat
 
