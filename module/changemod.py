@@ -49,6 +49,19 @@ class changepoint:
         self.__maxval__ = -float("inf")
         self.__allvalues__ = []
 
+        self.__lambda95__ = None
+        self.__lambdastart__ = None
+        self.__pvalue__ = None
+
+    def get_lambda95(self):
+        return self.__lambda95__
+
+    def get_lambdastart(self):
+        return self.__lambdastart__
+
+    def get_pvalue(self):
+        return self.__pvalue__
+
     def get_cp1_found(self):
         return self.__cp1_found__
 
@@ -249,17 +262,17 @@ class changepoint:
             L4 = 0.0
         
             pr1 = 0.0
-            lambdastart = 0.0
+            self.__lambdastart__ = 0.0
         
             if self.__num_of_cps__ == 1:
                 L, L1, L2, pr1, pr2 = self.__compute_cps__ (\
                         self.__metacommunity__, self.__cp_fortest_1__, True)
-                lambdastart = 2.0*((L1+L2)-L)
+                self.__lambdastart__ = 2.0*((L1+L2)-L)
             elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
                 self.__compute_cps__ (self.__metacommunity__, \
                 self.__cp_fortest_1__, True, self.__cp_fortest_2__)
-                lambdastart = 2.0*((L1+L2+L3)-L)
+                self.__lambdastart__ = 2.0*((L1+L2+L3)-L)
                 if (self.__verbose__):
                     print L, L1, L2, L3
             elif self.__num_of_cps__ == 3:
@@ -267,7 +280,7 @@ class changepoint:
                         self.__compute_cps__ (self.__metacommunity__, \
                         self.__cp_fortest_1__, True, \
                         elf.__cp_fortest_2__, self.__cp_fortest_3__)
-                lambdastart = 2.0*((L1+L2+L3+L4)-L)
+                self.__lambdastart__ = 2.0*((L1+L2+L3+L4)-L)
                 if (self.__verbose__):
                     print L, L1, L2, L3, L4
         
@@ -322,7 +335,7 @@ class changepoint:
             if idx95 >= self.__num_of_bootstrap_iter__:
                 idx95 = self.__num_of_bootstrap_iter__ - 1
         
-            lamda95 = lambdas[idx95]
+            self.__lambda95__ = lambdas[idx95]
         
             minrat = numpy.min(self.__metacommunity__)
             maxrat = numpy.max(self.__metacommunity__)
@@ -331,19 +344,19 @@ class changepoint:
             #ndof = max (positive1, positive2)
         
             #chi2 = scipy.stats.chi2.isf(0.05, ndof)
-            #pvalue = 1.0 - scipy.stats.chi2.cdf(lamda95, ndof)
+            #pvalue = 1.0 - scipy.stats.chi2.cdf(self.__lambda95__, ndof)
         
-            pvalue = (1.0 / numpy.float64(self.__num_of_bootstrap_iter__ + 1)) * \
-                    (1.0 + numpy.float64(sum(i >= lambdastart for i in lambdas)))
+            self.__pvalue__ = \
+                    (1.0 / numpy.float64(self.__num_of_bootstrap_iter__ + 1)) * \
+                    (1.0 + numpy.float64(sum(i >= self.__lambdastart__ for i in lambdas)))
         
             if (self.__verbose__):
                 #print "Ndof        : ", ndof
-                print "Lambda(95%) : ", lamda95
-                print "Lambda      : ", lambdastart
-                print "P-Value     : ", pvalue
+                print "Lambda(95%) : ", self.__lambda95__
+                print "Lambda      : ", self.__lambdastart__
+                print "P-Value     : ", self.__pvalue__
         
-            vals = [lamda95, lambdastart, pvalue]
-            return vals
+            return 
         
         else:
         

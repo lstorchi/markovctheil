@@ -318,23 +318,21 @@ class main_window(QtGui.QMainWindow):
  
 
             if cp_fortest >= 0:
-                assert(len(vals) == 3)
                 QtGui.QMessageBox.information( self, \
                         "Value", "Lambda(95%) : " +\
-                        str(vals[0]) + " Lambda : " + \
-                        str(vals[1]) + " P-Value : "+
-                        str(vals[2]))
+                        str(runcps.get_lambda95()) + " Lambda : " + \
+                        str(runcps.get_lambdastart()) + " P-Value : "+
+                        str(runcps.get_pvalue()))
             else:
                 if self.__options_dialog_cp__.get_numofcp() == 1:
-                    assert(len(vals) == 3)
                     QtGui.QMessageBox.information( self, \
                         "Value", "CP : " +\
-                        str(vals[0]) + " Value : " + \
-                        str(vals[1]))
+                        str(runcps.get_cp1_found()) + " Value : " + \
+                        str(runcps.get_maxval()))
 
                     x = []
                     y = []
-                    for v in vals[2]:
+                    for v in runcps.get_allvalues():
                         x.append(v[0])
                         y.append(v[1])
 
@@ -350,7 +348,8 @@ class main_window(QtGui.QMainWindow):
                     self.__ax__.set_ylabel('Value')
                     self.__ax__.set_xlim([numpy.min(x), numpy.max(x)])
                     self.__ax__.annotate("ChangePoint", \
-                            xy=(vals[0], vals[1]), xytext=(-20, 20), \
+                            xy=(runcps.get_cp1_found(), \
+                            runcps.get_maxval()), xytext=(-20, 20), \
                             textcoords='offset points', ha='right', va='bottom', \
                             bbox=dict(boxstyle='round,pad=0.5', fc='yellow', alpha=0.5), \
                             arrowprops=dict(arrowstyle = '->', connectionstyle='arc3,rad=0'))
@@ -358,11 +357,10 @@ class main_window(QtGui.QMainWindow):
                     self.__plot_done__ = True
 
                 elif self.__options_dialog_cp__.get_numofcp() == 2:
-                    assert(len(vals) == 4)
                     QtGui.QMessageBox.information( self, \
-                        "Value", "CP1 : " + str(vals[0]) + \
-                        " CP2 : " + str(vals[1]) + \
-                        " Value : " + str(vals[2]))
+                        "Value", "CP1 : " + str(runcps.get_cp1_found()) + \
+                        " CP2 : " + str(runcps.get_cp2_found()) + \
+                        " Value : " + str(runcps.get_maxval()))
 
                     if self.__plot_done__ :
                       self.__ax__.cla()
@@ -370,12 +368,11 @@ class main_window(QtGui.QMainWindow):
                       self.__plot_done__ = False
 
                 elif self.__options_dialog_cp__.get_numofcp() == 3:
-                    assert(len(vals) == 5)
                     QtGui.QMessageBox.information( self, \
-                        "Value", "CP1 : " + str(vals[0]) + \
-                        " CP2 : " + str(vals[1]) + \
-                        " CP3 : " + str(vals[2]) + \
-                        " Value : " + str(vals[3]))
+                        "Value", "CP1 : " + str(runcps.get_cp1_found()) + \
+                        " CP2 : " + str(runcps.get_cp2_found()) + \
+                        " CP3 : " + str(runcps.get_cp3_found()) + \
+                        " Value : " + str(runcps.get_maxval()))
 
                     if self.__plot_done__ :
                       self.__ax__.cla()
