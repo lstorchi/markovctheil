@@ -43,6 +43,27 @@ class changepoint:
         self.__verbose__ = False 
         self.__fp__ = None 
 
+        self.__cp1_found__ = -1
+        self.__cp2_found__ = -1
+        self.__cp3_found__ = -1
+        self.__maxval__ = -float("inf")
+        self.__allvalues__ = []
+
+    def get_cp1_found(self):
+        return self.__cp1_found__
+
+    def get_cp2_found(self):
+        return self.__cp2_found__
+
+    def get_cp3_found(self):
+        return self.__cp3_found__
+
+    def get_maxval(self):
+        return self.__maxval__
+
+    def get_allvalues(self):
+        return self.__allvalues__
+
     def set_metacommunity(self, inmat):
         if not isinstance(inmat, numpy.ndarray):
             raise TypeError("set_metacommunity: input must be a numpy array")
@@ -345,7 +366,7 @@ class changepoint:
             
                 cp = 0
                 idx = 0
-                allvalues = []
+                self.__allvalues__ = []
                 for c_p in range(self.__cp1_start__, cp1stop):
                     start = tempo.time()
                     cstart = tempo.clock()
@@ -362,7 +383,7 @@ class changepoint:
                 
                     if not (self.__fp__ is None):
                         self.__fp__.write(str(c_p) + " " + str(L1+L2) + "\n")
-                    allvalues.append((c_p, L1+L2))
+                    self.__allvalues__.append((c_p, L1+L2))
             
                     end = tempo.time()
                     cend = tempo.clock()
@@ -387,8 +408,10 @@ class changepoint:
                     print ""
                     print "Change Point: ", cp, " (",maxval, ")"
                 
-                vals = [cp, maxval, allvalues]
-                return vals
+                self.__cp1_found__ = cp
+                self.__maxval__ = maxval
+
+                return 
         
             elif (self.__num_of_cps__ == 2):
                 cp1 = 0
@@ -416,7 +439,7 @@ class changepoint:
                            tot = tot + 1
             
                    idx = 0
-                   allvalues = []
+                   self.__allvalues__ = []
                    for c_p1 in range(self.__cp1_start__, cp1stop):
                        for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
                            start = tempo.time()
@@ -454,15 +477,18 @@ class changepoint:
                               self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(L1+L2+L3) + "\n")
         
-                           allvalues.append((c_p1, c_p2, L1+L2+L3))
+                           self.__allvalues__.append((c_p1, c_p2, L1+L2+L3))
         
                    if (self.__verbose__):
                        print ""
                        print ""
                        print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
                    
-                   vals = [cp1, cp2, maxval, allvalues]
-                   return vals
+                   self.__cp1_found__ = cp1
+                   self.__cp2_found__ = cp2
+                   self.__maxval__ = maxval
+
+                   return 
         
                 else:
             
@@ -502,7 +528,7 @@ class changepoint:
                            tot = tot + 1
         
                    idx = 0
-                   allvalues = []
+                   self.__allvalues__ = []
                    for c_p1 in range(self.__cp1_start__, cp1stop):
                        for c_p2 in range(self.__cp2_start__, cp2stop):
             
@@ -541,15 +567,18 @@ class changepoint:
                               self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                    + str(L1+L2+L3) + "\n")
         
-                           allvalues.append((c_p1, c_p2, L1+L2+L3))
+                           self.__allvalues__.append((c_p1, c_p2, L1+L2+L3))
         
                    if (self.__verbose__):
                         print ""
                         print ""
                         print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
-        
-                   vals = [cp1, cp2, maxval, allvalues]
-                   return vals
+
+                   self.__cp1_found__ = cp1
+                   self.__cp2_found__ = cp2
+                   self.__maxval__ = maxval
+
+                   return 
         
             elif (self.__num_of_cps__ == 3):
                 cp1 = 0
@@ -579,7 +608,7 @@ class changepoint:
                                tot = tot + 1
             
                    idx = 0
-                   allvalues = []
+                   self.__allvalues__ = []
                    for c_p1 in range(self.__cp1_start__, cp1stop):
                        for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
                            for c_p3 in range(c_p2 + self.__delta_cp__, time-1):
@@ -621,7 +650,7 @@ class changepoint:
                                   self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " 
                                        + str(c_p3) + " " 
                                        + str(L1+L2+L3+L4) + "\n")
-                               allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+                               self.__allvalues__.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
                    if (self.__verbose__):
                         print ""
@@ -629,8 +658,12 @@ class changepoint:
                         print "Change Point: ", cp1, " , ", cp2, \
                                 " ", cp3, " (",maxval, ")"
         
-                   vals = [cp1, cp2, cp3, maxval, allvalues]
-                   return vals
+                   self.__cp1_found__ = cp1
+                   self.__cp2_found__ = cp2
+                   self.__cp3_found__ = cp3
+                   self.__maxval__ = maxval
+
+                   return 
         
                 else:
             
@@ -686,7 +719,7 @@ class changepoint:
                                tot = tot + 1
             
                    idx = 0
-                   allvalues = []
+                   self.__allvalues__ = []
                    for c_p1 in range(self.__cp1_start__, cp1stop):
                        for c_p2 in range(self.__cp2_start__, cp2stop):
                            for c_p3 in range(self.__cp3_start__, cp3stop):
@@ -729,7 +762,7 @@ class changepoint:
                                     self.__fp__.write(str(c_p1) + " " + str(c_p2) + " " \
                                        + str(c_p3) + " " \
                                        + str(L1+L2+L3+L4) + "\n")
-                               allvalues.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
+                               self.__allvalues__.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
                    if (self.__verbose__):
                         print ""
@@ -737,8 +770,12 @@ class changepoint:
                         print "Change Point: ", cp1, " , ", cp2 , \
                                 " ", cp3, " (",maxval, ")"
                    
-                   vals = [cp1, cp2, cp3, maxval, allvalues]
-                   return vals
+                   self.__cp1_found__ = cp1
+                   self.__cp2_found__ = cp2
+                   self.__cp3_found__ = cp3
+                   self.__maxval__ = maxval
+ 
+                   return 
         
         raise Error ("Nothing todo")
 

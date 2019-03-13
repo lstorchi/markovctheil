@@ -271,6 +271,8 @@ class main_window(QtGui.QMainWindow):
             progdialog.setWindowModality(QtCore.Qt.WindowModal)
             progdialog.setMinimumDuration(0)
             progdialog.show()
+            
+            runcps = changemod.changepoint()
 
             try:
                 #print self.__options_dialog_cp__.get_cp1start(), " ", \
@@ -280,23 +282,40 @@ class main_window(QtGui.QMainWindow):
                 #        self.__options_dialog_cp__.get_cp2stop(), " ", \
                 #        self.__options_dialog_cp__.get_deltacp()
 
-                vals = changemod.main_compute_cps (self.__rm__, \
-                        num_of_run, cp_fortest, cp_fortest_2, cp_fortest_3, \
-                        self.__options_dialog_cp__.get_numofcp(), \
-                        self.__options_dialog_cp__.get_cp1start(), \
-                        self.__options_dialog_cp__.get_cp2start(), \
-                        self.__options_dialog_cp__.get_cp3start(), \
-                        self.__options_dialog_cp__.get_cp1stop(), \
-                        self.__options_dialog_cp__.get_cp2stop(), \
-                        self.__options_dialog_cp__.get_cp3stop(), \
-                        self.__options_dialog_cp__.get_deltacp(), \
-                        False, None, False, progdialog)
-                        #True, None, True, progdialog)
+                runcps.set_metacommunity (self.__rm__)
+                runcps.set_num_of_bootstrap_iter (num_of_run)
+                runcps.set_cp1_fortest (cp_fortest)
+                runcps.set_cp2_fortest (cp_fortest_2)
+                runcps.set_cp3_fortest (cp_fortest_3)
+
+                runcps.set_num_of_cps (self.__options_dialog_cp__.get_numofcp())
+                runcps.set_cp1_start_stop (\
+                        self.__options_dialog_cp__.get_cp1start(),\
+                        self.__options_dialog_cp__.get_cp1stop())
+                runcps.set_cp2_start_stop (\
+                        self.__options_dialog_cp__.get_cp2start(),\
+                        self.__options_dialog_cp__.get_cp2stop())
+                runcps.set_cp3_start_stop (\
+                        self.__options_dialog_cp__.get_cp3start(),\
+                        self.__options_dialog_cp__.get_cp3stop())
+                runcps.set_delta_cp (\
+                        self.__options_dialog_cp__.get_deltacp())
+                runcps.set_print_iter_info(False)
+                runcps.set_verbose(False)
+               
+                runcps.compute_cps (progdialog)
+
             except changemod.Error:
                 QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     "Oops! error in the main function")
                 return
+            except TypeError as err:
+                QtGui.QMessageBox.critical( self, \
+                    "ERROR", \
+                    "Oops! type error in the main function")
+                return
+ 
 
             if cp_fortest >= 0:
                 assert(len(vals) == 3)
