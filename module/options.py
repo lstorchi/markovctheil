@@ -200,6 +200,7 @@ class optiondialog(QtGui.QDialog):
         self.__tprev__ = 37
         self.__nofrun__ = 100
         self.__inftime__ = False
+        self.__usecopula__ = False
        
         super(optiondialog, self).__init__(parent)
 
