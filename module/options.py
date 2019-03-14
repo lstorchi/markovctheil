@@ -232,6 +232,7 @@ class optiondialog(QtGui.QDialog):
         self.grid = QtGui.QGridLayout(self)
 
         self.grid.addWidget(self.inftcb)
+        self.grid.addWidget(self.copulacb)
 
         self.grid.addWidget(labelstep)
         self.grid.addWidget(self.steptb)
