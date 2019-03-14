@@ -27,37 +27,37 @@ class optiondialog_cp(QtGui.QDialog):
         self.numofcp_line.move(20, 20)
         self.numofcp_line.resize(280,40)
 
-        labelcp1start = QtGui.QLabel("CP1 start: ", self)
+        labelcp1start = QtGui.QLabel("CP1 ranges from: ", self)
         self.cp1start_line = QtGui.QLineEdit(str(self.__cp1start__), self)
         self.cp1start_line.move(20, 20)
         self.cp1start_line.resize(280,40)
 
-        labelcp1stop = QtGui.QLabel("CP1 stop: ", self)
+        labelcp1stop = QtGui.QLabel("CP1 ranges to: ", self)
         self.cp1stop_line = QtGui.QLineEdit(str(self.__cp1stop__), self)
         self.cp1stop_line.move(20, 20)
         self.cp1stop_line.resize(280,40)
 
-        labelcp2start = QtGui.QLabel("CP2 start: ", self)
+        labelcp2start = QtGui.QLabel("CP2 ranges from: ", self)
         self.cp2start_line = QtGui.QLineEdit(str(self.__cp2start__), self)
         self.cp2start_line.move(20, 20)
         self.cp2start_line.resize(280,40)
 
-        labelcp2stop = QtGui.QLabel("CP2 stop: ", self)
+        labelcp2stop = QtGui.QLabel("CP2 ranges to: ", self)
         self.cp2stop_line = QtGui.QLineEdit(str(self.__cp2stop__), self)
         self.cp2stop_line.move(20, 20)
         self.cp2stop_line.resize(280,40)
 
-        labelcp3start = QtGui.QLabel("CP3 start: ", self)
+        labelcp3start = QtGui.QLabel("CP3 ranges from: ", self)
         self.cp3start_line = QtGui.QLineEdit(str(self.__cp3start__), self)
         self.cp3start_line.move(20, 20)
         self.cp3start_line.resize(280,40)
 
-        labelcp3stop = QtGui.QLabel("CP3 stop: ", self)
+        labelcp3stop = QtGui.QLabel("CP3 ranges to: ", self)
         self.cp3stop_line = QtGui.QLineEdit(str(self.__cp3stop__), self)
         self.cp3stop_line.move(20, 20)
         self.cp3stop_line.resize(280,40)
 
-        labeldeltacp = QtGui.QLabel("Delta CP: ", self)
+        labeldeltacp = QtGui.QLabel("Delta time between CPs: ", self)
         self.deltacp_line = QtGui.QLineEdit(str(self.__deltacp__), self)
         self.deltacp_line.move(20, 20)
         self.deltacp_line.resize(280,40)
@@ -66,7 +66,6 @@ class optiondialog_cp(QtGui.QDialog):
         self.performtest_line = QtGui.QLineEdit(str(self.__performtest__), self)
         self.performtest_line.move(20, 20)
         self.performtest_line.resize(280,40)
-
 
         self.grid = QtGui.QGridLayout(self)
 
