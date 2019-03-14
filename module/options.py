@@ -285,7 +285,7 @@ class optiondialog(QtGui.QDialog):
         return self.__inftime__
 
     def getusecopula (self):
-        return self._usecopula__
+        return self.__usecopula__
 
 class optionnamedialog(QtGui.QDialog):
 
