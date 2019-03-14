@@ -23,8 +23,6 @@ class main_window(QtGui.QMainWindow):
         self.__entropiadone__ = False
         self.__plot_done__ = False
 
-        self.__usecopula__ = False
-
         self.__entropy__ = None
         self.__var__ = None
         self.__allratings__ = None
@@ -66,7 +64,7 @@ class main_window(QtGui.QMainWindow):
         runchangepoint.setStatusTip("Run ChangePoint")
         self.connect(runchangepoint, QtCore.SIGNAL('triggered()'), self.runchangepoint)
 
-        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot CS distributions", self)
+        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot Empirical distributions", self)
         self.__plots__.setShortcut("Ctrl+S")
         self.__plots__.setStatusTip("Credit spread distributions")
         self.__plots__.connect(self.__plots__ , QtCore.SIGNAL('triggered()'), \
@@ -432,7 +430,8 @@ class main_window(QtGui.QMainWindow):
                 markovrun.set_verbose(False)
                 markovrun.set_dump_files(False)
 
-                markovrun.set_usecopula(self.__usecopula__)
+                markovrun.set_usecopula(\
+                        self.__options_dialog__.getusecopula())
 
                 if not markovrun.run_computation(progdialog):
                     

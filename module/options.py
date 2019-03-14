@@ -210,12 +210,15 @@ class optiondialog(QtGui.QDialog):
         self.inftcb = QtGui.QCheckBox("Simulation using stationary distribution", self)
         self.inftcb.setChecked(self.__inftime__)
 
+        self.copulacb = QtGui.QCheckBox("Simulation using copula for the reward processes", self)
+        self.copulacb.setChecked(self.__usecopula__)
+
         labelstep = QtGui.QLabel("Bin width: ", self)
         self.steptb = QtGui.QLineEdit(str(self.__step__), self)
         self.steptb.move(20, 20)
         self.steptb.resize(280,40)
 
-        labeltprev = QtGui.QLabel("Forecasted period: ", self)
+        labeltprev = QtGui.QLabel("Simulated period: ", self)
         self.tprevtb = QtGui.QLineEdit(str(self.__tprev__), self)
         self.tprevtb.move(20, 20)
         self.tprevtb.resize(280,40)
@@ -263,6 +266,7 @@ class optiondialog(QtGui.QDialog):
             "Max. num of iterations unexpected value reset to default")
 
         self.__inftime__ = self.inftcb.isChecked()
+        self.__usecopula__ = self.copulacb.isChecked()
 
         self.close()
 
@@ -277,6 +281,9 @@ class optiondialog(QtGui.QDialog):
 
     def getinftime (self):
         return self.__inftime__
+
+    def getusecopula (self):
+        return self._usecopula__
 
 class optionnamedialog(QtGui.QDialog):
 
@@ -295,7 +302,7 @@ class optionnamedialog(QtGui.QDialog):
         self.ratingnametb.move(20, 20)
         self.ratingnametb.resize(280,40)
 
-        labelinterest_ratesname = QtGui.QLabel("Name of the rewards matrix: ", self)
+        labelinterest_ratesname = QtGui.QLabel("Name of the reward matrix: ", self)
         self.interest_ratestb = QtGui.QLineEdit(str(self.__nameir__), self)
         self.interest_ratestb.move(20, 20)
         self.interest_ratestb.resize(280,40)
