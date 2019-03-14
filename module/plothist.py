@@ -13,7 +13,7 @@ class plohitwin (QtGui.QMainWindow):
         super(plohitwin, self).__init__(parent)
 
         self.resize(640, 480) 
-        self.setWindowTitle('CS distributions')
+        self.setWindowTitle('Empirical distributions')
 
         figure = plt.figure()
         canvas = FigureCanvas(figure)
@@ -34,8 +34,8 @@ class plohitwin (QtGui.QMainWindow):
             #ax.hold(False)
             ax.set_title("K="+str(k))
             ax.grid(True)
-            ax.set_ylabel('f(BP)')
-            ax.set_xlabel('BP(%)')
+            ax.set_ylabel('f(bp)')
+            ax.set_xlabel('bp')
             ax.hist(allratings[i], normed=False, \
                     bins=allratingsnins[i], \
                     facecolor='green')
