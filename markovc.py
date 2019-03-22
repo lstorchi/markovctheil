@@ -47,9 +47,10 @@ if __name__ == "__main__" :
     if len(sys.argv) == 1:
         parser.print_help()
         exit(1)
-    
+
     args = parser.parse_args()
-    
+
+
     namebp = args.nameofbpmatrix
     timeinf = args.timeinf
     verbose = args.verbose
@@ -110,6 +111,8 @@ if __name__ == "__main__" :
         if not markovrun.run_computation():
             print "Error in main markov kernel"
             exit(1)
+
+        print markovrun.get_usecopula()
 
     except TypeError as err:
         print err

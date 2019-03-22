@@ -119,7 +119,7 @@ class markovkernel:
         if not isinstance(flagin, bool):
             raise TypeError("input must be a boolean")
 
-        self.__usecompula__ = flagin
+        self.__usecopula__ = flagin
 
 
     def get_usecopula (self):
@@ -417,7 +417,7 @@ class markovkernel:
         entropy = None
         ac = None
         bp = None 
-        
+
         if self.__usecopula__:
             valuevec, binvec, rho = self.__compute_copula_variables__ (r)
             
@@ -552,15 +552,15 @@ class markovkernel:
         mcrows = self.__metacommunity__.shape[0]
         
         spread_synth_tmp = numpy.zeros(mcrows)
-        spread_synth = numpy.zeros(self.__num_of_mc_iterations__,\
-                self.__simulated_time__,mcrows)
-        
+        spread_synth = numpy.zeros((self.__num_of_mc_iterations__,\
+                self.__simulated_time__,mcrows))
+
         entropy = t_t[-1]*numpy.ones((self.__simulated_time__,\
                self.__num_of_mc_iterations__))
         
         if self.__verbose__:
             print "Start MC simulation  ..."
-        
+
         for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
@@ -573,6 +573,7 @@ class markovkernel:
                         self.__transitions_probability_mtx__[r_in-1,:],1)
                 jj = numpy.zeros(mcrows, dtype=int)
                 for k in range(mcrows):
+
                     jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                     
                     func = interp1d(valuevec[jj[k]][1:], binvec[jj[k]][1:], \
@@ -589,6 +590,7 @@ class markovkernel:
                     spread_synth_tmp[k] = max(func(xval), -0.9)
         
                 r_in = jj
+                #print "rin: ", r_in
                 spread_synth[run,j,:] = numpy.multiply( \
                         numpy.squeeze(spread_synth[run,j-1,:]), \
                         (1+spread_synth_tmp[:].transpose()))
