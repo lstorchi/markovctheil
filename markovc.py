@@ -112,8 +112,6 @@ if __name__ == "__main__" :
             print "Error in main markov kernel"
             exit(1)
 
-        print markovrun.get_usecopula()
-
     except TypeError as err:
         print err
         exit(1)
