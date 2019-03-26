@@ -502,11 +502,11 @@ class markovkernel:
         if self.__metacommunity__.shape != r.shape:
             print "Error  in matrix dimension"
             exit(1)
-        
+
         mcmaxvalue = numpy.max(self.__metacommunity__)
         rrows = r.shape[0]
         Dst = max(r.shape)
-        
+
         inc_spread = numpy.zeros((rrows,Dst-1))
         
         end = r.shape[1]
@@ -537,11 +537,12 @@ class markovkernel:
                     dist_sp)
         
             x, y = basicutils.ecdf(dist_sp)
+
             valuevec.append(x)
             binvec.append(y)
         
         rho = numpy.corrcoef(r) 
-        
+
         return valuevec, binvec, rho
 
     
@@ -553,7 +554,7 @@ class markovkernel:
         
         spread_synth_tmp = numpy.zeros(mcrows)
         spread_synth = numpy.zeros((self.__num_of_mc_iterations__,\
-                self.__simulated_time__,mcrows))
+                self.__simulated_time__, mcrows))
 
         entropy = t_t[-1]*numpy.ones((self.__simulated_time__,\
                self.__num_of_mc_iterations__))
@@ -568,6 +569,9 @@ class markovkernel:
         for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
+            #print self.__attributes__[:,-1]
+            #print self.__metacommunity__[:,-1]
+            #exit()
             u = basicutils.gaussian_copula_rnd (rho, \
                     self.__simulated_time__)
 
@@ -575,8 +579,9 @@ class markovkernel:
                     self.__simulated_time__), dtype=numpy.float64)
             counter_per_ratclass = numpy.zeros((numpy.max(self.__metacommunity__), \
                     self.__simulated_time__), dtype=numpy.float64)
-            sum_spread =  numpy.zeros(self.__simulated_time__, dtype=numpy.float64)
-        
+            sum_spread =  numpy.zeros((numpy.max(self.__metacommunity__), \
+                    self.__simulated_time__), dtype=numpy.float64)
+
             for j in range(1,self.__simulated_time__):
                 v = numpy.random.uniform(0.0, 1.0, mcrows)
                 pp = numpy.cumsum(\
@@ -586,38 +591,41 @@ class markovkernel:
 
                     jj[k] = numpy.where(pp[k,:] >= v[k])[0][0]
                     
-                    func = interp1d(valuevec[jj[k]][1:], binvec[jj[k]][1:], \
+                    func = interp1d(binvec[jj[k]][1:], valuevec[jj[k]][1:], \
                             kind='linear')
         
                     xval = u[j,k]
-                    xmin = min(valuevec[jj[k]][1:])
-                    xmax = max(valuevec[jj[k]][1:])
+                    xmin = min(binvec[jj[k]][1:])
+                    xmax = max(binvec[jj[k]][1:])
                     if u[j,k] < xmin:
                         xval = xmin
                     if u[j,k] > xmax:
                         xval = xmax 
-        
+
                     spread_synth_tmp[k] = max(func(xval), -0.9)
         
                 r_in = jj # rating at time j 
 
-                for k in range(mcrows):
-                    for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        if r_in[k] == ratvalue:
-                            spread_cont_time[k,j] = spread_synth_tmp[k]
-                            counter_per_ratclass[ratvalue-1, j] += 1
-                            sum_spread[j] += spread_cont_time[k,j]
-
                 spread_synth[run,j,:] = numpy.multiply( \
                         numpy.squeeze(spread_synth[run,j-1,:]), \
                         (1+spread_synth_tmp[:].transpose()))
+
+                #print "spread_synth_tmp: ", spread_synth_tmp
+                #print "spread_synth: ", spread_synth[run,j,:]
+                #print "r_in: ", r_in 
+
+                for k in range(mcrows):
+                    for ratvalue in range(numpy.max(self.__metacommunity__)):
+                        if r_in[k] == ratvalue:
+                            spread_cont_time[k,j] = spread_synth[run,j,k]
+                            counter_per_ratclass[ratvalue-1, j] += 1
+                            sum_spread[ratvalue-1, j] += spread_cont_time[k,j]
         
                 summa = numpy.sum(spread_synth[run,j,:])
-                if summa != 0.0:
+                if summa == 0.0:
                     summa = 1.0e-10
         
-                P_spread = spread_synth[run,j,:]/numpy.sum(\
-                        spread_synth[run,j,:])
+                P_spread = spread_synth[run,j,:]/summa
         
                 P_spread = P_spread.clip(min=1.0e-15)
         
@@ -631,11 +639,12 @@ class markovkernel:
                     dtype=numpy.float64)
 
 
-            for j in range(self.__simulated_time__):
-                for k in range(mcrows):
+            for k in range(mcrows):
+                for j in range(self.__simulated_time__):
                     for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        if spread_cont_time[k, j] != 0:
-                            pinter_spread[k,j,ratvalue-1] = spread_cont_time[k, j]/sum_spread[j]
+                        if sum_spread[ratvalue-1, j] != 0:
+                            pinter_spread[k,j,ratvalue-1] = spread_cont_time[k, j]/ \
+                                    sum_spread[ratvalue-1, j]
 
                         if pinter_spread[k,j,ratvalue-1] != 0:
                             if counter_per_ratclass[ratvalue-1, j] != 0:
