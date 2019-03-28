@@ -557,11 +557,15 @@ class markovkernel:
                 self.__simulated_time__, mcrows))
 
         entropy = t_t[-1]*numpy.ones((self.__simulated_time__,\
-               self.__num_of_mc_iterations__))
+               self.__num_of_mc_iterations__), dtype=numpy.float64)
 
         entropy_inter = numpy.zeros((numpy.max(self.__metacommunity__), \
                 self.__simulated_time__,\
-                self.__num_of_mc_iterations__))
+                self.__num_of_mc_iterations__), dtype=numpy.float64)
+
+        r_prev = numpy.zeros((self.__simulated_time__,\
+                self.__num_of_mc_iterations__), dtype=numpy.float64)
+ 
         
         if self.__verbose__:
             print "Start MC simulation  ..."
@@ -571,12 +575,13 @@ class markovkernel:
             #print spread_synth[run,0,:]
             #print self.__attributes__[:,-1]
             #print self.__metacommunity__[:,-1]
-            #exit()
+
             u = basicutils.gaussian_copula_rnd (rho, \
                     self.__simulated_time__)
 
             spread_cont_time = numpy.zeros((mcrows, \
-                    self.__simulated_time__), dtype=numpy.float64)
+                    self.__simulated_time__, numpy.max(self.__metacommunity__)),\
+                    dtype=numpy.float64)
             counter_per_ratclass = numpy.zeros((numpy.max(self.__metacommunity__), \
                     self.__simulated_time__), dtype=numpy.float64)
             sum_spread =  numpy.zeros((numpy.max(self.__metacommunity__), \
@@ -604,22 +609,25 @@ class markovkernel:
 
                     spread_synth_tmp[k] = max(func(xval), -0.9)
         
-                r_in = jj # rating at time j 
+                r_in = jj+1 # rating at time j 
 
                 spread_synth[run,j,:] = numpy.multiply( \
                         numpy.squeeze(spread_synth[run,j-1,:]), \
                         (1+spread_synth_tmp[:].transpose()))
 
-                #print "spread_synth_tmp: ", spread_synth_tmp
-                #print "spread_synth: ", spread_synth[run,j,:]
-                #print "r_in: ", r_in 
+
+                r_prev[j,run] = numpy.sum(spread_synth[run,j,:])
+
+                #for idex in range(len(r_in)):
+                #    print "%5d %5d %10.5f"%(idex+1, r_in[idex], spread_synth[run,j,idex])
+                #print ""
 
                 for k in range(mcrows):
                     for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        if r_in[k] == ratvalue:
-                            spread_cont_time[k,j] = spread_synth[run,j,k]
-                            counter_per_ratclass[ratvalue-1, j] += 1
-                            sum_spread[ratvalue-1, j] += spread_cont_time[k,j]
+                        if r_in[k] == ratvalue+1:
+                            spread_cont_time[k,j,ratvalue] = spread_synth[run,j,k]
+                            counter_per_ratclass[ratvalue, j] += 1
+                            sum_spread[ratvalue, j] += spread_synth[run,j,k]
         
                 summa = numpy.sum(spread_synth[run,j,:])
                 if summa == 0.0:
@@ -638,20 +646,21 @@ class markovkernel:
                     numpy.max(self.__metacommunity__)), \
                     dtype=numpy.float64)
 
-
             for k in range(mcrows):
                 for j in range(self.__simulated_time__):
                     for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        if sum_spread[ratvalue-1, j] != 0:
-                            pinter_spread[k,j,ratvalue-1] = spread_cont_time[k, j]/ \
-                                    sum_spread[ratvalue-1, j]
+                        if sum_spread[ratvalue, j] != 0:
+                            pinter_spread[k,j,ratvalue] = float(\
+                                    spread_cont_time[k, j, ratvalue])/ \
+                                    float(sum_spread[ratvalue, j])
 
-                        if pinter_spread[k,j,ratvalue-1] != 0:
-                            if counter_per_ratclass[ratvalue-1, j] != 0:
-                                entropy_inter[ratvalue-1,j,run] += \
-                                        pinter_spread[k,j,ratvalue-1]* \
-                                        numpy.log(counter_per_ratclass[ratvalue-1,j]*\
-                                        pinter_spread[k,j,ratvalue-1])
+                        if pinter_spread[k,j,ratvalue] != 0.0:
+                            if counter_per_ratclass[ratvalue, j] != 0:
+                                entropy_inter[ratvalue,j,run] += \
+                                        pinter_spread[k,j,ratvalue]* \
+                                        numpy.log(counter_per_ratclass[ratvalue,j]*\
+                                        pinter_spread[k,j,ratvalue])
+                
 
             if self.__verbose__:
                 basicutils.progress_bar(run+1, \
