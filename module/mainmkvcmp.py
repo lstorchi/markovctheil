@@ -46,6 +46,9 @@ class markovkernel:
         self.__entropy_sigma__ = None 
         self.__transitions_probability_mtx__ = None 
 
+        self.__inter_entropy__ = None 
+        self.__intra_entropy__ = None 
+ 
         self.__attributes_pdf_values__ = [] 
         self.__attributes_pdf_bins__ = [] 
         self.__attributes_mean_values__ = [] 
@@ -422,8 +425,9 @@ class markovkernel:
             valuevec, binvec, rho = self.__compute_copula_variables__ (r)
             
             try:
-                entropy = self.__runmcsimulation_copula__ (r, valuevec, \
-                    binvec, rho, t_t, setval)
+                entropy, self.__intra_entropy__, self.__inter_entropy__ = \
+                        self.__runmcsimulation_copula__ (r, valuevec, \
+                        binvec, rho, t_t, setval)
             except StopIteration:
                 return False
 
@@ -461,6 +465,30 @@ class markovkernel:
                       self.__entropy_sigma__[t]))
          
           outf.close()
+
+          if self.__usecopula__:
+              oufilename = "inter_entropy_"+\
+                      str(self.__num_of_mc_iterations__)+".txt"
+
+              if os.path.exists(oufilename):
+                  os.remove(oufilename)
+            
+              outf = open(oufilename, "w")
+              for t in range(self.__simulated_time__):
+                  outf.write("%d %f \n"%(t+1, self.__inter_entropy__[t])) 
+              outf.close()
+
+              oufilename = "intra_entropy_"+\
+                      str(self.__num_of_mc_iterations__)+".txt"
+
+              if os.path.exists(oufilename):
+                  os.remove(oufilename)
+            
+              outf = open(oufilename, "w")
+              for t in range(self.__simulated_time__):
+                  outf.write("%d %f \n"%(t+1, self.__intra_entropy__[t])) 
+              outf.close()
+ 
         
         if not self.__usecopula__:
 
@@ -559,14 +587,15 @@ class markovkernel:
         entropy = t_t[-1]*numpy.ones((self.__simulated_time__,\
                self.__num_of_mc_iterations__), dtype=numpy.float64)
 
-        entropy_inter = numpy.zeros((numpy.max(self.__metacommunity__), \
-                self.__simulated_time__,\
+        intra_entr = numpy.zeros((self.__simulated_time__, \
                 self.__num_of_mc_iterations__), dtype=numpy.float64)
 
-        r_prev = numpy.zeros((self.__simulated_time__,\
+        inter_entr = numpy.zeros((self.__simulated_time__, \
                 self.__num_of_mc_iterations__), dtype=numpy.float64)
- 
-        
+
+        inter_entropy = numpy.zeros(self.__simulated_time__, dtype=numpy.float64)
+        intra_entropy = numpy.zeros(self.__simulated_time__, dtype=numpy.float64)
+
         if self.__verbose__:
             print "Start MC simulation  ..."
 
@@ -578,14 +607,25 @@ class markovkernel:
 
             u = basicutils.gaussian_copula_rnd (rho, \
                     self.__simulated_time__)
+            
+            r_prev = numpy.zeros(self.__simulated_time__,\
+                    dtype=numpy.float64)
+
+            r_prev[0] = numpy.sum(spread_synth[run,0,:]) 
 
             spread_cont_time = numpy.zeros((mcrows, \
-                    self.__simulated_time__, numpy.max(self.__metacommunity__)),\
+                    self.__simulated_time__, \
+                    numpy.max(self.__metacommunity__)),\
                     dtype=numpy.float64)
+
             counter_per_ratclass = numpy.zeros((numpy.max(self.__metacommunity__), \
                     self.__simulated_time__), dtype=numpy.float64)
+
             sum_spread =  numpy.zeros((numpy.max(self.__metacommunity__), \
                     self.__simulated_time__), dtype=numpy.float64)
+            
+            entropy_inter_tmp = numpy.zeros((numpy.max(self.__metacommunity__), \
+                self.__simulated_time__), dtype=numpy.float64)
 
             for j in range(1,self.__simulated_time__):
                 v = numpy.random.uniform(0.0, 1.0, mcrows)
@@ -615,9 +655,6 @@ class markovkernel:
                         numpy.squeeze(spread_synth[run,j-1,:]), \
                         (1+spread_synth_tmp[:].transpose()))
 
-
-                r_prev[j,run] = numpy.sum(spread_synth[run,j,:])
-
                 #for idex in range(len(r_in)):
                 #    print "%5d %5d %10.5f"%(idex+1, r_in[idex], spread_synth[run,j,idex])
                 #print ""
@@ -632,6 +669,8 @@ class markovkernel:
                 summa = numpy.sum(spread_synth[run,j,:])
                 if summa == 0.0:
                     summa = 1.0e-10
+
+                r_prev[j] = summa
         
                 P_spread = spread_synth[run,j,:]/summa
         
@@ -641,26 +680,44 @@ class markovkernel:
                         numpy.multiply(P_spread, \
                         numpy.log(float(mcrows)*P_spread)))
 
-            pinter_spread = numpy.zeros((mcrows, \
-                    self.__simulated_time__, \
-                    numpy.max(self.__metacommunity__)), \
-                    dtype=numpy.float64)
-
             for k in range(mcrows):
                 for j in range(self.__simulated_time__):
                     for ratvalue in range(numpy.max(self.__metacommunity__)):
+                        pinter_spread = 0.0
+
                         if sum_spread[ratvalue, j] != 0:
-                            pinter_spread[k,j,ratvalue] = float(\
+                            pinter_spread = float(\
                                     spread_cont_time[k, j, ratvalue])/ \
                                     float(sum_spread[ratvalue, j])
 
-                        if pinter_spread[k,j,ratvalue] != 0.0:
+                        if pinter_spread != 0.0:
                             if counter_per_ratclass[ratvalue, j] != 0:
-                                entropy_inter[ratvalue,j,run] += \
-                                        pinter_spread[k,j,ratvalue]* \
+                                entropy_inter_tmp[ratvalue,j] += pinter_spread* \
                                         numpy.log(counter_per_ratclass[ratvalue,j]*\
-                                        pinter_spread[k,j,ratvalue])
-                
+                                        pinter_spread)
+            #for k in range(mcrows):
+            #    for j in range(self.__simulated_time__):
+            #        for ratvalue in range(numpy.max(self.__metacommunity__)):
+            #            print ratvalue,j,run,entropy_inter[ratvalue,j]
+
+            for j in range(self.__simulated_time__):
+                t1 = 0.0
+                t2 = 0.0
+                t3 = 0.0
+                for ratvalue in range(numpy.max(self.__metacommunity__)):
+                    ac = numpy.float64(sum_spread[ratvalue, j])/r_prev[j]
+                    
+                    if ac != 0:
+                        maxratval = float(numpy.max(self.__metacommunity__))
+                        t1 += ac * entropy_inter_tmp[ratvalue,j]
+                        t2 += ac * numpy.log(maxratval * ac)
+
+                        if counter_per_ratclass[ratvalue,j] != 0:
+                            t3 += ac * numpy.log(mcrows/(maxratval* \
+                                    counter_per_ratclass[ratvalue,j]))
+
+                intra_entr[j,run] = t1
+                inter_entr[j,run] = t2 + t3
 
             if self.__verbose__:
                 basicutils.progress_bar(run+1, \
@@ -673,7 +730,11 @@ class markovkernel:
                    #errmsg.append("Cancelled!")
                    raise StopIteration("Cancelled!")
 
-        return entropy
+        for j in range(self.__simulated_time__):
+            intra_entropy[j] = numpy.mean(intra_entr[j, :])
+            inter_entropy[j] = numpy.mean(inter_entr[j, :])
+
+        return entropy, intra_entropy, inter_entropy
         
     
     def __runmcsimulation__ (self, tiv, setval):
