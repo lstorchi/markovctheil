@@ -730,7 +730,8 @@ class markovkernel:
                    #errmsg.append("Cancelled!")
                    raise StopIteration("Cancelled!")
 
-        for j in range(self.__simulated_time__):
+        # add inter and intra entropy computation for the historical values 
+        for j in range(1, self.__simulated_time__):
             intra_entropy[j] = numpy.mean(intra_entr[j, :])
             inter_entropy[j] = numpy.mean(inter_entr[j, :])
 
