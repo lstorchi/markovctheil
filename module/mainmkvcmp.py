@@ -176,6 +176,14 @@ class markovkernel:
         return self.__entropy__
 
 
+    def get_inter_entropy (self):
+        return self.__inter_entropy__
+
+
+    def get_intra_entropy (self):
+        return self.__intra_entropy__
+
+
     def get_entropy_sigma (self):
         return self.__entropy_sigma__
 
@@ -599,6 +607,10 @@ class markovkernel:
         if self.__verbose__:
             print "Start MC simulation  ..."
 
+        if setval != None:
+            setval.setValue(0)
+            setval.setLabelText("Monte Carlo simulation")
+
         for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
@@ -626,6 +638,14 @@ class markovkernel:
             
             entropy_inter_tmp = numpy.zeros((numpy.max(self.__metacommunity__), \
                 self.__simulated_time__), dtype=numpy.float64)
+
+            if setval != None:
+                setval.setValue(100.0*(float(run)/ \
+                        float(self.__num_of_mc_iterations__)))
+                if setval.wasCanceled():
+                   #errmsg.append("Cancelled!")
+                   raise StopIteration("Cancelled!")
+
 
             for j in range(1,self.__simulated_time__):
                 v = numpy.random.uniform(0.0, 1.0, mcrows)

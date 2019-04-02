@@ -24,6 +24,8 @@ class main_window(QtGui.QMainWindow):
         self.__plot_done__ = False
 
         self.__entropy__ = None
+        self.__inter_entropy__ = None
+        self.__intra_entropy__ = None
         self.__var__ = None
         self.__allratings__ = None
         self.__allratingsnins__ = None
@@ -454,6 +456,8 @@ class main_window(QtGui.QMainWindow):
                 return 
 
             self.__entropy__ = markovrun.get_entropy()
+            self.__intra_entropy__ = markovrun.get_intra_entropy()
+            self.__inter_entropy__ = markovrun.get_inter_entropy()
             self.__var__ = markovrun.get_entropy_sigma()
             self.__allratings__ = markovrun.get_attributes_pdf_values()
             self.__allratingsnins__ = markovrun.get_attributes_pdf_bins()
@@ -476,26 +480,33 @@ class main_window(QtGui.QMainWindow):
                         str(numpy.mean(ev)) + " stdev: " + \
                         str(numpy.std(ev)))
             else:
-                self.plot(self.__entropy__)
+                self.plot()
 
         else:
             QtGui.QMessageBox.critical( self, \
                     "ERROR", \
                     "Error occurs while opening input file")
 
-    def plot(self, data):
+    def plot(self):
 
         x = []
         y = []
+        intra_y = []
+        inter_y = []
         for i in range(1,self.__options_dialog__.gettprev()+1):
             x.append(i)
-            y.append(data[i-1])
+            y.append(self.__entropy__[i-1])
+            intra_y.append(self.__intra_entropy__[i-1])
+            inter_y.append(self.__inter_entropy__[i-1])
         
         if self.__entropiadone__ :
             self.__ax__  = self.__figure__.add_subplot(111)
             #self.__ax__.hold(False)
-            self.__ax__.plot(x, y, '*-')
+            self.__ax__.plot(x, y, '*-', label="DT")
+            self.__ax__.plot(x, intra_y, '*', label="Intra DT")
+            self.__ax__.plot(x, inter_y, '-', label="Inter DT")
             #self.__ax__.scatter(x, y)
+            self.__ax__.legend()
             self.__ax__.set_xlabel('Time')
             self.__ax__.set_ylabel('DT')
             self.__ax__.set_xlim([2, self.__options_dialog__.gettprev()])
