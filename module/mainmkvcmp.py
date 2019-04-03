@@ -679,12 +679,18 @@ class markovkernel:
                 #    print "%5d %5d %10.5f"%(idex+1, r_in[idex], spread_synth[run,j,idex])
                 #print ""
 
-                for k in range(mcrows):
-                    for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        if r_in[k] == ratvalue+1:
-                            spread_cont_time[k,j,ratvalue] = spread_synth[run,j,k]
-                            counter_per_ratclass[ratvalue, j] += 1
-                            sum_spread[ratvalue, j] += spread_synth[run,j,k]
+                for ratvalue in range(numpy.max(self.__metacommunity__)):
+                    indexes = numpy.where(r_in == ratvalue+1)
+                    spread_cont_time[indexes[0],j,ratvalue] = spread_synth[run,j,indexes[0]]
+                    sum_spread[ratvalue, j] += spread_synth[run,j,indexes[0]].sum()
+                    counter_per_ratclass[ratvalue, j] += len(indexes[0])
+
+                #for k in range(mcrows):
+                #    for ratvalue in range(numpy.max(self.__metacommunity__)):
+                #        if r_in[k] == ratvalue+1:
+                #            spread_cont_time[k,j,ratvalue] = spread_synth[run,j,k]
+                #            counter_per_ratclass[ratvalue, j] += 1
+                #            sum_spread[ratvalue, j] += spread_synth[run,j,k]
         
                 summa = numpy.sum(spread_synth[run,j,:])
                 if summa == 0.0:
@@ -699,6 +705,10 @@ class markovkernel:
                 entropy[j, run] =  numpy.sum(\
                         numpy.multiply(P_spread, \
                         numpy.log(float(mcrows)*P_spread)))
+
+            indexes = numpy.where(sum_spread != 0.0)
+            print indexes
+            exit()
 
             for k in range(mcrows):
                 for j in range(self.__simulated_time__):
