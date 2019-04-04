@@ -856,11 +856,12 @@ class changepoint:
         
         
             num1 = numpy.zeros((rating,rating), dtype='int64')
-            den1 = numpy.zeros(rating, dtype='int64')
+            den1 = 0.0
             
             L1 = 0.0 
             
             for i in range(rating):
+                 den1 = 0.0
                  for j in range(rating):
                     for c in range(countries):
                          for t in range(c_p1-1):
@@ -868,19 +869,19 @@ class changepoint:
                                     (metacommunity[c, t+1] == (j+1)):
                                 num1[i, j] = num1[i, j] + 1
                     
-                 den1[i] = sum(num1[i])
+                 den1 = sum(num1[i])
             
-                 if (den1[i] > 0.0):
+                 if (den1 > 0.0):
                     for j in range(rating):
-                       val = numpy.float64(num1[i,j])/numpy.float64(den1[i])
+                       val = numpy.float64(num1[i,j])/numpy.float64(den1)
                        if (val > 0.0):
                           L1 += num1[i,j]*math.log(val) 
             
             if performtest:
                  for i in range(rating):
                      for j in range(rating):
-                         if den1[i] != 0:
-                            pr1[i, j] = float(num1[i, j])/float(den1[i])
+                         if den1 != 0:
+                            pr1[i, j] = float(num1[i, j])/float(den1)
                          else: 
                             pr1[i, j] = 0        
                             pr1[i,i] = 1  
