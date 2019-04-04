@@ -611,6 +611,8 @@ class markovkernel:
             setval.setValue(0)
             setval.setLabelText("Monte Carlo simulation")
 
+        maxratval = numpy.max(self.__metacommunity__)
+
         for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
@@ -625,18 +627,17 @@ class markovkernel:
 
             r_prev[0] = numpy.sum(spread_synth[run,0,:]) 
 
-            spread_cont_time = numpy.zeros((mcrows, \
-                    self.__simulated_time__, \
-                    numpy.max(self.__metacommunity__)),\
+            spread_cont_time = numpy.zeros((mcrows, maxratval, \
+                    self.__simulated_time__), \
                     dtype=numpy.float64)
 
-            counter_per_ratclass = numpy.zeros((numpy.max(self.__metacommunity__), \
+            counter_per_ratclass = numpy.zeros((maxratval, \
                     self.__simulated_time__), dtype=numpy.float64)
 
-            sum_spread =  numpy.zeros((numpy.max(self.__metacommunity__), \
+            sum_spread =  numpy.zeros((maxratval, \
                     self.__simulated_time__), dtype=numpy.float64)
             
-            entropy_inter_tmp = numpy.zeros((numpy.max(self.__metacommunity__), \
+            entropy_inter_tmp = numpy.zeros((maxratval, \
                 self.__simulated_time__), dtype=numpy.float64)
 
             if setval != None:
@@ -679,19 +680,12 @@ class markovkernel:
                 #    print "%5d %5d %10.5f"%(idex+1, r_in[idex], spread_synth[run,j,idex])
                 #print ""
 
-                for ratvalue in range(numpy.max(self.__metacommunity__)):
+                for ratvalue in range(maxratval):
                     indexes = numpy.where(r_in == ratvalue+1)
-                    spread_cont_time[indexes[0],j,ratvalue] = spread_synth[run,j,indexes[0]]
+                    spread_cont_time[indexes[0],ratvalue, j] = spread_synth[run,j,indexes[0]]
                     sum_spread[ratvalue, j] += spread_synth[run,j,indexes[0]].sum()
                     counter_per_ratclass[ratvalue, j] += len(indexes[0])
 
-                #for k in range(mcrows):
-                #    for ratvalue in range(numpy.max(self.__metacommunity__)):
-                #        if r_in[k] == ratvalue+1:
-                #            spread_cont_time[k,j,ratvalue] = spread_synth[run,j,k]
-                #            counter_per_ratclass[ratvalue, j] += 1
-                #            sum_spread[ratvalue, j] += spread_synth[run,j,k]
-        
                 summa = numpy.sum(spread_synth[run,j,:])
                 if summa == 0.0:
                     summa = 1.0e-10
@@ -706,48 +700,27 @@ class markovkernel:
                         numpy.multiply(P_spread, \
                         numpy.log(float(mcrows)*P_spread)))
 
-            #indexes = numpy.where(sum_spread != 0.0)
-            #print indexes
-            #exit()
-
             for k in range(mcrows):
-                for j in range(self.__simulated_time__):
-                    for ratvalue in range(numpy.max(self.__metacommunity__)):
-                        pinter_spread = 0.0
+                pinter_spread = numpy.divide(spread_cont_time[k, :,:], \
+                        sum_spread[:,:], out=numpy.zeros_like(spread_cont_time[k, :,:]), \
+                        where=sum_spread[:,:]!=0)
+                logm = numpy.ma.log(counter_per_ratclass * pinter_spread)
+                entropy_inter_tmp += pinter_spread * logm.filled(0.0)
 
-                        if sum_spread[ratvalue, j] != 0:
-                            pinter_spread = float(\
-                                    spread_cont_time[k, j, ratvalue])/ \
-                                    float(sum_spread[ratvalue, j])
+            acmtx = numpy.divide(sum_spread[:, :], r_prev)
 
-                        if pinter_spread != 0.0:
-                            if counter_per_ratclass[ratvalue, j] != 0:
-                                entropy_inter_tmp[ratvalue,j] += pinter_spread* \
-                                        numpy.log(counter_per_ratclass[ratvalue,j]*\
-                                        pinter_spread)
-            #for k in range(mcrows):
-            #    for j in range(self.__simulated_time__):
-            #        for ratvalue in range(numpy.max(self.__metacommunity__)):
-            #            print ratvalue,j,run,entropy_inter[ratvalue,j]
+            t1 = acmtx[:,:] * entropy_inter_tmp[:,:]
+            mat2 = numpy.ma.log(float(maxratval) * acmtx[:,:])
+            t2 = acmtx[:,:] * mat2.filled(0.0)
+            dividemat = numpy.divide(float(mcrows), \
+                    (float(maxratval)*counter_per_ratclass[:,:]), \
+                    out=numpy.zeros_like(counter_per_ratclass[:,:]), \
+                    where=counter_per_ratclass[:,:]!=0)
+            mat3 = numpy.ma.log(dividemat)
+            t3 = acmtx[:,:] * mat3.filled(0.0)
 
-            for j in range(self.__simulated_time__):
-                t1 = 0.0
-                t2 = 0.0
-                t3 = 0.0
-                for ratvalue in range(numpy.max(self.__metacommunity__)):
-                    ac = numpy.float64(sum_spread[ratvalue, j])/r_prev[j]
-                    
-                    if ac != 0:
-                        maxratval = float(numpy.max(self.__metacommunity__))
-                        t1 += ac * entropy_inter_tmp[ratvalue,j]
-                        t2 += ac * numpy.log(maxratval * ac)
-
-                        if counter_per_ratclass[ratvalue,j] != 0:
-                            t3 += ac * numpy.log(mcrows/(maxratval* \
-                                    counter_per_ratclass[ratvalue,j]))
-
-                intra_entr[j,run] = t1
-                inter_entr[j,run] = t2 + t3
+            intra_entr[:,run] = numpy.sum(t1, axis=0)
+            inter_entr[:,run] = numpy.sum(t2, axis=0) + numpy.sum(t3, axis=0)
 
             if self.__verbose__:
                 basicutils.progress_bar(run+1, \
@@ -761,9 +734,8 @@ class markovkernel:
                    raise StopIteration("Cancelled!")
 
         # add inter and intra entropy computation for the historical values 
-        for j in range(1, self.__simulated_time__):
-            intra_entropy[j] = numpy.mean(intra_entr[j, :])
-            inter_entropy[j] = numpy.mean(inter_entr[j, :])
+        intra_entropy = numpy.mean(intra_entr, axis=1)
+        inter_entropy = numpy.mean(inter_entr, axis=1)
 
         return entropy, intra_entropy, inter_entropy
         
