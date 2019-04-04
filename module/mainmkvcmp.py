@@ -706,9 +706,9 @@ class markovkernel:
                         numpy.multiply(P_spread, \
                         numpy.log(float(mcrows)*P_spread)))
 
-            indexes = numpy.where(sum_spread != 0.0)
-            print indexes
-            exit()
+            #indexes = numpy.where(sum_spread != 0.0)
+            #print indexes
+            #exit()
 
             for k in range(mcrows):
                 for j in range(self.__simulated_time__):

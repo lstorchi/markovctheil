@@ -496,15 +496,18 @@ class main_window(QtGui.QMainWindow):
         for i in range(1,self.__options_dialog__.gettprev()+1):
             x.append(i)
             y.append(self.__entropy__[i-1])
-            intra_y.append(self.__intra_entropy__[i-1])
-            inter_y.append(self.__inter_entropy__[i-1])
+
+            if self.__options_dialog__.getusecopula():
+                intra_y.append(self.__intra_entropy__[i-1])
+                inter_y.append(self.__inter_entropy__[i-1])
         
         if self.__entropiadone__ :
             self.__ax__  = self.__figure__.add_subplot(111)
             #self.__ax__.hold(False)
             self.__ax__.plot(x, y, '*-', label="DT")
-            self.__ax__.plot(x, intra_y, '*', label="Intra DT")
-            self.__ax__.plot(x, inter_y, '-', label="Inter DT")
+            if self.__options_dialog__.getusecopula():
+                self.__ax__.plot(x, intra_y, '*', label="Intra DT")
+                self.__ax__.plot(x, inter_y, '-', label="Inter DT")
             #self.__ax__.scatter(x, y)
             self.__ax__.legend()
             self.__ax__.set_xlabel('Time')
