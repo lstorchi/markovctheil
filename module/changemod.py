@@ -841,11 +841,9 @@ class changepoint:
                     den[i] = sum(num[i])
                 
                     if (den[i] > 0.0):
-                        for j in range(rating):
-                            val = numpy.float64(num[i,j])/numpy.float64(den[i])
-                            if (val > 0.0):
-                                L += num[i,j]*math.log(val) 
-                
+                        vals = numpy.divide(numpy.float64(num[i,:]), numpy.float64(den[i]))
+                        L += numpy.sum(num[i,:] * (numpy.ma.log(vals)).filled(0))
+
                 for i in range(rating):
                     for j in range(rating):
                         if den[i] != 0:
