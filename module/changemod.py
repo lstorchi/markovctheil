@@ -858,7 +858,7 @@ class changepoint:
             num1 = numpy.zeros((rating,rating), dtype='int64')
             den1 = 0.0
             
-            L1 = 0.0 
+            L1 = 0.0
             
             for i in range(rating):
                  den1 = 0.0
@@ -869,23 +869,19 @@ class changepoint:
                                     (metacommunity[c, t+1] == (j+1)):
                                 num1[i, j] = num1[i, j] + 1
                     
-                 den1 = sum(num1[i])
+                 den1 = numpy.sum(num1[i,:])
             
                  if (den1 > 0.0):
-                    for j in range(rating):
-                       val = numpy.float64(num1[i,j])/numpy.float64(den1)
-                       if (val > 0.0):
-                          L1 += num1[i,j]*math.log(val) 
+                    vals = numpy.float64(num1[i,:])/numpy.float64(den1)
+                    L1 += numpy.sum(num1[i,:]*(numpy.ma.log(vals)).filled(0))
             
             if performtest:
-                 for i in range(rating):
-                     for j in range(rating):
-                         if den1 != 0:
-                            pr1[i, j] = float(num1[i, j])/float(den1)
-                         else: 
-                            pr1[i, j] = 0        
-                            pr1[i,i] = 1  
-        
+
+                 if den1 != 0:
+                    pr1 = numpy.divide(num1, float(den1))
+                 else:
+                    numpy.fill_diagonal(pr1, 1)
+
             num2 = numpy.zeros((rating,rating), dtype='int64')
             den2 = numpy.zeros(rating, dtype='int64')
              
