@@ -836,23 +836,23 @@ class changepoint:
                                         (metacommunity[c, t+1] == (j+1)):
                                     nk[i, j, c] = nk[i, j, c] + 1
                                 
-                        num[i, j] = sum(nk[i, j])
+                        num[i, j] = numpy.sum(nk[i, j, :])
                     
-                    den[i] = sum(num[i])
+                    den[i] = numpy.sum(num[i, :])
                 
                     if (den[i] > 0.0):
-                        vals = numpy.divide(numpy.float64(num[i,:]), numpy.float64(den[i]))
+                        vals = numpy.divide(numpy.float64(num[i,:]), \
+                                numpy.float64(den[i]))
                         L += numpy.sum(num[i,:] * (numpy.ma.log(vals)).filled(0))
 
                 for i in range(rating):
-                    for j in range(rating):
-                        if den[i] != 0:
-                           pr[i, j] = float(num[i, j])/float(den[i])
-                        else: 
-                           pr[i, j] = 0
-                           pr[i, i] = 1
-        
-        
+                    if den[i] != 0:
+                        pr[i, :] = numpy.divide(numpy.float64(num[i, :]), \
+                                numpy.float64(den[i])) 
+                    else:
+                        pr[i, :] = 0
+                        pr[i, i] = 1
+
             num1 = numpy.zeros((rating,rating), dtype='int64')
             den1 = 0.0
             
@@ -887,6 +887,8 @@ class changepoint:
            
             if c_p2 > 0:
         
+                pr3 = None
+
                 if performtest:
                     pr3 = numpy.zeros((rating,rating),dtype='float64')
                
@@ -898,14 +900,13 @@ class changepoint:
                                           (metacommunity[c, t+1] == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
-                     den2[i] = sum(num2[i])
+                     den2[i] = numpy.sum(num2[i, :])
                 
                      if (den2[i] > 0.0):
-                         for j in range(rating):
-                            val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
-                            if (val > 0.0):
-                                L2 += num2[i,j]*math.log(val) 
-        
+                         vals =numpy.divide(numpy.float64(num2[i,:]), \
+                                 numpy.float64(den2[i]))
+                         L2 += numpy.sum(num2[i,:] * (numpy.ma.log(vals)).filled(0))
+
                 if performtest:
         
                      for i in range(rating):
