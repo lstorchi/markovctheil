@@ -869,9 +869,10 @@ class changepoint:
                     
                  den1 = numpy.sum(num1[i,:])
             
-                 if (den1 > 0.0):
-                    vals = numpy.float64(num1[i,:])/numpy.float64(den1)
-                    L1 += numpy.sum(num1[i,:]*(numpy.ma.log(vals)).filled(0))
+                 if den1 != 0 :
+                   vals = numpy.divide(numpy.float64(num1[i,:]), 
+                          numpy.float64(den1))
+                   L1 += numpy.sum(num1[i,:]*(numpy.ma.log(vals)).filled(0))
             
             if performtest:
 
@@ -902,20 +903,20 @@ class changepoint:
                          
                      den2[i] = numpy.sum(num2[i, :])
                 
-                     if (den2[i] > 0.0):
-                         vals =numpy.divide(numpy.float64(num2[i,:]), \
-                                 numpy.float64(den2[i]))
-                         L2 += numpy.sum(num2[i,:] * (numpy.ma.log(vals)).filled(0))
+                     if den2[i] != 0 :
+                       vals = numpy.divide(numpy.float64(num2[i,:]), \
+                               numpy.float64(den2[i]))
+                       L2 += numpy.sum(num2[i,:] * (numpy.ma.log(vals)).filled(0))
 
                 if performtest:
         
                      for i in range(rating):
-                         for j in range(rating):
-                             if den2[i] != 0:
-                                pr2[i, j] = float(num2[i, j])/float(den2[i])
-                             else: 
-                                pr2[i, j] = 0        
-                                pr2[i,i] = 1  
+                         if den2[i] != 0:
+                             pr2[i, :] = numpy.divide(numpy.float64(num2[i,:]) ,
+                                     numpy.float64(den2[i]))
+                         else:
+                             pr2[i,:] = 0
+                             pr2[i,i] = 1
         
                 num3 = numpy.zeros((rating,rating), dtype='int64')
                 den3 = numpy.zeros(rating, dtype='int64')
@@ -936,23 +937,23 @@ class changepoint:
                                               (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
-                         den3[i] = sum(num3[i])
+                         den3[i] = numpy.sum(num3[i, j])
                     
                          if (den3[i] > 0.0):
-                             for j in range(rating):
-                                val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
-                                if (val > 0.0):
-                                    L3 += num3[i,j]*math.log(val) 
+                             vals = numpy.divide(numpy.float64(num3[i,j]), 
+                                    numpy.float64(den3[i]))
+                             L3 += numpy.sum(num3[i,:] * (numpy.ma.log(vals)).filled(0))
         
                     if performtest:
         
                         for i in range(rating):
-                            for j in range(rating):
-                                if den3[i] != 0:
-                                   pr3[i, j] = float(num3[i, j])/float(den3[i])
-                                else: 
-                                   pr3[i, j] = 0
-                                   pr3[i,i] = 1
+                            if den3[i] != 0:
+                                pr3[i, :] = numpy.divide(numpy.float64(num3[i, :]),
+                                      float(den3[i]))
+                            else:
+                                pr3[i, :] = 0
+                                pr3[i, i] = 1
+
                     
                     num4 = numpy.zeros((rating,rating), dtype='int64')
                     den4 = numpy.zeros(rating, dtype='int64')
@@ -968,25 +969,24 @@ class changepoint:
                                               == (j+1)):
                                           num4[i, j] = num4[i, j] + 1
                              
-                         den4[i] = sum(num4[i])
+                         den4[i] = numpy.sum(num4[i, :])
+
                          if (den4[i] > 0.0):
-                             for j in range(rating):
-                                val = numpy.float64(num4[i,j])/numpy.float64(den4[i])
-                                if (val > 0.0):
-                                    L4 += num4[i,j]*math.log(val) 
+                             vals = numpy.divide(numpy.float64(num4[i,:]), 
+                                     numpy.float64(den4[i]))
+                             L4 += numpy.sum(num4[i,:] * (numpy.ma.log(vals)).filled(0))
         
                     if performtest:
         
                          for i in range(rating):
-                             for j in range(rating):
-                                 if den4[i] != 0:
-                                    pr4[i, j] = float(num4[i, j])/float(den4[i])
-                                 else: 
-                                    pr4[i, j] = 0        
-                                    pr4[i,i] = 1  
+                             if den4[i] != 0:
+                                 pr4[i, :] = numpy.divide(numpy.float64(num4[i,:]),
+                                         numpy.float64(den4[i]))
+                             else:
+                                 pr4[i, :] = 0
+                                 pr4[i, i] = 1
         
                          return L, L1, L2, L3, L4, pr1, pr2, pr3, pr4
-        
                     
                     return L1, L2, L3, L4
         
@@ -1000,24 +1000,23 @@ class changepoint:
                                               == (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
-                         den3[i] = sum(num3[i])
+                         den3[i] = numpy.sum(num3[i, :])
                     
                          if (den3[i] > 0.0):
-                             for j in range(rating):
-                                val = numpy.float64(num3[i,j])/numpy.float64(den3[i])
-                                if (val > 0.0):
-                                    L3 += num3[i,j]*math.log(val) 
-        
+                             vals = numpy.divide(numpy.float64(num3[i,:]), 
+                                     numpy.float64(den3[i]))
+                             L3 += numpy.sum(num3[i,:] * (numpy.ma.log(vals)).filled(0))
+ 
                     if performtest:
         
                         for i in range(rating):
-                            for j in range(rating):
-                                if den3[i] != 0:
-                                   pr3[i, j] = float(num3[i, j])/float(den3[i])
-                                else: 
-                                   pr3[i, j] = 0
-                                   pr3[i,i] = 1
-        
+                             if den3[i] != 0:
+                                 pr3[i, :] = numpy.divide(numpy.float64(num3[i,:]),
+                                         numpy.float64(den3[i]))
+                             else:
+                                 pr3[i, :] = 0
+                                 pr3[i, i] = 1
+ 
                         return L, L1, L2, L3, pr1, pr2, pr3
         
                     return L1, L2, L3 
@@ -1033,27 +1032,26 @@ class changepoint:
                                           == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
-                     den2[i] = sum(num2[i])
+                     den2[i] = numpy.sum(num2[i, :])
                 
-                     if (den2[i] > 0.0):
-                         for j in range(rating):
-                            val = numpy.float64(num2[i,j])/numpy.float64(den2[i])
-                            if (val > 0.0):
-                                L2 += num2[i,j]*math.log(val) 
+                     if den2[i] != 0 :
+                       vals = numpy.divide(numpy.float64(num2[i,:]), \
+                               numpy.float64(den2[i]))
+                       L2 += numpy.sum(num2[i,:] * (numpy.ma.log(vals)).filled(0))
+
+                if performtest:
         
-                     if performtest:
-        
-                         for i in range(rating):
-                             for j in range(rating):
-                                 if den2[i] != 0:
-                                    pr2[i, j] = float(num2[i, j])/float(den2[i])
-                                 else: 
-                                    pr2[i, j] = 0
-                                    pr2[i,i] = 1
-        
-                         return L, L1, L2, pr1, pr2
-        
-        
+                     for i in range(rating):
+                         if den2[i] != 0:
+                             pr2[i, :] = numpy.divide(numpy.float64(num2[i,:]) ,
+                                     numpy.float64(den2[i]))
+                         else:
+                             pr2[i,:] = 0
+                             pr2[i,i] = 1
+
+                     return L, L1, L2, pr1, pr2
+ 
+                
                 return L1, L2
         
         raise Error ("at least cp1 should be > 0")
@@ -1067,13 +1065,11 @@ class changepoint:
         
         cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
         
-        for i in range (mcmaxvalue):
-            cdf[i, 0] = transitions_probability_mtx[i, 0]
+        cdf[:, 0] = transitions_probability_mtx[:, 0]
         
-        for i in range(mcmaxvalue):
-            for j in range(1,mcmaxvalue):
-                cdf[i, j] = transitions_probability_mtx[i, j] \
-                        + cdf[i, j-1]
+        for j in range(1,mcmaxvalue):
+            cdf[:, j] = transitions_probability_mtx[:, j] \
+                + cdf[:, j-1]
         
         x = numpy.zeros((mcrows,mccols), dtype='int')
         xi = numpy.random.rand(mcrows,mccols)
