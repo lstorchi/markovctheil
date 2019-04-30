@@ -41,7 +41,7 @@ class matable (QtWidgets.QMainWindow):
             self.__mat__.append([])
             for j in range(mat.shape[1]):
                 newitem = QtWidgets.QTableWidgetItem()
-                newitem.setText(str(mat[i, j]))
+                newitem.setText("%10.4e"%(mat[i, j]))
                 # not editable
                 newitem.setFlags(newitem.flags() ^ QtCore.Qt.ItemIsEditable);
                 self.__mat__[i].append(mat[i, j])
