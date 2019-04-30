@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import os
 
@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 import basicutils
 
-class matable (QtGui.QMainWindow):
+class matable (QtWidgets.QMainWindow):
 
     def __init__(self, mat, name, parent=None):
         super(matable, self).__init__(parent)
@@ -18,16 +18,15 @@ class matable (QtGui.QMainWindow):
         self.resize(640, 480) 
         self.setWindowTitle(name)
 
-        savefile = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        savefile = QtWidgets.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
         savefile.setStatusTip("Save file")
-        savefile.connect(savefile , QtCore.SIGNAL('triggered()'), \
-         self.savefile)
+        savefile.triggered.connect(self.savefile)
         savefile.setEnabled(True)
 
-        quit = QtGui.QAction(QtGui.QIcon("icons/cancel.png"), "Quit", self)
+        quit = QtWidgets.QAction(QtGui.QIcon("icons/cancel.png"), "Quit", self)
         quit.setShortcut("Ctrl+Q")
         quit.setStatusTip("Quit application")
-        self.connect(quit, QtCore.SIGNAL('triggered()'), self.closedialog)
+        quit.triggered.connect(self.closedialog)
 
         menubar = self.menuBar()
         
@@ -36,12 +35,12 @@ class matable (QtGui.QMainWindow):
         file.addAction(savefile)
         file.addAction(quit)
 
-        self.__table__ = QtGui.QTableWidget(len(mat), len(mat[0]), self) 
+        self.__table__ = QtWidgets.QTableWidget(len(mat), len(mat[0]), self) 
 
         for i in range(mat.shape[0]):
             self.__mat__.append([])
             for j in range(mat.shape[1]):
-                newitem = QtGui.QTableWidgetItem()
+                newitem = QtWidgets.QTableWidgetItem()
                 newitem.setText(str(mat[i, j]))
                 # not editable
                 newitem.setFlags(newitem.flags() ^ QtCore.Qt.ItemIsEditable);
@@ -51,10 +50,10 @@ class matable (QtGui.QMainWindow):
         self.__table__.resizeColumnsToContents()
         self.__table__.resizeRowsToContents()
 
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.__table__ )
 
-        maindialog = QtGui.QWidget()
+        maindialog = QtWidgets.QWidget()
         maindialog.setLayout(layout)
 
         self.setCentralWidget(maindialog)
@@ -77,7 +76,7 @@ class matable (QtGui.QMainWindow):
 
     def savefile(self):
 
-        tosave = QtGui.QFileDialog.getSaveFileName(self) 
+        tosave = QtWidgets.QFileDialog.getSaveFileName(self)[0]
         if os.path.exists(str(tosave)):
             os.remove(str(tosave))
             

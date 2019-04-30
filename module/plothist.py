@@ -1,4 +1,4 @@
-from PyQt4 import QtCore, QtGui
+from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 import basicutils
 
-class plohitwin (QtGui.QMainWindow):
+class plohitwin (QtWidgets.QMainWindow):
 
     def __init__(self, allratings, allratingsnins, parent=None):
         super(plohitwin, self).__init__(parent)
@@ -19,11 +19,11 @@ class plohitwin (QtGui.QMainWindow):
         canvas = FigureCanvas(figure)
         toolbar = NavigationToolbar(canvas, self)
 
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(toolbar)
         layout.addWidget(canvas)
 
-        maindialog = QtGui.QWidget()
+        maindialog = QtWidgets.QWidget()
         maindialog.setLayout(layout)
 
         self.setCentralWidget(maindialog)

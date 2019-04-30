@@ -1,4 +1,4 @@
-from PyQt4 import QtGui, QtCore 
+from PyQt5 import QtGui, QtCore, QtWidgets
 
 import mainmkvcmp
 import changemod
@@ -15,9 +15,10 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-class main_window(QtGui.QMainWindow):
-    
+class main_window(QtWidgets.QMainWindow):
+
     def __init__(self):
+
         self.__inputfile__ = ""
         self.__fileio__ = False
         self.__entropiadone__ = False
@@ -33,51 +34,48 @@ class main_window(QtGui.QMainWindow):
         self.__stdeval__ = None
         self.__pr__ = None
        
-        QtGui.QMainWindow.__init__(self) 
+        QtWidgets.QMainWindow.__init__(self) 
         self.resize(640, 480) 
         self.setWindowTitle('Dynamic Theil entropy')
         self.statusBar().showMessage('Markov started') 
 
-        ofile = QtGui.QAction(QtGui.QIcon("icons/open.png"), "Open", self)
+        ofile = QtWidgets.QAction(QtGui.QIcon("icons/open.png"), "Open", self)
         ofile.setShortcut("Ctrl+O")
         ofile.setStatusTip("Open file")
-        ofile.connect(ofile, QtCore.SIGNAL('triggered()'), self.openfile)
+        ofile.triggered.connect(self.openfile)
 
-        self.__savefile__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
+        self.__savefile__ = QtWidgets.QAction(QtGui.QIcon("icons/save.png"), "Save", self)
         self.__savefile__.setStatusTip("Save file")
-        self.__savefile__.connect(self.__savefile__ , QtCore.SIGNAL('triggered()'), \
-                self.savefile)
+        self.__savefile__.triggered.connect(self.savefile)
         self.__savefile__.setEnabled(False)
 
-        sep = QtGui.QAction(self)
+        sep = QtWidgets.QAction(self)
         sep.setSeparator(True)
 
-        quit = QtGui.QAction(QtGui.QIcon("icons/cancel.png"), "Quit", self)
+        quit = QtWidgets.QAction(QtGui.QIcon("icons/cancel.png"), "Quit", self)
         quit.setShortcut("Ctrl+Q")
         quit.setStatusTip("Quit application")
-        self.connect(quit, QtCore.SIGNAL('triggered()'), QtCore.SLOT('close()'))
+        quit.triggered.connect(self.close)
 
-        run = QtGui.QAction(QtGui.QIcon("icons/run.png"), "Run", self)
+        run = QtWidgets.QAction(QtGui.QIcon("icons/run.png"), "Run", self)
         run.setShortcut("Ctrl+R")
         run.setStatusTip("Run")
-        self.connect(run, QtCore.SIGNAL('triggered()'), self.mainrun)
+        run.triggered.connect(self.mainrun)
 
-        runchangepoint = QtGui.QAction(QtGui.QIcon("icons/run.png"), "RunChangePoint", self)
+        runchangepoint = QtWidgets.QAction(QtGui.QIcon("icons/run.png"), "RunChangePoint", self)
         runchangepoint.setStatusTip("Run ChangePoint")
-        self.connect(runchangepoint, QtCore.SIGNAL('triggered()'), self.runchangepoint)
+        runchangepoint.triggered.connect(self.runchangepoint)
 
-        self.__plots__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "Plot Empirical distributions", self)
+        self.__plots__ = QtWidgets.QAction(QtGui.QIcon("icons/save.png"), "Plot Empirical distributions", self)
         self.__plots__.setShortcut("Ctrl+S")
         self.__plots__.setStatusTip("Credit spread distributions")
-        self.__plots__.connect(self.__plots__ , QtCore.SIGNAL('triggered()'), \
-                self.plot_hist)
+        self.__plots__.triggered.connect(self.plot_hist)
         self.__plots__.setEnabled(False)
 
-        self.__mats__ = QtGui.QAction(QtGui.QIcon("icons/save.png"), "View transition matrix", self)
+        self.__mats__ = QtWidgets.QAction(QtGui.QIcon("icons/save.png"), "View transition matrix", self)
         self.__mats__.setShortcut("Ctrl+M")
         self.__mats__.setStatusTip("View transition matrices")
-        self.__mats__.connect(self.__mats__ , QtCore.SIGNAL('triggered()'), \
-                self.view_mats)
+        self.__mats__.triggered.connect(self.view_mats)
         self.__mats__.setEnabled(False)
 
         self.statusBar().show()
@@ -102,11 +100,11 @@ class main_window(QtGui.QMainWindow):
         self.__canvas__ = FigureCanvas(self.__figure__)
         self.__toolbar__ = NavigationToolbar(self.__canvas__, self)
 
-        layout = QtGui.QVBoxLayout()
+        layout = QtWidgets.QVBoxLayout()
         layout.addWidget(self.__toolbar__)
         layout.addWidget(self.__canvas__)
 
-        maindialog = QtGui.QWidget()
+        maindialog = QtWidgets.QWidget()
         maindialog.setLayout(layout)
 
         self.setCentralWidget(maindialog)
@@ -120,7 +118,7 @@ class main_window(QtGui.QMainWindow):
     def savefile(self):
 
         if self.__entropiadone__ :
-           tosave = QtGui.QFileDialog.getSaveFileName(self) 
+           tosave = QtWidgets.QFileDialog.getSaveFileName(self) 
            if os.path.exists(str(tosave)):
                os.remove(str(tosave))
                
@@ -159,7 +157,8 @@ class main_window(QtGui.QMainWindow):
 
     def openfile(self):
 
-        self.__inputfile__ = QtGui.QFileDialog.getOpenFileName(self) 
+        self.__inputfile__ = QtWidgets.QFileDialog.getOpenFileName(self, 
+                "Open File", "./", "Mat or CSV (*.mat *.csv)")[0]
 
         self.__fileio__ = False
         
@@ -183,20 +182,20 @@ class main_window(QtGui.QMainWindow):
               msd = scipy.io.loadmat(str(self.__inputfile__))
               bpd = scipy.io.loadmat(str(self.__inputfile__))
           except ValueError:
-             QtGui.QMessageBox.critical( self, \
+             QtWidgets.QMessageBox.critical( self, \
               "ERROR", \
               "Error while opening " + self.__inputfile__ )
              return
           
           if not(self.__options_name_dialog__.getratingname() in list(msd.keys())):
-             QtGui.QMessageBox.critical( self, \
+             QtWidgets.QMessageBox.critical( self, \
               "ERROR", \
               "Cannot find " + self.__options_name_dialog__.getratingname()+ \
               " in " + self.__inputfile__)
              return 
           
           if not(self.__options_name_dialog__.getiratingname() in list(bpd.keys())):
-              QtGui.QMessageBox.critical( self, \
+              QtWidgets.QMessageBox.critical( self, \
                       "ERROR", \
                       "Cannot find " + self.__options_name_dialog__.getiratingname() \
                       + " in " + self.__inputfile__)
@@ -204,7 +203,7 @@ class main_window(QtGui.QMainWindow):
           
           if msd[self.__options_name_dialog__.getratingname()].shape[0] != \
                   bpd[self.__options_name_dialog__.getiratingname()].shape[0]:
-              QtGui.QMessageBox.critical( self, \
+              QtWidgets.QMessageBox.critical( self, \
                       "ERROR", \
                       "wrong dim of the input matrix")
               return 
@@ -229,7 +228,7 @@ class main_window(QtGui.QMainWindow):
             #print self.__options_dialog_cp__.get_performtest()
 
             if len(self.__options_dialog_cp__.get_performtest()) < 1:
-                QtGui.QMessageBox.critical( self, \
+                QtWidgets.QMessageBox.critical( self, \
                         "ERROR", \
                         "Error in perform-test values")
                 return
@@ -239,7 +238,7 @@ class main_window(QtGui.QMainWindow):
             
                if self.__options_dialog_cp__.get_numofcp() == 1:
                    if len(self.__options_dialog_cp__.get_performtest()) != 2:
-                       QtGui.QMessageBox.critical( self, \
+                       QtWidgets.QMessageBox.critical( self, \
                                "ERROR", \
                                "Error in perform-test values")
                        return
@@ -247,7 +246,7 @@ class main_window(QtGui.QMainWindow):
                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[1])
                elif self.__options_dialog_cp__.get_numofcp() == 2:
                    if len(self.__options_dialog_cp__.get_performtest()) != 3:
-                       QtGui.QMessageBox.critical( self, \
+                       QtWidgets.QMessageBox.critical( self, \
                                "ERROR", "Error in perform-test values")
                        return
                    
@@ -255,7 +254,7 @@ class main_window(QtGui.QMainWindow):
                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[2])
                elif self.__options_dialog_cp__.get_numofcp() == 3:
                    if len(self.__options_dialog_cp__.get_performtest()) != 4:
-                       QtGui.QMessageBox.critical( self, \
+                       QtWidgets.QMessageBox.critical( self, \
                                "ERROR", \
                                "Error in perform-test values")
                        return
@@ -264,7 +263,7 @@ class main_window(QtGui.QMainWindow):
                    cp_fortest_3 = int(self.__options_dialog_cp__.get_performtest()[2])
                    num_of_run = int(self.__options_dialog_cp__.get_performtest()[3])
 
-            progdialog = QtGui.QProgressDialog(
+            progdialog = QtWidgets.QProgressDialog(
                     "", "Cancel", 0, 100.0, self)
 
             progdialog.setWindowTitle("Running")
@@ -306,26 +305,26 @@ class main_window(QtGui.QMainWindow):
                 runcps.compute_cps (progdialog)
 
             except changemod.Error:
-                QtGui.QMessageBox.critical( self, \
+                QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Oops! error in the main function")
                 return
             except TypeError as err:
-                QtGui.QMessageBox.critical( self, \
+                QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Oops! type error in the main function")
                 return
  
 
             if cp_fortest >= 0:
-                QtGui.QMessageBox.information( self, \
+                QtWidgets.QMessageBox.information( self, \
                         "Value", "Lambda(95%) : " +\
                         str(runcps.get_lambda95()) + " Lambda : " + \
                         str(runcps.get_lambdastart()) + " P-Value : "+
                         str(runcps.get_pvalue()))
             else:
                 if self.__options_dialog_cp__.get_numofcp() == 1:
-                    QtGui.QMessageBox.information( self, \
+                    QtWidgets.QMessageBox.information( self, \
                         "Value", "CP : " +\
                         str(runcps.get_cp1_found()) + " Value : " + \
                         str(runcps.get_maxval()))
@@ -357,7 +356,7 @@ class main_window(QtGui.QMainWindow):
                     self.__plot_done__ = True
 
                 elif self.__options_dialog_cp__.get_numofcp() == 2:
-                    QtGui.QMessageBox.information( self, \
+                    QtWidgets.QMessageBox.information( self, \
                         "Value", "CP1 : " + str(runcps.get_cp1_found()) + \
                         " CP2 : " + str(runcps.get_cp2_found()) + \
                         " Value : " + str(runcps.get_maxval()))
@@ -368,7 +367,7 @@ class main_window(QtGui.QMainWindow):
                       self.__plot_done__ = False
 
                 elif self.__options_dialog_cp__.get_numofcp() == 3:
-                    QtGui.QMessageBox.information( self, \
+                    QtWidgets.QMessageBox.information( self, \
                         "Value", "CP1 : " + str(runcps.get_cp1_found()) + \
                         " CP2 : " + str(runcps.get_cp2_found()) + \
                         " CP3 : " + str(runcps.get_cp3_found()) + \
@@ -404,7 +403,7 @@ class main_window(QtGui.QMainWindow):
 
             self.__options_dialog__.exec_()
 
-            progdialog = QtGui.QProgressDialog(
+            progdialog = QtWidgets.QProgressDialog(
                     "", "Cancel", 0, 100.0, self)
 
             progdialog.setWindowTitle("Running")
@@ -437,7 +436,7 @@ class main_window(QtGui.QMainWindow):
 
                 if not markovrun.run_computation(progdialog):
                     
-                    QtGui.QMessageBox.critical( self, \
+                    QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Error in main markov kernel")
 
@@ -447,7 +446,7 @@ class main_window(QtGui.QMainWindow):
                     return 
 
             except TypeError as err:
-                QtGui.QMessageBox.critical( self, \
+                QtWidgets.QMessageBox.critical( self, \
                         "ERROR", err)
 
                 progdialog.setValue(100.0)
@@ -475,7 +474,7 @@ class main_window(QtGui.QMainWindow):
 
             if self.__options_dialog__.getinftime():
                 ev = self.__entropy__[1:]
-                QtGui.QMessageBox.information( self, \
+                QtWidgets.QMessageBox.information( self, \
                         "Value", "Stationary value: " +\
                         str(numpy.mean(ev)) + " stdev: " + \
                         str(numpy.std(ev)))
@@ -483,7 +482,7 @@ class main_window(QtGui.QMainWindow):
                 self.plot()
 
         else:
-            QtGui.QMessageBox.critical( self, \
+            QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Error occurs while opening input file")
 

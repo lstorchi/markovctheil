@@ -1,11 +1,11 @@
 import sys
-from PyQt4 import QtGui
+from PyQt5 import QtWidgets
 
 sys.path.append("./module")
 import mainwin
 
 def main():
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     main = mainwin.main_window()
     main.show()
     sys.exit(app.exec_())
