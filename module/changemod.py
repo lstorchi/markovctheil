@@ -253,7 +253,7 @@ class changepoint:
         if self.__cp_fortest_1__ >= 0 and self.__num_of_bootstrap_iter__ >= 0:
         
             if (self.__verbose__):
-                print "Startint CP test..."
+                print("Startint CP test...")
         
             L = 0.0
             L1 = 0.0
@@ -274,7 +274,7 @@ class changepoint:
                 self.__cp_fortest_1__, True, self.__cp_fortest_2__)
                 self.__lambdastart__ = 2.0*((L1+L2+L3)-L)
                 if (self.__verbose__):
-                    print L, L1, L2, L3
+                    print(L, L1, L2, L3)
             elif self.__num_of_cps__ == 3:
                 L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
                         self.__compute_cps__ (self.__metacommunity__, \
@@ -282,12 +282,12 @@ class changepoint:
                         elf.__cp_fortest_2__, self.__cp_fortest_3__)
                 self.__lambdastart__ = 2.0*((L1+L2+L3+L4)-L)
                 if (self.__verbose__):
-                    print L, L1, L2, L3, L4
+                    print(L, L1, L2, L3, L4)
         
             lambdas = []
         
             if (self.__verbose__):
-                print "Starting iterations..."
+                print("Starting iterations...")
         
             for i in range(self.__num_of_bootstrap_iter__):
         
@@ -325,9 +325,9 @@ class changepoint:
                 cend = tempo.clock()
             
                 if (self.__verbose__):
-                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                    print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
                             i+1 , self.__num_of_bootstrap_iter__, 
-                         end - start, cend - cstart)
+                         end - start, cend - cstart))
          
         
             idx95 = int(self.__num_of_bootstrap_iter__*0.95+0.5)
@@ -352,9 +352,9 @@ class changepoint:
         
             if (self.__verbose__):
                 #print "Ndof        : ", ndof
-                print "Lambda(95%) : ", self.__lambda95__
-                print "Lambda      : ", self.__lambdastart__
-                print "P-Value     : ", self.__pvalue__
+                print("Lambda(95%) : ", self.__lambda95__)
+                print("Lambda      : ", self.__lambdastart__)
+                print("P-Value     : ", self.__pvalue__)
         
             return 
         
@@ -403,9 +403,9 @@ class changepoint:
             
                     if (self.__verbose__):
                         if self.__print_iter_info__:
-                            print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                            print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
                                     idx+1 , cp1stop-self.__cp1_start__, \
-                                    end - start, cend - cstart)
+                                    end - start, cend - cstart))
                         else:
                             basicutils.progress_bar(idx+1, cp1stop-self.__cp1_start__)
         
@@ -417,9 +417,9 @@ class changepoint:
                     idx = idx + 1 
             
                 if (self.__verbose__):
-                    print ""
-                    print ""
-                    print "Change Point: ", cp, " (",maxval, ")"
+                    print("")
+                    print("")
+                    print("Change Point: ", cp, " (",maxval, ")")
                 
                 self.__cp1_found__ = cp
                 self.__maxval__ = maxval
@@ -474,8 +474,8 @@ class changepoint:
             
                            if (self.__verbose__):
                                 if self.__print_iter_info__:
-                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
-                                            idx+1 , tot, end - start, cend - cstart)
+                                    print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                            idx+1 , tot, end - start, cend - cstart))
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
         
@@ -493,9 +493,9 @@ class changepoint:
                            self.__allvalues__.append((c_p1, c_p2, L1+L2+L3))
         
                    if (self.__verbose__):
-                       print ""
-                       print ""
-                       print "Change Point: ", cp1, " , ", cp2, " (",maxval, ")"
+                       print("")
+                       print("")
+                       print("Change Point: ", cp1, " , ", cp2, " (",maxval, ")")
                    
                    self.__cp1_found__ = cp1
                    self.__cp2_found__ = cp2
@@ -564,8 +564,8 @@ class changepoint:
             
                            if (self.__verbose__):
                                 if self.__print_iter_info__:
-                                    print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
-                                            idx+1 , tot, end - start, cend - cstart)
+                                    print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                            idx+1 , tot, end - start, cend - cstart))
                                 else:
                                     basicutils.progress_bar(idx+1, tot)
         
@@ -583,9 +583,9 @@ class changepoint:
                            self.__allvalues__.append((c_p1, c_p2, L1+L2+L3))
         
                    if (self.__verbose__):
-                        print ""
-                        print ""
-                        print "Change Point: ", cp1, " , ", cp2 ," (",maxval, ")"
+                        print("")
+                        print("")
+                        print("Change Point: ", cp1, " , ", cp2 ," (",maxval, ")")
 
                    self.__cp1_found__ = cp1
                    self.__cp2_found__ = cp2
@@ -647,8 +647,8 @@ class changepoint:
                   
                                if (self.__verbose__):
                                     if self.__print_iter_info__:
-                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
-                                                idx+1 , tot, end - start, cend - cstart)
+                                        print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                                idx+1 , tot, end - start, cend - cstart))
                                     else:
                                         basicutils.progress_bar(idx+1, tot)
         
@@ -666,10 +666,10 @@ class changepoint:
                                self.__allvalues__.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
                    if (self.__verbose__):
-                        print ""
-                        print ""
-                        print "Change Point: ", cp1, " , ", cp2, \
-                                " ", cp3, " (",maxval, ")"
+                        print("")
+                        print("")
+                        print("Change Point: ", cp1, " , ", cp2, \
+                                " ", cp3, " (",maxval, ")")
         
                    self.__cp1_found__ = cp1
                    self.__cp2_found__ = cp2
@@ -759,8 +759,8 @@ class changepoint:
         
                                if (self.__verbose__):
                                     if self.__print_iter_info__:
-                                        print "%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
-                                                idx+1 , tot, end - start, cend - cstart)
+                                        print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
+                                                idx+1 , tot, end - start, cend - cstart))
                                     else:
                                         basicutils.progress_bar(idx+1, tot)
         
@@ -778,10 +778,10 @@ class changepoint:
                                self.__allvalues__.append((c_p1, c_p2, c_p3, L1+L2+L3+L4))
         
                    if (self.__verbose__):
-                        print ""
-                        print ""
-                        print "Change Point: ", cp1, " , ", cp2 , \
-                                " ", cp3, " (",maxval, ")"
+                        print("")
+                        print("")
+                        print("Change Point: ", cp1, " , ", cp2 , \
+                                " ", cp3, " (",maxval, ")")
                    
                    self.__cp1_found__ = cp1
                    self.__cp2_found__ = cp2

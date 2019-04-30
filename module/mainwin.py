@@ -188,14 +188,14 @@ class main_window(QtGui.QMainWindow):
               "Error while opening " + self.__inputfile__ )
              return
           
-          if not(self.__options_name_dialog__.getratingname() in msd.keys()):
+          if not(self.__options_name_dialog__.getratingname() in list(msd.keys())):
              QtGui.QMessageBox.critical( self, \
               "ERROR", \
               "Cannot find " + self.__options_name_dialog__.getratingname()+ \
               " in " + self.__inputfile__)
              return 
           
-          if not(self.__options_name_dialog__.getiratingname() in bpd.keys()):
+          if not(self.__options_name_dialog__.getiratingname() in list(bpd.keys())):
               QtGui.QMessageBox.critical( self, \
                       "ERROR", \
                       "Cannot find " + self.__options_name_dialog__.getiratingname() \

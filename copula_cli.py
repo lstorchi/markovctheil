@@ -57,19 +57,19 @@ if __name__ == "__main__" :
     errmsg = []
     
     if not (os.path.isfile(filename)):
-        print ("File " + filename + " does not exist ")
+        print(("File " + filename + " does not exist "))
         exit(1)
     
     matf = scipy.io.loadmat(filename)
     
-    if not(name_rtmt in matf.keys()):
-        print "Cannot find " + name_rtmt + " in " + filename
-        print matf.keys()
+    if not(name_rtmt in list(matf.keys())):
+        print("Cannot find " + name_rtmt + " in " + filename)
+        print(list(matf.keys()))
         exit(1)
     
-    if not(name_spmt in matf.keys()):
-        print "Cannot find " + name_spmt + " in " + filename
-        print matf.keys()
+    if not(name_spmt in list(matf.keys())):
+        print("Cannot find " + name_spmt + " in " + filename)
+        print(list(matf.keys()))
         exit(1)
     
     ratings = matf[name_rtmt]
@@ -79,7 +79,7 @@ if __name__ == "__main__" :
     #kstest.slipshod_kstest (spread, ratings)
 
     if ratings.shape != spread.shape:
-        print "Error  in matrix dimension"
+        print("Error  in matrix dimension")
         exit(1)
     
     N = numpy.max(ratings)
@@ -87,7 +87,7 @@ if __name__ == "__main__" :
     Dst = max(spread.shape)
 
     if verbose:
-        print "Computing Copula parameters ..."
+        print("Computing Copula parameters ...")
 
     G, X, rho = mainmkvcmp.compute_copula_variables (ratings, spread)
     
@@ -101,6 +101,6 @@ if __name__ == "__main__" :
             p_rating, G, X, rho, \
             Nnaz, Nsim, d, verbose, None)
 
-    print numpy.mean(entropy_t[1:, :],1)
+    print(numpy.mean(entropy_t[1:, :],1))
     plt.plot(numpy.mean(entropy_t[1:, :],1))
     plt.savefig("mean_entropy.png")

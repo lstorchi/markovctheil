@@ -268,8 +268,8 @@ class markovkernel:
         if self.__infinite_time__: 
             # matrice delle probabilita' diventa stazionaria tempo elevato 
             if self.__verbose__:
-              print ""
-              print "Solve ..."
+              print("")
+              print("Solve ...")
         
             ai = numpy.identity(mcmaxvalue, dtype='float64') - \
                     numpy.matrix.transpose(self.__transitions_probability_mtx__)
@@ -291,16 +291,16 @@ class markovkernel:
                     self.__transitions_probability_mtx__[i, j] = x[0][j] 
         
         if self.__verbose__:
-          print " "
-          print "Solve SVD "
+          print(" ")
+          print("Solve SVD ")
         
         npr = self.__transitions_probability_mtx__ - \
                 numpy.identity(mcmaxvalue, dtype='float64')
         s, v, d = numpy.linalg.svd(npr)
         
         if self.__verbose__:
-            print " "
-            print "mean value: ", numpy.mean(v)
+            print(" ")
+            print("mean value: ", numpy.mean(v))
         
         for i in range(len(self.__attributes__)):
             for j in range(len(self.__attributes__[0])):
@@ -379,7 +379,7 @@ class markovkernel:
         fval, pval = scipy.stats.f_oneway (*args)
         
         if self.__verbose__:
-          print " "
+          print(" ")
         
         oufilename = "1wayanova_"+\
                 str(self.__num_of_mc_iterations__)+".txt"
@@ -447,7 +447,7 @@ class markovkernel:
                 return False
         
         if self.__verbose__:
-          print " "
+          print(" ")
         
         oufilename = "entropy_"+\
                 str(self.__num_of_mc_iterations__)+".txt"
@@ -536,7 +536,7 @@ class markovkernel:
     def __compute_copula_variables__ (self, r):
 
         if self.__metacommunity__.shape != r.shape:
-            print "Error  in matrix dimension"
+            print("Error  in matrix dimension")
             exit(1)
 
         mcmaxvalue = numpy.max(self.__metacommunity__)
@@ -565,12 +565,11 @@ class markovkernel:
         for i in range(mcmaxvalue):
             tmp = numpy.where(rttmp == i+1)[0]
             dist_sp = [f_inc_spread[j] for j in tmp]
-            dist_sp = filter(lambda a: a != float("Inf"), dist_sp)
+            dist_sp = [a for a in dist_sp if a != float("Inf")]
             mind = scipy.stats.mstats.mquantiles(dist_sp, 0.05)
             maxd = scipy.stats.mstats.mquantiles(dist_sp, 0.95)
         
-            dist_sp = filter(lambda a: a >= mind and a <= maxd, \
-                    dist_sp)
+            dist_sp = [a for a in dist_sp if a >= mind and a <= maxd]
         
             x, y = basicutils.ecdf(dist_sp)
 
@@ -605,7 +604,7 @@ class markovkernel:
         intra_entropy = numpy.zeros(self.__simulated_time__, dtype=numpy.float64)
 
         if self.__verbose__:
-            print "Start MC simulation  ..."
+            print("Start MC simulation  ...")
 
         if setval != None:
             setval.setValue(0)

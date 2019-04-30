@@ -54,14 +54,14 @@ if len(sys.argv) == 1:
 args = parser.parse_args()
 
 if not (os.path.isfile(args.rmatfilename)):
-    print "File " + args.rmatfilename + " does not exist "
+    print("File " + args.rmatfilename + " does not exist ")
     exit(1)
 
 msd = scipy.io.loadmat(args.rmatfilename)
 
-if not(args.nameofmatrix in msd.keys()):
-    print "Cannot find " + args.nameofmatrix + " in " + args.rmatfilename
-    print msd.keys()
+if not(args.nameofmatrix in list(msd.keys())):
+    print("Cannot find " + args.nameofmatrix + " in " + args.rmatfilename)
+    print(list(msd.keys()))
     exit(1)
 
 ms = msd[args.nameofmatrix]
@@ -74,7 +74,7 @@ cp_fortest_2 = -1
 cp_fortest_3 = -1
 
 if len(args.performtest.split(";")) < 1:
-    print "Error in --perform-test option"
+    print("Error in --perform-test option")
     exit(1)
 
 cp_fortest = int(args.performtest.split(";")[0])
@@ -82,20 +82,20 @@ cp_fortest = int(args.performtest.split(";")[0])
 if cp_fortest >= 0:
     if args.numofcp == 1:
         if len(args.performtest.split(";")) != 2:
-            print "Error in --perform-test option"
+            print("Error in --perform-test option")
             exit(1)
     
         num_of_run = int(args.performtest.split(";")[1])
     elif args.numofcp == 2:
         if len(args.performtest.split(";")) != 3:
-            print "Error in --perform-test option"
+            print("Error in --perform-test option")
             exit(1)
      
         cp_fortest_2 = int(args.performtest.split(";")[1])
         num_of_run = int(args.performtest.split(";")[2])
     elif args.numofcp == 3:
         if len(args.performtest.split(";")) != 4:
-            print "Error in --perform-test option"
+            print("Error in --perform-test option")
             exit(1)
      
         cp_fortest_2 = int(args.performtest.split(";")[1])
@@ -122,11 +122,11 @@ try:
     runcps.compute_cps ()
 
 except changemod.Error as err:
-    print "Oops! error in the main function" 
-    print err
+    print("Oops! error in the main function") 
+    print(err)
     exit(1)
 except TypeError as err:
-    print err
+    print(err)
     exit(1)
  
 fp.close()

@@ -65,28 +65,28 @@ if __name__ == "__main__" :
     errmsg = []
     
     if not (os.path.isfile(filename1)):
-        print "File " + filename1 + " does not exist"
+        print("File " + filename1 + " does not exist")
         exit(1)
     
     if not (os.path.isfile(filename2)):
-        print "File ", filename2, " does not exist"
+        print("File ", filename2, " does not exist")
         exit(1)
     
     msd = scipy.io.loadmat(filename1)
     bpd = scipy.io.loadmat(filename2)
     
-    if not(namems in msd.keys()):
-        print "Cannot find " + namems + " in " + filename1
-        print msd.keys()
+    if not(namems in list(msd.keys())):
+        print("Cannot find " + namems + " in " + filename1)
+        print(list(msd.keys()))
         exit(1)
     
-    if not(namebp in bpd.keys()):
-        print "Cannot find " + namebp + " in " + filename2
-        print bpd.keys()
+    if not(namebp in list(bpd.keys())):
+        print("Cannot find " + namebp + " in " + filename2)
+        print(list(bpd.keys()))
         exit(1)
     
     if msd[namems].shape[0] != bpd[namebp].shape[0]:
-        print "wrong dim of the input matrix"
+        print("wrong dim of the input matrix")
         exit(1)
     
     ms = msd[namems]
@@ -109,9 +109,9 @@ if __name__ == "__main__" :
         markovrun.set_dump_files(True)
 
         if not markovrun.run_computation():
-            print "Error in main markov kernel"
+            print("Error in main markov kernel")
             exit(1)
 
     except TypeError as err:
-        print err
+        print(err)
         exit(1)
