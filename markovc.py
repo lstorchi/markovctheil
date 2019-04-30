@@ -71,10 +71,32 @@ if __name__ == "__main__" :
     if not (os.path.isfile(filename2)):
         print("File ", filename2, " does not exist")
         exit(1)
-    
-    msd = scipy.io.loadmat(filename1)
-    bpd = scipy.io.loadmat(filename2)
-    
+
+    msd = None
+    bpd = None
+
+    if filename1.endswith('.csv'):
+        msd = basicutils.csvfile_to_mats(filename1)
+        if msd == None:
+             print("Error while reading file " + filename1)
+             exit(1)
+    elif filename1.endswith('.mat'):
+        msd = scipy.io.loadmat(filename1)
+    else:
+        print("Error in file extension")
+        exit(1)
+
+    if filename2.endswith('.csv'):
+        bpd = basicutils.csvfile_to_mats(filename2)
+        if bpd == None:
+             print("Error while reading file " + filename2)
+             exit(1)
+    elif filename2.endswith('.mat'):
+        bpd = scipy.io.loadmat(filename2)
+    else:
+        print("Error in file extension")
+        exit(1)
+
     if not(namems in list(msd.keys())):
         print("Cannot find " + namems + " in " + filename1)
         print(list(msd.keys()))
@@ -88,10 +110,10 @@ if __name__ == "__main__" :
     if msd[namems].shape[0] != bpd[namebp].shape[0]:
         print("wrong dim of the input matrix")
         exit(1)
-    
-    ms = msd[namems]
-    ir = bpd[namebp]
-    
+
+    ms = msd[namems].astype(numpy.int)
+    ir = bpd[namebp].astype(numpy.float)
+
     try:
         markovrun = mainmkvcmp.markovkernel()
 

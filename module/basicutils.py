@@ -164,3 +164,43 @@ def gaussian_copula_rnd (rho, m):
     return u
 
 #######################################################################
+
+def csvfile_to_mats (filename):
+
+    retdict = {}
+
+    with open(filename) as f:
+        linelist = f.read().splitlines()
+        counter = 0
+        if len(linelist) > 2:
+            numofmtx = int(linelist[counter])
+            counter += 1
+            
+            for matidx in range(numofmtx):
+                mtxname = linelist[counter]
+                counter += 1
+                
+                line = linelist[counter]
+                counter += 1
+
+                if len(line.split(",")) != 2:
+                    return None
+
+                rows = int(line.split(",")[0])
+                cols = int(line.split(",")[1])
+
+                mtx = numpy.zeros((rows, cols), dtype=numpy.float)
+
+                for i in range(rows):
+                    line = linelist[counter]
+                    if len(line.split(",")) != cols:
+                        return None
+                    x = numpy.array(line.split(","))
+                    mtx[i, : ] = x.astype(numpy.float)
+                    counter += 1
+
+                retdict[mtxname] = mtx
+
+    return retdict
+
+
