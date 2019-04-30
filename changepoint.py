@@ -57,14 +57,25 @@ if not (os.path.isfile(args.rmatfilename)):
     print("File " + args.rmatfilename + " does not exist ")
     exit(1)
 
-msd = scipy.io.loadmat(args.rmatfilename)
+msd = None
+
+if args.rmatfilename.endswith('.csv'):
+    msd = basicutils.csvfile_to_mats(args.rmatfilename)
+    if msd == None:
+         print("Error while reading file " + args.rmatfilename)
+         exit(1)
+elif args.rmatfilename.endswith('.mat'):
+    msd = scipy.io.loadmat(args.rmatfilename)
+else:
+    print("Error in file extension")
+    exit(1)
 
 if not(args.nameofmatrix in list(msd.keys())):
     print("Cannot find " + args.nameofmatrix + " in " + args.rmatfilename)
     print(list(msd.keys()))
     exit(1)
 
-ms = msd[args.nameofmatrix]
+ms = msd[args.nameofmatrix].astype(numpy.int)
 
 fp = open(args.outf, "w")
 
