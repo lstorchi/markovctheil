@@ -13,11 +13,20 @@ import os.path
 
 sys.path.append("./module")
 
-import mainmkvcmp
+from mainmkvcmp import markovkernel
 import basicutils
-import kstest
+#import kstest
 
 import matplotlib.pyplot as plt
+
+class minemainmkvcmp (markovkernel):
+
+    def __init__ (self):
+        markovkernel.__init__(self)
+
+    def compute_copula_variables (self, ratings):
+
+        return markovkernel.__compute_copula_variables__ (self, ratings)
 
 #######################################################################
 
@@ -60,8 +69,19 @@ if __name__ == "__main__" :
         print(("File " + filename + " does not exist "))
         exit(1)
     
-    matf = scipy.io.loadmat(filename)
-    
+    matf = None
+
+    if filename.endswith('.csv'):
+        matf = basicutils.csvfile_to_mats(filename)
+        if matf == None:
+             print("error while reading file " + filename)
+             exit(1)
+    elif filename.endswith('.mat'):
+        matf = scipy.io.loadmat(filename)
+    else:
+        print("error in file extension")
+        exit(1)
+
     if not(name_rtmt in list(matf.keys())):
         print("Cannot find " + name_rtmt + " in " + filename)
         print(list(matf.keys()))
@@ -72,9 +92,9 @@ if __name__ == "__main__" :
         print(list(matf.keys()))
         exit(1)
     
-    ratings = matf[name_rtmt]
-    spread = matf[name_spmt]
-    p_rating = matf[name_prmt]
+    ratings = matf[name_rtmt].astype(numpy.int)
+    spread = matf[name_spmt].astype(numpy.float)
+    p_rating = matf[name_prmt].astype(numpy.float)
 
     #kstest.slipshod_kstest (spread, ratings)
 
@@ -89,7 +109,11 @@ if __name__ == "__main__" :
     if verbose:
         print("Computing Copula parameters ...")
 
-    G, X, rho = mainmkvcmp.compute_copula_variables (ratings, spread)
+    markovk = minemainmkvcmp()
+    markovk.set_metacommunity(spread)
+    markovk.set_attributes(ratings)
+
+    G, X, rho = markovk.compute_copula_variables (ratings)
     
     # eigvals, m =  numpy.linalg.eig(rho)
     # print numpy.sort(eigvals)
@@ -97,7 +121,7 @@ if __name__ == "__main__" :
     # tau = 2.0*numpy.arcsin(rho)/math.pi
     # print tau
 
-    entropy_t = mainmkvcmp.runmcsimulation_copula (ratings, spread, \
+    entropy_t = markovk.runmcsimulation_copula (ratings, spread, \
             p_rating, G, X, rho, \
             Nnaz, Nsim, d, verbose, None)
 
