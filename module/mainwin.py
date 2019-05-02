@@ -11,6 +11,8 @@ import os
 
 import os.path
 
+import basicutils
+
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
@@ -179,8 +181,33 @@ class main_window(QtWidgets.QMainWindow):
           self.__options_name_dialog__.exec_()
           
           try:
-              msd = scipy.io.loadmat(str(self.__inputfile__))
-              bpd = scipy.io.loadmat(str(self.__inputfile__))
+              msd = None
+              bpd = None
+
+              if str(self.__inputfile__).endswith('.csv'):
+                  msd = basicutils.csvfile_to_mats(\
+                          str(self.__inputfile__))
+                  if msd == None:
+                      QtWidgets.QMessageBox.critical( self, \
+                              "ERROR", \
+                              "Error while reading file")
+                      return
+                  bpd = basicutils.csvfile_to_mats(\
+                          str(self.__inputfile__))
+                  if bpd == None:
+                      QtWidgets.QMessageBox.critical( self, \
+                              "ERROR", \
+                              "Error while reading file")
+                      return
+              elif str(self.__inputfile__).endswith('.mat'):
+                  msd = scipy.io.loadmat(str(self.__inputfile__))
+                  bpd = scipy.io.loadmat(str(self.__inputfile__))
+              else:
+                  QtWidgets.QMessageBox.critical( self, \
+                          "ERROR", \
+                          "Error in file extension " + self.__inputfile__ )
+                  return
+
           except ValueError:
              QtWidgets.QMessageBox.critical( self, \
               "ERROR", \
@@ -207,9 +234,9 @@ class main_window(QtWidgets.QMainWindow):
                       "ERROR", \
                       "wrong dim of the input matrix")
               return 
-          
-          self.__rm__ = msd[self.__options_name_dialog__.getratingname()]
-          self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()]
+
+          self.__rm__ = msd[self.__options_name_dialog__.getratingname()].astype(numpy.int)
+          self.__ir__ = bpd[self.__options_name_dialog__.getiratingname()].astype(numpy.float)
           self.__fileio__ = True
 
     def runchangepoint(self):
