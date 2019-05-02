@@ -24,23 +24,23 @@ if __name__ == "__main__" :
     errmsg = []
     
     if not (os.path.isfile(filename)):
-        print "File " + filename + " does not exist"
+        print("File " + filename + " does not exist")
         exit(1)
     
     m = scipy.io.loadmat(filename)
 
     howmany = 0
-    for name in m.iterkeys():
+    for name in m.keys():
         if (isinstance( m[name],(numpy.ndarray))):
             howmany += 1
     
-    print howmany
+    print(howmany)
 
-    for name in m.iterkeys():
+    for name in m.keys():
         if (isinstance( m[name],(numpy.ndarray))):
             if (len(m[name].shape) == 2):
-                print name
-                print m[name].shape[0], " , ", m[name].shape[1]
+                print(name)
+                print(m[name].shape[0], " , ", m[name].shape[1])
 
                 for i in range(m[name].shape[0]):
                     for j in range(m[name].shape[1]-1):
