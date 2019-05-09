@@ -14,7 +14,8 @@ import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
 sys.path.append("./module")
-import mainmkvcmp
+
+import mkvtmod
 import basicutils
 
 if __name__ == "__main__" :
@@ -115,7 +116,7 @@ if __name__ == "__main__" :
     ir = bpd[namebp].astype(numpy.float)
 
     try:
-        markovrun = mainmkvcmp.markovkernel()
+        markovrun = mkvtmod.markovkernel()
 
         markovrun.set_metacommunity(ms)
         markovrun.set_attributes(ir)

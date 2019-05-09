@@ -6,9 +6,9 @@ import scipy.io
 import os.path
 
 sys.path.append("./module")
-import changemod
+
+import mkvtmod
 import basicutils
-import mainmkvcmp
 
 parser = argparse.ArgumentParser()
 
@@ -113,7 +113,7 @@ if cp_fortest >= 0:
         cp_fortest_3 = int(args.performtest.split(";")[2])
         num_of_run = int(args.performtest.split(";")[3])
 
-runcps = changemod.changepoint()
+runcps = mkvtmod.changepoint()
 
 try:
     runcps.set_metacommunity (ms)
@@ -132,7 +132,7 @@ try:
 
     runcps.compute_cps ()
 
-except changemod.Error as err:
+except mkvtmod.Error as err:
     print("Oops! error in the main function") 
     print(err)
     exit(1)

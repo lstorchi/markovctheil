@@ -1,7 +1,5 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 
-import mainmkvcmp
-import changemod
 import plothist
 import scipy.io
 import options
@@ -16,6 +14,8 @@ import basicutils
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
+
+import mkvtmod
 
 class main_window(QtWidgets.QMainWindow):
 
@@ -298,7 +298,7 @@ class main_window(QtWidgets.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-            runcps = changemod.changepoint()
+            runcps = mkvtmod.changepoint()
 
             try:
                 #print self.__options_dialog_cp__.get_cp1start(), " ", \
@@ -331,7 +331,7 @@ class main_window(QtWidgets.QMainWindow):
                
                 runcps.compute_cps (progdialog)
 
-            except changemod.Error:
+            except mkvtmod.Error:
                 QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Oops! error in the main function")
@@ -438,7 +438,7 @@ class main_window(QtWidgets.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-            markovrun = mainmkvcmp.markovkernel()
+            markovrun = mkvtmod.markovkernel()
 
             try:
             
