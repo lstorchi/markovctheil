@@ -221,6 +221,9 @@ class markovkernel:
     
     def run_computation (self, setval=None):
 
+        if self.__metacommunity__.shape != self.__attributes__.shape:
+            raise ValueError("Error in metacommunity or attributes dimensions")
+
         if self.__use_a_seed__:
             numpy.random.seed(self.__seed_value__)
         
@@ -441,8 +444,11 @@ class markovkernel:
         bp = None 
 
         if self.__usecopula__:
+            if self.__metacommunity__.shape != r.shape:
+                raise ValueError("Error in matrix dimensions")
+
             valuevec, binvec, rho = self.__compute_copula_variables__ (r)
-            
+
             try:
                 entropy, self.__intra_entropy__, self.__inter_entropy__ = \
                         self.__runmcsimulation_copula__ (r, valuevec, \
@@ -545,10 +551,6 @@ class markovkernel:
 
 
     def __compute_copula_variables__ (self, r):
-
-        if self.__metacommunity__.shape != r.shape:
-            print("Error  in matrix dimension")
-            exit(1)
 
         mcmaxvalue = numpy.max(self.__metacommunity__)
         rrows = r.shape[0]
