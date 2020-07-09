@@ -36,13 +36,13 @@ if __name__ == "__main__" :
             type=str, required=False, default="ms", dest="nameofmatrix")
     parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix ", \
             type=str, required=False, default="i_r", dest="nameofbpmatrix")
-    parser.add_argument("-v", "--verbose", help="increase output verbosity", \
+    parser.add_argument("-v", "--verbose", help="Increase output verbosity", \
             default=False, action="store_true")
-    parser.add_argument("-i", "--time-inf", help="Simulation using stationary distribution", \
+    parser.add_argument("-i", "--time-inf", help="Runa the simulation using stationary distribution", \
             default=False, action="store_true", dest="timeinf")
-    parser.add_argument("-S", "--seed", help="Using a seed for the random generator", \
+    parser.add_argument("-S", "--seed", help="Use a seed for the random generator", \
             default=False, action="store_true", dest="seed")
-    parser.add_argument("-c", "--use-copule", help="Using copula", \
+    parser.add_argument("-c", "--use-copule", help="Use the copula based Markov reward", \
             default=False, action="store_true", dest="usecopula")
     
     if len(sys.argv) == 1:
