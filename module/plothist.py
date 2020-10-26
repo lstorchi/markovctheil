@@ -36,7 +36,7 @@ class plohitwin (QtWidgets.QMainWindow):
             ax.grid(True)
             ax.set_ylabel('f(bp)')
             ax.set_xlabel('bp')
-            ax.hist(allratings[i], normed=False, \
+            ax.hist(allratings[i], \
                     bins=allratingsnins[i], \
                     facecolor='green')
             k = k + 1

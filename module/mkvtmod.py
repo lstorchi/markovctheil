@@ -1138,7 +1138,7 @@ class changepoint:
             for i in range(self.__num_of_bootstrap_iter__):
         
                 start = tempo.time()
-                cstart = tempo.clock()
+                cstart = tempo.process_time()
          
                 x = self.__mkc_prop__ (self.__metacommunity__, pr1)
         
@@ -1168,7 +1168,7 @@ class changepoint:
                     self.__fp__.write(str(i+1) + " " + str(lambdav) + "\n") 
         
                 end = tempo.time()
-                cend = tempo.clock()
+                cend = tempo.process_time()
             
                 if (self.__verbose__):
                     print("%10d of %10d time (%10.5f s CPU time %10.5f s)"%(\
@@ -1228,7 +1228,7 @@ class changepoint:
                 self.__allvalues__ = []
                 for c_p in range(self.__cp1_start__, cp1stop):
                     start = tempo.time()
-                    cstart = tempo.clock()
+                    cstart = tempo.process_time()
         
             
                     try:
@@ -1245,7 +1245,7 @@ class changepoint:
                     self.__allvalues__.append((c_p, L1+L2))
             
                     end = tempo.time()
-                    cend = tempo.clock()
+                    cend = tempo.process_time()
             
                     if (self.__verbose__):
                         if self.__print_iter_info__:
@@ -1302,7 +1302,7 @@ class changepoint:
                    for c_p1 in range(self.__cp1_start__, cp1stop):
                        for c_p2 in range(c_p1 + self.__delta_cp__, time-1):
                            start = tempo.time()
-                           cstart = tempo.clock()
+                           cstart = tempo.process_time()
             
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
@@ -1316,7 +1316,7 @@ class changepoint:
                                cp2 = c_p2
             
                            end = tempo.time()
-                           cend = tempo.clock()
+                           cend = tempo.process_time()
             
                            if (self.__verbose__):
                                 if self.__print_iter_info__:
@@ -1392,7 +1392,7 @@ class changepoint:
                        for c_p2 in range(self.__cp2_start__, cp2stop):
             
                            start = tempo.time()
-                           cstart = tempo.clock()
+                           cstart = tempo.process_time()
             
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
@@ -1406,7 +1406,7 @@ class changepoint:
                                cp2 = c_p2
             
                            end = tempo.time()
-                           cend = tempo.clock()
+                           cend = tempo.process_time()
             
                            if (self.__verbose__):
                                 if self.__print_iter_info__:
@@ -1473,7 +1473,7 @@ class changepoint:
                            for c_p3 in range(c_p2 + self.__delta_cp__, time-1):
             
                                start = tempo.time()
-                               cstart = tempo.clock()
+                               cstart = tempo.process_time()
             
                                try:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
@@ -1489,7 +1489,7 @@ class changepoint:
                                    cp3 = c_p3
             
                                end = tempo.time()
-                               cend = tempo.clock()
+                               cend = tempo.process_time()
                   
                                if (self.__verbose__):
                                     if self.__print_iter_info__:
@@ -1584,7 +1584,7 @@ class changepoint:
                            for c_p3 in range(self.__cp3_start__, cp3stop):
             
                                start = tempo.time()
-                               cstart = tempo.clock()
+                               cstart = tempo.process_time()
             
                                try:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
@@ -1600,7 +1600,7 @@ class changepoint:
                                    cp3 = c_p3
             
                                end = tempo.time()
-                               cend = tempo.clock()
+                               cend = tempo.process_time()
                   
         
                                if (self.__verbose__):
