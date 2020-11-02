@@ -366,8 +366,9 @@ class main_window(QtWidgets.QMainWindow):
                       self.__ax__.cla()
                       self.__canvas__.draw()
                       self.__plot_done__ = False
+                    else:
+                      self.__ax__ = self.__figure__.add_subplot(111)
                     
-                    self.__ax__ = self.__figure__.add_subplot(111)
                     self.__ax__.plot(x, y, '*-')
                     #self.__ax__.scatter(x, y)
                     self.__ax__.set_xlabel('Time')
@@ -528,7 +529,9 @@ class main_window(QtWidgets.QMainWindow):
                 inter_y.append(self.__inter_entropy__[i-1])
         
         if self.__entropiadone__ :
-            self.__ax__  = self.__figure__.add_subplot(111)
+            if not self.__plot_done__ :
+                self.__ax__  = self.__figure__.add_subplot(111)
+
             #self.__ax__.hold(False)
             self.__ax__.plot(x, y, '*-', label="DT")
             if self.__options_dialog__.getusecopula():
