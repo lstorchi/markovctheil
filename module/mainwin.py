@@ -15,7 +15,7 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import matplotlib.pyplot as plt
 
-import mkvtmod
+import randentropymod
 
 class main_window(QtWidgets.QMainWindow):
 
@@ -298,7 +298,7 @@ class main_window(QtWidgets.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-            runcps = mkvtmod.changepoint()
+            runcps = randentropymod.changepoint()
 
             try:
                 #print self.__options_dialog_cp__.get_cp1start(), " ", \
@@ -331,7 +331,7 @@ class main_window(QtWidgets.QMainWindow):
                
                 runcps.compute_cps (progdialog)
 
-            except mkvtmod.Error:
+            except randentropymod.Error:
                 QtWidgets.QMessageBox.critical( self, \
                     "ERROR", \
                     "Oops! error in the main function")
@@ -439,7 +439,7 @@ class main_window(QtWidgets.QMainWindow):
             progdialog.setMinimumDuration(0)
             progdialog.show()
             
-            markovrun = mkvtmod.markovkernel()
+            markovrun = randentropymod.randentropykernel()
 
             try:
             

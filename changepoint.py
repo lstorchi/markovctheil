@@ -7,7 +7,7 @@ import os.path
 
 sys.path.append("./module")
 
-import mkvtmod
+import randentropymod
 import basicutils
 
 parser = argparse.ArgumentParser()
@@ -113,7 +113,7 @@ if cp_fortest >= 0:
         cp_fortest_3 = int(args.performtest.split(";")[2])
         num_of_run = int(args.performtest.split(";")[3])
 
-runcps = mkvtmod.changepoint()
+runcps = randentropymod.changepoint()
 
 try:
     runcps.set_metacommunity (ms)
@@ -132,7 +132,7 @@ try:
 
     runcps.compute_cps ()
 
-except mkvtmod.Error as err:
+except randentropymod.Error as err:
     print("Oops! error in the main function") 
     print(err)
     exit(1)

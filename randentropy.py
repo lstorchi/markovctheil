@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append("./module")
 
-import mkvtmod
+import randentropymod
 import basicutils
 
 if __name__ == "__main__" :
@@ -116,7 +116,7 @@ if __name__ == "__main__" :
     ir = bpd[namebp].astype(numpy.float)
 
     try:
-        markovrun = mkvtmod.markovkernel()
+        markovrun = randentropymod.randentropykernel()
 
         markovrun.set_metacommunity(ms)
         markovrun.set_attributes(ir)

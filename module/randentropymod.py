@@ -25,14 +25,14 @@ class Error(Exception):
 
 
 ###############################################################################
-# markovkernel
+# randentropykernel
 ###############################################################################
 
-class markovkernel:
+class randentropykernel:
 
     def __init__ (self):
         """
-        Init markovkernel class.
+        Init randentropykernel class.
         """
 
         # input
