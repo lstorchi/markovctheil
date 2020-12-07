@@ -308,7 +308,7 @@ class main_window(QtWidgets.QMainWindow):
                 #        self.__options_dialog_cp__.get_cp2stop(), " ", \
                 #        self.__options_dialog_cp__.get_deltacp()
 
-                runcps.set_metacommunity (self.__rm__)
+                runcps.set_community (self.__rm__)
                 runcps.set_num_of_bootstrap_iter (num_of_run)
                 runcps.set_cp1_fortest (cp_fortest)
                 runcps.set_cp2_fortest (cp_fortest_2)
@@ -443,7 +443,7 @@ class main_window(QtWidgets.QMainWindow):
 
             try:
             
-                markovrun.set_metacommunity(self.__rm__)
+                markovrun.set_community(self.__rm__)
                 markovrun.set_attributes(self.__ir__)
                 markovrun.set_step( \
                         self.__options_dialog__.getstep())

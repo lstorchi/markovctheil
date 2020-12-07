@@ -36,7 +36,7 @@ class randentropykernel:
         """
 
         # input
-        self.__metacommunity__ = None 
+        self.__community__ = None 
         self.__attributes__ = None 
 
         self.__infinite_time__ = False 
@@ -66,19 +66,19 @@ class randentropykernel:
         self.__attributes_sigma_values__ = [] 
 
 
-    def set_metacommunity (self, inmat):
+    def set_community (self, inmat):
         """
-        Specify the metacommunity matrix.
+        Specify the community matrix.
         """
 
         if not isinstance(inmat, numpy.ndarray):
             raise TypeError("input must be a numpy array")
 
-        self.__metacommunity__ = inmat
+        self.__community__ = inmat
 
 
-    def get_metacommunity (self):
-        return self.__metacommunity__
+    def get_community (self):
+        return self.__community__
 
 
     def set_attributes (self, inmat):
@@ -221,18 +221,18 @@ class randentropykernel:
     
     def run_computation (self, setval=None):
 
-        if self.__metacommunity__.shape != self.__attributes__.shape:
-            raise ValueError("Error in metacommunity or attributes dimensions")
+        if self.__community__.shape != self.__attributes__.shape:
+            raise ValueError("Error in community or attributes dimensions")
 
         if self.__use_a_seed__:
             numpy.random.seed(self.__seed_value__)
         
-        mcrows = self.__metacommunity__.shape[0]
-        mcmaxvalue = numpy.max(self.__metacommunity__)
-        mccols = self.__metacommunity__.shape[1]
+        mcrows = self.__community__.shape[0]
+        mcmaxvalue = numpy.max(self.__community__)
+        mccols = self.__community__.shape[1]
         
         if (mcmaxvalue <= 0) or (mcmaxvalue > 8):
-            raise ValueError("metacommunity has invalid values")
+            raise ValueError("community has invalid values")
 
         self.__transitions_probability_mtx__ = \
                 numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64') 
@@ -249,8 +249,8 @@ class randentropykernel:
             for t in range(mccols-1):
                 for i in range(mcmaxvalue):
                     for j in range(mcmaxvalue):
-                        if (self.__metacommunity__[k, t] == (i+1)) \
-                                and (self.__metacommunity__[k, t+1] \
+                        if (self.__community__[k, t] == (i+1)) \
+                                and (self.__community__[k, t+1] \
                                 == (j+1)):
                             nk[i, j, k] = nk[i, j, k] + 1
         
@@ -346,7 +346,7 @@ class randentropykernel:
         for i in range(mcmaxvalue):
             for j in range(mcrows):
                 for k in range(mccols):
-                    if self.__metacommunity__[j, k] == i+1: 
+                    if self.__community__[j, k] == i+1: 
                         nn[i] = nn[i] + 1 
                         ist[i, nn[i]-1] = r[j, k]
         
@@ -444,7 +444,7 @@ class randentropykernel:
         bp = None 
 
         if self.__usecopula__:
-            if self.__metacommunity__.shape != r.shape:
+            if self.__community__.shape != r.shape:
                 raise ValueError("Error in matrix dimensions")
 
             valuevec, binvec, rho = self.__compute_copula_variables__ (r)
@@ -552,7 +552,7 @@ class randentropykernel:
 
     def __compute_copula_variables__ (self, r):
 
-        mcmaxvalue = numpy.max(self.__metacommunity__)
+        mcmaxvalue = numpy.max(self.__community__)
         rrows = r.shape[0]
         Dst = max(r.shape)
 
@@ -566,7 +566,7 @@ class randentropykernel:
                     out=numpy.full_like(a, 
                 float("Inf")), where=b!=0)
         
-        rttmp = self.__metacommunity__[:,1:end]
+        rttmp = self.__community__[:,1:end]
         totdim = rttmp.shape[0]*rttmp.shape[1]
         
         rttmp = rttmp.reshape(totdim, order='F')
@@ -597,8 +597,8 @@ class randentropykernel:
     def __runmcsimulation_copula__ (self, r, valuevec, binvec, rho, \
         t_t, setval):
 
-        r_in = self.__metacommunity__[:,-1]
-        mcrows = self.__metacommunity__.shape[0]
+        r_in = self.__community__[:,-1]
+        mcrows = self.__community__.shape[0]
         
         spread_synth_tmp = numpy.zeros(mcrows)
         spread_synth = numpy.zeros((self.__num_of_mc_iterations__,\
@@ -623,13 +623,13 @@ class randentropykernel:
             setval.setValue(0)
             setval.setLabelText("Monte Carlo simulation")
 
-        maxratval = numpy.max(self.__metacommunity__)
+        maxratval = numpy.max(self.__community__)
 
         for run in range(self.__num_of_mc_iterations__):
             spread_synth[run,0,:] = r[:,-1].transpose()
             #print spread_synth[run,0,:]
             #print self.__attributes__[:,-1]
-            #print self.__metacommunity__[:,-1]
+            #print self.__community__[:,-1]
 
             u = basicutils.gaussian_copula_rnd (rho, \
                     self.__simulated_time__)
@@ -756,8 +756,8 @@ class randentropykernel:
 
         entropy = numpy.zeros((self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
-        mcmaxvalue = numpy.max(self.__metacommunity__)
-        mcrows = self.__metacommunity__.shape[0]
+        mcmaxvalue = numpy.max(self.__community__)
+        mcrows = self.__community__.shape[0]
         
         bp = numpy.zeros((mcrows,self.__simulated_time__,\
                 self.__num_of_mc_iterations__), dtype='float64')
@@ -796,7 +796,7 @@ class randentropykernel:
             cont = numpy.zeros((mcmaxvalue,self.__simulated_time__), \
                     dtype='int')
             xi = numpy.random.rand(mcrows,self.__simulated_time__)
-            x[:, 0] = self.__metacommunity__[:, -1]
+            x[:, 0] = self.__community__[:, -1]
         
             for c in range(mcrows):
                 if xi[c, 0] <= cdf[x[c, 0]-1, 0]:
@@ -865,7 +865,7 @@ class changepoint:
 
     def __init__(self):
 
-        self.__metacommunity__ = None 
+        self.__community__ = None 
         self.__num_of_bootstrap_iter__ = 100 
         
         self.__cp_fortest_1__ = -1
@@ -923,16 +923,16 @@ class changepoint:
     def get_allvalues(self):
         return self.__allvalues__
 
-    def set_metacommunity(self, inmat):
+    def set_community(self, inmat):
         if not isinstance(inmat, numpy.ndarray):
-            raise TypeError("set_metacommunity: input must be a numpy array")
+            raise TypeError("set_community: input must be a numpy array")
 
-        self.__metacommunity__ = inmat
+        self.__community__ = inmat
 
 
-    def get_metacommunity(self):
+    def get_community(self):
 
-        return self.__metacommunity__
+        return self.__community__
 
     def set_num_of_bootstrap_iter (self, inval):
         if not isinstance(inval, int):
@@ -1093,8 +1093,8 @@ class changepoint:
             setval.setValue(0)
             setval.setLabelText("ChangePoint analysis")
         
-        rating = numpy.max(self.__metacommunity__)
-        time = self.__metacommunity__.shape[1]
+        rating = numpy.max(self.__community__)
+        time = self.__community__.shape[1]
         
         if self.__cp_fortest_1__ >= 0 and self.__num_of_bootstrap_iter__ >= 0:
         
@@ -1112,18 +1112,18 @@ class changepoint:
         
             if self.__num_of_cps__ == 1:
                 L, L1, L2, pr1, pr2 = self.__compute_cps__ (\
-                        self.__metacommunity__, self.__cp_fortest_1__, True)
+                        self.__community__, self.__cp_fortest_1__, True)
                 self.__lambdastart__ = 2.0*((L1+L2)-L)
             elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
-                self.__compute_cps__ (self.__metacommunity__, \
+                self.__compute_cps__ (self.__community__, \
                 self.__cp_fortest_1__, True, self.__cp_fortest_2__)
                 self.__lambdastart__ = 2.0*((L1+L2+L3)-L)
                 if (self.__verbose__):
                     print(L, L1, L2, L3)
             elif self.__num_of_cps__ == 3:
                 L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
-                        self.__compute_cps__ (self.__metacommunity__, \
+                        self.__compute_cps__ (self.__community__, \
                         self.__cp_fortest_1__, True, \
                         elf.__cp_fortest_2__, self.__cp_fortest_3__)
                 self.__lambdastart__ = 2.0*((L1+L2+L3+L4)-L)
@@ -1140,7 +1140,7 @@ class changepoint:
                 start = tempo.time()
                 cstart = tempo.process_time()
          
-                x = self.__mkc_prop__ (self.__metacommunity__, pr1)
+                x = self.__mkc_prop__ (self.__community__, pr1)
         
                 lambdav = 0.0
         
@@ -1183,8 +1183,8 @@ class changepoint:
         
             self.__lambda95__ = lambdas[idx95]
         
-            minrat = numpy.min(self.__metacommunity__)
-            maxrat = numpy.max(self.__metacommunity__)
+            minrat = numpy.min(self.__community__)
+            maxrat = numpy.max(self.__community__)
         
             #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
             #ndof = max (positive1, positive2)
@@ -1232,7 +1232,7 @@ class changepoint:
         
             
                     try:
-                        L1, L2 = self.__compute_cps__ (self.__metacommunity__, c_p)
+                        L1, L2 = self.__compute_cps__ (self.__community__, c_p)
                     except Error:
                         raise Error ("Oops! error in the main function") 
             
@@ -1306,7 +1306,7 @@ class changepoint:
             
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
-                                       self.__metacommunity__, c_p1, False, c_p2)
+                                       self.__community__, c_p1, False, c_p2)
                            except Error:
                                raise Error ("Oops! error in the main function")
              
@@ -1396,7 +1396,7 @@ class changepoint:
             
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
-                                       self.__metacommunity__, c_p1, False, c_p2)
+                                       self.__community__, c_p1, False, c_p2)
                            except Error:
                                raise Error ("Oops! error in the main function") 
                    
@@ -1477,7 +1477,7 @@ class changepoint:
             
                                try:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
-                                           self.__metacommunity__, \
+                                           self.__community__, \
                                            c_p1, False, c_p2, c_p3)
                                except Error:
                                    raise Error ("Oops! error in the main function") 
@@ -1588,7 +1588,7 @@ class changepoint:
             
                                try:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
-                                           self.__metacommunity__,  \
+                                           self.__community__,  \
                                            c_p1, False, c_p2, c_p3)
                                except Error:
                                    raise Error ("Oops! error in the main function") 
@@ -1643,12 +1643,12 @@ class changepoint:
 # PRIVATE
 ###############################################################################
 
-    def __compute_cps__ (self, metacommunity, c_p1, performtest = False, \
+    def __compute_cps__ (self, community, c_p1, performtest = False, \
             c_p2 = -1, c_p3 = -1):
 
-        countries=metacommunity.shape[0]
-        rating=numpy.max(metacommunity)
-        time=metacommunity.shape[1]
+        countries=community.shape[0]
+        rating=numpy.max(community)
+        time=community.shape[1]
         
         if (rating <= 0) or (rating > 8):
             raise Error ("rating " + rating + \
@@ -1678,8 +1678,8 @@ class changepoint:
                 
                         for c  in range(countries):
                             for t in range(time-1):
-                                if (metacommunity[c, t] == (i+1)) and \
-                                        (metacommunity[c, t+1] == (j+1)):
+                                if (community[c, t] == (i+1)) and \
+                                        (community[c, t+1] == (j+1)):
                                     nk[i, j, c] = nk[i, j, c] + 1
                                 
                         num[i, j] = numpy.sum(nk[i, j, :])
@@ -1709,8 +1709,8 @@ class changepoint:
                  for j in range(rating):
                     for c in range(countries):
                          for t in range(c_p1-1):
-                            if (metacommunity[c, t] == (i+1)) and \
-                                    (metacommunity[c, t+1] == (j+1)):
+                            if (community[c, t] == (i+1)) and \
+                                    (community[c, t+1] == (j+1)):
                                 num1[i, j] = num1[i, j] + 1
                     
                  den1 = numpy.sum(num1[i,:])
@@ -1743,8 +1743,8 @@ class changepoint:
                      for j in range(rating):
                          for c in range(countries):
                               for t in range(c_p1,c_p2-1) :
-                                  if (metacommunity[c, t] == (i+1)) and \
-                                          (metacommunity[c, t+1] == (j+1)):
+                                  if (community[c, t] == (i+1)) and \
+                                          (community[c, t+1] == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
                      den2[i] = numpy.sum(num2[i, :])
@@ -1778,8 +1778,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p2,c_p3-1) :
-                                      if (metacommunity[c, t] == (i+1)) and \
-                                              (metacommunity[c, t+1] == \
+                                      if (community[c, t] == (i+1)) and \
+                                              (community[c, t+1] == \
                                               (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
@@ -1810,8 +1810,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p3,time-1) :
-                                      if (metacommunity[c, t] == (i+1)) and \
-                                              (metacommunity[c, t+1] \
+                                      if (community[c, t] == (i+1)) and \
+                                              (community[c, t+1] \
                                               == (j+1)):
                                           num4[i, j] = num4[i, j] + 1
                              
@@ -1841,8 +1841,8 @@ class changepoint:
                          for j in range(rating):
                              for c in range(countries):
                                   for t in range(c_p2,time-1) :
-                                      if (metacommunity[c, t] == (i+1)) and \
-                                              (metacommunity[c, t+1] \
+                                      if (community[c, t] == (i+1)) and \
+                                              (community[c, t+1] \
                                               == (j+1)):
                                           num3[i, j] = num3[i, j] + 1
                              
@@ -1873,8 +1873,8 @@ class changepoint:
                      for j in range(rating):
                          for c in range(countries):
                               for t in range(c_p1,time-1) :
-                                  if (metacommunity[c, t] == (i+1)) and \
-                                          (metacommunity[c, t+1] \
+                                  if (community[c, t] == (i+1)) and \
+                                          (community[c, t+1] \
                                           == (j+1)):
                                       num2[i, j] = num2[i, j] + 1
                          
@@ -1903,11 +1903,11 @@ class changepoint:
         raise Error ("at least cp1 should be > 0")
 
 
-    def __mkc_prop__ (self, metacommunity, transitions_probability_mtx): 
+    def __mkc_prop__ (self, community, transitions_probability_mtx): 
 
-        mcrows = metacommunity.shape[0]
-        mcmaxvalue = numpy.max(metacommunity)
-        mccols = metacommunity.shape[1]
+        mcrows = community.shape[0]
+        mcmaxvalue = numpy.max(community)
+        mccols = community.shape[1]
         
         cdf = numpy.zeros((mcmaxvalue,mcmaxvalue), dtype='float64')
         
@@ -1921,7 +1921,7 @@ class changepoint:
         xi = numpy.random.rand(mcrows,mccols)
         
         for c in range(mcrows):
-            x[c, 0] = metacommunity[c, 0]
+            x[c, 0] = community[c, 0]
         
         for c in range(mcrows):
             if xi[c, 0] <= cdf[x[c, 0]-1, 0]:

@@ -118,7 +118,7 @@ if __name__ == "__main__" :
     try:
         markovrun = randentropymod.randentropykernel()
 
-        markovrun.set_metacommunity(ms)
+        markovrun.set_community(ms)
         markovrun.set_attributes(ir)
         markovrun.set_step(step)
 

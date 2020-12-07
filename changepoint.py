@@ -116,7 +116,7 @@ if cp_fortest >= 0:
 runcps = randentropymod.changepoint()
 
 try:
-    runcps.set_metacommunity (ms)
+    runcps.set_community (ms)
     runcps.set_num_of_bootstrap_iter (num_of_run)
     runcps.set_cp1_fortest (cp_fortest)
     runcps.set_cp2_fortest (cp_fortest_2)
