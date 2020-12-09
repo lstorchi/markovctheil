@@ -14,8 +14,8 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument("-m","--rmat-filename", help="Observed transition matrix filename", \
         type=str, required=True, dest="rmatfilename")
-parser.add_argument("-M", "--name-of-matrix", help="Name of the observed transition matrix (default: ms)", \
-        type=str, required=False, default="ms", dest="nameofmatrix")
+parser.add_argument("-M", "--name-of-matrix", help="Name of the observed transition matrix (default: ratings)", \
+        type=str, required=False, default="ratings", dest="nameofmatrix")
 parser.add_argument("-c", "--numof-cp", help="Number of change points 1, 2, 3 (default: 1)", \
         type=int, required=False, default=1, dest="numofcp")
 parser.add_argument("-o", "--output-file", help="Dumps all values (default: change.txt)", \
