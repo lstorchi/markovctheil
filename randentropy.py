@@ -32,10 +32,10 @@ if __name__ == "__main__" :
             type=int, required=False, default=37, dest="tprev")
     parser.add_argument("-n", "--max-run", help="Monte carlo iterations ", \
             type=int, required=True, dest="maxrun")
-    parser.add_argument("-M", "--name-of-matrix", help="Name of the observed transition matrix ", \
-            type=str, required=False, default="ms", dest="nameofmatrix")
-    parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix ", \
-            type=str, required=False, default="i_r", dest="nameofbpmatrix")
+    parser.add_argument("-M", "--name-of-matrix", help="Name of the observed transition matrix (default=ratings)", \
+            type=str, required=False, default="ratings", dest="nameofmatrix")
+    parser.add_argument("-B", "--name-of-bpmatrix", help="Name of the rewards matrix (default=interest_rates)", \
+            type=str, required=False, default="interest_rates", dest="nameofbpmatrix")
     parser.add_argument("-v", "--verbose", help="Increase output verbosity", \
             default=False, action="store_true")
     parser.add_argument("-i", "--time-inf", help="Runa the simulation using stationary distribution", \
