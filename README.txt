@@ -18,8 +18,8 @@ python randentropy.py
 
 Finally you'll find also a changepoint.py CLI
 
-Quick start, to perfom some test using the changepoint CLI you
-can use the input files in ./files specifically:
+Quick  start:  to  perform some test using the changepoint CLI 
+you can use the input files in ./files specifically:
 
 $ python3 changepoint.py -m ./files/sep_monthly.mat -c 1
 
