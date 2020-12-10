@@ -8,15 +8,34 @@ and Windows OS.
 
 To run the GUI:
 
-python markovc_qt.py 
+python randentropy_qt.py
 
 to run the GUI you may need to export QT_X11_NO_MITSHM=1
 
 to run the CLI:
 
-python markovc.py
+python randentropy.py
 
 Finally you'll find also a changepoint.py CLI
+
+Quick start, to perfom some test using the changepoint CLI you
+can use the input files in ./files specifically:
+
+$ python3 changepoint.py -m ./files/sep_monthly.mat -c 1
+
+you should  get  Change Point:  158  ( -320.0611462871186 ) as
+a result. Similarly you can run the same using the GUI.
+
+To  test the  randentropy CLI,  you  can  use tha same file as 
+before:
+
+$ python3 randentropy.py -m ./files/sep_monthly.mat \
+  -b ./files/sep_monthly.mat -s 0.25 -t 36 -n 1000 -v
+
+the sep_monthly.mat contains both  the  community as  well  as
+the  attributes   matrices.  The same  results can be obtained 
+using the GUI (i.e. randentropy_qt.py).
+
 Cite this as:
 
 D’Amico G, Scocchera S, Storchi L (2018b). “Financial risk distribution in European Union.”
