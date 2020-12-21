@@ -33,8 +33,9 @@ $ python3 randentropy.py -m ./files/sep_monthly.mat \
   -b ./files/sep_monthly.mat -s 0.25 -t 36 -n 1000 -v
 
 the sep_monthly.mat contains both  the  community as  well  as
-the  attributes   matrices.  The same  results can be obtained 
-using the GUI (i.e. randentropy_qt.py).
+the     attributes      matrices.    The     same      results 
+(i.e. entropy_1000.txt in thi case)  can be obtained using the 
+GUI (i.e. randentropy_qt.py).
 
 Cite this as:
 
