@@ -26,7 +26,7 @@ $ python3 changepoint.py -m ./files/sep_monthly.mat -c 1
 you should  get  Change Point:  158  ( -320.0611462871186 ) as
 a result. Similarly you can run the same using the GUI.
 
-To  test the  randentropy CLI,  you  can  use tha same file as 
+To  test the  randentropy CLI,  you  can  use the same file as 
 before:
 
 $ python3 randentropy.py -m ./files/sep_monthly.mat \
