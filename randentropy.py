@@ -42,7 +42,7 @@ if __name__ == "__main__" :
             default=False, action="store_true", dest="timeinf")
     parser.add_argument("-S", "--seed", help="Use a seed for the random generator", \
             default=False, action="store_true", dest="seed")
-    parser.add_argument("-c", "--use-copule", help="Use the copula based Markov reward", \
+    parser.add_argument("-c", "--use-copula", help="Use the copula based Markov reward", \
             default=False, action="store_true", dest="usecopula")
     
     if len(sys.argv) == 1:
