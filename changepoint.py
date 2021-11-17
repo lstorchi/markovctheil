@@ -75,7 +75,7 @@ if not(args.nameofmatrix in list(msd.keys())):
     print(list(msd.keys()))
     exit(1)
 
-ms = msd[args.nameofmatrix].astype(numpy.int)
+ms = msd[args.nameofmatrix].astype(numpy.int32)
 
 fp = open(args.outf, "w")
 
