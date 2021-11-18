@@ -26,6 +26,20 @@ $ python3 changepoint.py -m ./files/sep_monthly.mat -c 1
 you should  get  Change Point:  158  ( -320.0611462871186 ) as
 a result. Similarly you can run the same using the GUI.
 
+To use two change-points:
+
+$ python3 changepoint.py -m ./files/sep_monthly.mat -c 2 \
+	--cp2-start 50 --cp2-stop 157
+
+you should get the following results:
+
+Change Point:  73  ,  119  ( -311.1237648393643 )
+
+You can run also the Lambda test:
+
+$ python3 changepoint.py -m ./files/sep_monthly.mat -c 2 \
+	--perform-test "73;119;100"
+
 To  test the  randentropy CLI,  you  can  use the same file as 
 before:
 
