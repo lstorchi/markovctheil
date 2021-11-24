@@ -899,6 +899,11 @@ class changepoint:
         self.__lambdastart__ = None
         self.__pvalue__ = None
 
+        self.__bicvalues__ = None
+
+    def get_bicvalues (self):
+        return self.__bicvalues__
+
     def get_lambda95(self):
         return self.__lambda95__
 
@@ -1089,6 +1094,8 @@ class changepoint:
     
     def compute_cps (self, setval=None):
 
+        self.__bicvalues__ = None
+
         if setval != None:
             setval.setValue(0)
             setval.setLabelText("ChangePoint analysis")
@@ -1114,6 +1121,11 @@ class changepoint:
                 L, L1, L2, pr1, pr2 = self.__compute_cps__ (\
                         self.__community__, self.__cp_fortest_1__, True)
                 self.__lambdastart__ = 2.0*((L1+L2)-L)
+
+                #D = uni1q in  self.__community__ matrix values
+                #n = self.__community__.shape[0] * self.__community__.shape[1]
+                #self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * math.log(n) - 2.0 * (L1+L2) 
+
             elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
                 self.__compute_cps__ (self.__community__, \
