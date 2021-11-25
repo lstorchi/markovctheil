@@ -1134,9 +1134,6 @@ class changepoint:
                         self.__community__, self.__cp_fortest_1__, True)
                 self.__lambdastart__ = 2.0*((L1+L2)-L)
 
-                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
-                    math.log10(N) - 2.0 * (L1+L2) 
-
             elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
                 self.__compute_cps__ (self.__community__, \
@@ -1145,8 +1142,6 @@ class changepoint:
                 if (self.__verbose__):
                     print(L, L1, L2, L3)
 
-                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
-                    math.log10(N) - 2.0 * (L1+L2+L3) 
             elif self.__num_of_cps__ == 3:
                 L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
                         self.__compute_cps__ (self.__community__, \
@@ -1155,10 +1150,7 @@ class changepoint:
                 self.__lambdastart__ = 2.0*((L1+L2+L3+L4)-L)
                 if (self.__verbose__):
                     print(L, L1, L2, L3, L4)
-
-                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
-                    math.log10(N) - 2.0 * (L1+L2+L3+L4) 
-        
+       
             lambdas = []
         
             if (self.__verbose__):
@@ -1262,6 +1254,8 @@ class changepoint:
             
                     try:
                         L1, L2 = self.__compute_cps__ (self.__community__, c_p)
+                        self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                            math.log10(N) - 2.0 * (L1+L2) 
                     except Error:
                         raise Error ("Oops! error in the main function") 
             
@@ -1336,6 +1330,9 @@ class changepoint:
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
                                        self.__community__, c_p1, False, c_p2)
+                                
+                               self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                                    math.log10(N) - 2.0 * (L1+L2+L3) 
                            except Error:
                                raise Error ("Oops! error in the main function")
              
@@ -1426,6 +1423,8 @@ class changepoint:
                            try:
                                L1, L2, L3 = self.__compute_cps__ (\
                                        self.__community__, c_p1, False, c_p2)
+                               self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                                    math.log10(N) - 2.0 * (L1+L2+L3) 
                            except Error:
                                raise Error ("Oops! error in the main function") 
                    
@@ -1508,6 +1507,9 @@ class changepoint:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
                                            self.__community__, \
                                            c_p1, False, c_p2, c_p3)
+                                   self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                                        math.log10(N) - 2.0 * (L1+L2+L3+L4) 
+ 
                                except Error:
                                    raise Error ("Oops! error in the main function") 
                                
@@ -1619,6 +1621,9 @@ class changepoint:
                                    L1, L2, L3, L4 = self.__compute_cps__ (\
                                            self.__community__,  \
                                            c_p1, False, c_p2, c_p3)
+                                   self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                                        math.log10(N) - 2.0 * (L1+L2+L3+L4) 
+ 
                                except Error:
                                    raise Error ("Oops! error in the main function") 
              
