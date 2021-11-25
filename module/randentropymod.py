@@ -901,7 +901,7 @@ class changepoint:
 
         self.__bicvalues__ = None
 
-    def get_bicvalues (self):
+    def get_bicvalue (self):
         return self.__bicvalues__
 
     def get_lambda95(self):
@@ -1101,9 +1101,19 @@ class changepoint:
             setval.setLabelText("ChangePoint analysis")
 
         N = self.__community__.shape[0] * self.__community__.shape[1]
+
+        classet = set()
+        for i in range(self.__community__.shape[0]):
+            for j in range(self.__community__.shape[1]):
+                classet.add(self.__community__[i][j])
+        D = len(classet)
         
         rating = numpy.max(self.__community__)
         time = self.__community__.shape[1]
+
+        if D != rating:
+            if (self.__verbose__):
+                print("Internal check, warning")
         
         if self.__cp_fortest_1__ >= 0 and self.__num_of_bootstrap_iter__ >= 0:
         
@@ -1124,9 +1134,8 @@ class changepoint:
                         self.__community__, self.__cp_fortest_1__, True)
                 self.__lambdastart__ = 2.0*((L1+L2)-L)
 
-                #D = uni1q in  self.__community__ matrix values
-                #n = self.__community__.shape[0] * self.__community__.shape[1]
-                #self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * math.log(n) - 2.0 * (L1+L2) 
+                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                    math.log10(N) - 2.0 * (L1+L2) 
 
             elif self.__num_of_cps__ == 2:
                 L, L1, L2, L3, pr1, pr2, pr3 = \
@@ -1135,6 +1144,9 @@ class changepoint:
                 self.__lambdastart__ = 2.0*((L1+L2+L3)-L)
                 if (self.__verbose__):
                     print(L, L1, L2, L3)
+
+                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                    math.log10(N) - 2.0 * (L1+L2+L3) 
             elif self.__num_of_cps__ == 3:
                 L, L1, L2, L3, L4, pr1, pr2, pr3, pr4 = \
                         self.__compute_cps__ (self.__community__, \
@@ -1143,6 +1155,9 @@ class changepoint:
                 self.__lambdastart__ = 2.0*((L1+L2+L3+L4)-L)
                 if (self.__verbose__):
                     print(L, L1, L2, L3, L4)
+
+                self.__bicvalues__ = D * (D - 1)*(self.__num_of_cps__ + 1) * \
+                    math.log10(N) - 2.0 * (L1+L2+L3+L4) 
         
             lambdas = []
         
@@ -1197,8 +1212,8 @@ class changepoint:
         
             self.__lambda95__ = lambdas[idx95]
         
-            minrat = numpy.min(self.__community__)
-            maxrat = numpy.max(self.__community__)
+            #minrat = numpy.min(self.__community__)
+            #maxrat = numpy.max(self.__community__)
         
             #ndof = (maxrat - minrat + 1) * (maxrat - minrat)
             #ndof = max (positive1, positive2)

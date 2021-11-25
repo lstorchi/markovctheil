@@ -131,6 +131,7 @@ try:
     runcps.set_file_pointer(fp)
 
     runcps.compute_cps ()
+    print("BIC: ", runcps.get_bicvalue())
 
 except randentropymod.Error as err:
     print("Oops! error in the main function") 
