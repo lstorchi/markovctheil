@@ -1099,6 +1099,8 @@ class changepoint:
         if setval != None:
             setval.setValue(0)
             setval.setLabelText("ChangePoint analysis")
+
+        N = self.__community__.shape[0] * self.__community__.shape[1]
         
         rating = numpy.max(self.__community__)
         time = self.__community__.shape[1]
