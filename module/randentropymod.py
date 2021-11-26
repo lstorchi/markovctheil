@@ -1574,22 +1574,22 @@ class changepoint:
             
                    if self.__cp2_start__ <= 0 or self.__cp2_start__ > time-1:
                        raise Error ("CP2 start invalid value")
-                  
+
                    if self.__cp2_stop__ < 0:
                        cp2stop = time-1
                    else:
                        cp2stop = self.__cp2_stop__
                   
                    if cp2stop <= self.__cp2_start__ or cp2stop > time-1:
-                       raise Error ("CP2 stop invalid value")
+                       raise Error ("CP2 stop invalid value ")
             
                    if self.__cp2_start__ <= self.__cp1_start__:
-                       raise Error ("CP2 start invalid value")
+                       raise Error ("CP2 start invalid value must be greater then CP1 start")
             
                    cp3stop = time-1
             
                    if self.__cp3_start__ <= 0 or self.__cp3_start__ > time-1:
-                       raise Error ("CP3 start invalid value")
+                       raise Error ("CP3 start invalid value ")
                   
                    if self.__cp3_stop__ < 0:
                        cp3stop = time-1
@@ -1597,10 +1597,10 @@ class changepoint:
                        cp3stop = self.__cp3_stop__
                   
                    if cp3stop <= self.__cp3_start__ or cp3stop > time-1:
-                       raise Error ("CP3 stop invalid value")
+                       raise Error ("CP3 stop invalid value ")
             
                    if self.__cp3_start__ <= self.__cp2_start__:
-                       raise Error ("CP3 start invalid value")
+                       raise Error ("CP3 start invalid value must be greater then CP2 start ")
              
                    tot = 0
                    for c_p1 in range(self.__cp1_start__, cp1stop):

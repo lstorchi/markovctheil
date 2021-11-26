@@ -53,6 +53,11 @@ if len(sys.argv) == 1:
 
 args = parser.parse_args()
 
+#print(args)
+#print(args.cp1start, args.cp1stop)
+#print(args.cp2start, args.cp2stop)
+#print(args.cp3start, args.cp3stop)
+
 if not (os.path.isfile(args.rmatfilename)):
     print("File " + args.rmatfilename + " does not exist ")
     exit(1)

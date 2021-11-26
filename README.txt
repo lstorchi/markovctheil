@@ -8,13 +8,13 @@ and Windows OS.
 
 To run the GUI:
 
-python randentropy_qt.py
+$ python randentropy_qt.py
 
 to run the GUI you may need to export QT_X11_NO_MITSHM=1
 
 to run the CLI:
 
-python randentropy.py
+$ python randentropy.py
 
 Finally you'll find also a changepoint.py CLI
 
